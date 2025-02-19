@@ -3,7 +3,7 @@ import bernardo from '../../imgs/1736527234906.jpeg'
 
 const AboutMe = () => {
   return (
-    <div className="flex justify-center items-center h-screen overflow-hidden bg-[#121212]">
+    <div className="flex justify-center items-center min-h-screen">
     <div className="max-w-4xl w-full mx-4">
       <div className="bg-[#1a1a1a] rounded-2xl shadow-xl overflow-hidden border border-[#2a2a2a]">
         <div className="md:flex h-full">
