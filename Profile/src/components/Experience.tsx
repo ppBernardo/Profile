@@ -3,9 +3,9 @@ import React from 'react';
 const Experience = () => {
   const experiences = [
     {
-      company: 'Mais Dados',
+      company: 'Mais Distribuidora',
       role: 'Analista de desenvolvimento de Sistemas',
-      period: 'Mai 2024 - Presente',
+      period: 'Mai 2024 - Abr 2025',
       description: [
         `Atualmente, atuo como Analista de Desenvolvedor de Sistemas, com foco em soluções eficientes e inovadoras. Tenho sólida experiência em Banco de Dados Oracle, administração de redes utilizando Mikrotik, além de desenvolvimento em C# e .NET Framework. No meu dia a dia, estou sempre buscando novas formas de otimizar processos e aprimorar minhas habilidades técnicas, contribuindo diretamente para a evolução dos projetos em que atuo e para o crescimento da empresa.\nAlém disso, desenvolvi sites utilizando React, garantindo interfaces modernas, responsivas e de alta performance, bem como APIs robustas em ASP.NET, que facilitam a integração entre sistemas e melhoram a eficiência operacional. Essas soluções têm sido fundamentais para impulsionar a produtividade e a inovação dentro da empresa.`,
       ],
