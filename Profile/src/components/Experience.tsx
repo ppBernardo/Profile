@@ -120,18 +120,18 @@ const Experience = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800 py-8">
-      <div className="max-w-6xl w-full mx-4">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-800 py-4">
+      <div className="max-w-4xl w-full mx-4">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-500/20 to-purple-600/20 rounded-full border border-purple-500/30 mb-4">
-            <div className="w-2 h-2 bg-purple-400 rounded-full mr-2 animate-pulse"></div>
-            <span className="text-sm font-semibold text-purple-400 tracking-wide">Experiência Profissional</span>
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-purple-500/20 to-purple-600/20 rounded-full border border-purple-500/30 mb-3">
+            <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mr-2 animate-pulse"></div>
+            <span className="text-xs font-semibold text-purple-400 tracking-wide">Experiência Profissional</span>
           </div>
-          <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-white via-purple-100 to-purple-300 bg-clip-text text-transparent mb-4">
+          <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white via-purple-100 to-purple-300 bg-clip-text text-transparent mb-3">
             Minha Jornada
           </h1>
-          <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-300 max-w-xl mx-auto">
             Trajetória profissional em desenvolvimento de software, construindo soluções inovadoras e impactantes
           </p>
         </div>
@@ -141,7 +141,7 @@ const Experience = () => {
           {/* Timeline Line */}
           <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500 via-blue-500 to-green-500 opacity-30"></div>
           
-          <div className="space-y-12">
+          <div className="space-y-8">
             {experiences.map((exp, index) => {
               const colors = getColorClasses(exp.color);
               return (
@@ -154,16 +154,16 @@ const Experience = () => {
                   <div className={`absolute left-6 w-4 h-4 ${colors.iconBg} rounded-full border-2 border-white shadow-lg z-10`}></div>
                   
                   {/* Experience Card */}
-                  <div className="ml-16 bg-gradient-to-r from-gray-800/90 to-gray-900/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 lg:p-10 border border-gray-700/50 hover:border-gray-600/50 transition-all duration-500 group">
+                  <div className="ml-16 bg-gradient-to-r from-gray-800/90 to-gray-900/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 lg:p-8 border border-gray-700/50 hover:border-gray-600/50 transition-all duration-500 group">
                     {/* Header */}
-                    <div className="flex flex-col lg:flex-row lg:items-start justify-between mb-6">
-                      <div className="flex items-start space-x-4 mb-4 lg:mb-0">
-                        <div className={`w-14 h-14 bg-gradient-to-r ${colors.gradient} rounded-2xl flex items-center justify-center border ${colors.border} shadow-lg ${colors.shadow}`}>
-                          <exp.icon size={28} className={colors.text} />
+                    <div className="flex flex-col lg:flex-row lg:items-start justify-between mb-4">
+                      <div className="flex items-start space-x-3 mb-3 lg:mb-0">
+                        <div className={`w-12 h-12 bg-gradient-to-r ${colors.gradient} rounded-xl flex items-center justify-center border ${colors.border} shadow-lg ${colors.shadow}`}>
+                          <exp.icon size={24} className={colors.text} />
                         </div>
                         <div>
-                          <h3 className="text-2xl lg:text-3xl font-bold text-white mb-1">{exp.company}</h3>
-                          <p className={`text-lg font-semibold ${colors.text} mb-2`}>{exp.role}</p>
+                          <h3 className="text-xl lg:text-2xl font-bold text-white mb-1">{exp.company}</h3>
+                          <p className={`text-base font-semibold ${colors.text} mb-2`}>{exp.role}</p>
                           <div className="flex flex-wrap gap-2">
                             <span className={`px-3 py-1 rounded-full text-xs font-medium ${colors.badge} border`}>
                               {exp.type}
@@ -191,29 +191,29 @@ const Experience = () => {
                     </div>
 
                     {/* Description */}
-                    <div className="mb-8">
-                      <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
-                        <Briefcase size={20} className="mr-2 text-purple-400" />
+                    <div className="mb-6">
+                      <h4 className="text-base font-semibold text-white mb-3 flex items-center">
+                        <Briefcase size={16} className="mr-2 text-purple-400" />
                         Responsabilidades
                       </h4>
-                      <div className="space-y-3">
+                      <div className="space-y-2">
                         {exp.description.map((item, i) => (
-                          <p key={i} className="text-gray-300 leading-relaxed">{item}</p>
+                          <p key={i} className="text-gray-300 leading-relaxed text-sm">{item}</p>
                         ))}
                       </div>
                     </div>
 
                     {/* Achievements */}
-                    <div className="mb-8">
-                      <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
-                        <Zap size={20} className="mr-2 text-yellow-400" />
+                    <div className="mb-6">
+                      <h4 className="text-base font-semibold text-white mb-3 flex items-center">
+                        <Zap size={16} className="mr-2 text-yellow-400" />
                         Principais Contribuições
                       </h4>
-                      <ul className="space-y-2">
+                      <ul className="space-y-1.5">
                         {exp.achievements.map((achievement, i) => (
-                          <li key={i} className="flex items-start space-x-3">
-                            <div className={`w-2 h-2 rounded-full ${colors.iconBg} border ${colors.border} mt-2 flex-shrink-0`}></div>
-                            <span className="text-gray-300">{achievement}</span>
+                          <li key={i} className="flex items-start space-x-2">
+                            <div className={`w-1.5 h-1.5 rounded-full ${colors.iconBg} border ${colors.border} mt-1.5 flex-shrink-0`}></div>
+                            <span className="text-gray-300 text-sm">{achievement}</span>
                           </li>
                         ))}
                       </ul>
@@ -221,15 +221,15 @@ const Experience = () => {
 
                     {/* Technologies */}
                     <div>
-                      <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
-                        <Code2 size={20} className="mr-2 text-blue-400" />
+                      <h4 className="text-base font-semibold text-white mb-3 flex items-center">
+                        <Code2 size={16} className="mr-2 text-blue-400" />
                         Tecnologias
                       </h4>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-1.5">
                         {exp.technologies.map((tech, i) => (
                           <span 
                             key={i} 
-                            className="px-3 py-2 bg-gradient-to-r from-gray-700/50 to-gray-800/50 rounded-lg border border-gray-600/30 text-gray-300 text-sm font-medium hover:border-blue-500/50 transition-all duration-300"
+                            className="px-2 py-1 bg-gradient-to-r from-gray-700/50 to-gray-800/50 rounded-md border border-gray-600/30 text-gray-300 text-xs font-medium hover:border-blue-500/50 transition-all duration-300"
                           >
                             {tech}
                           </span>
@@ -244,22 +244,22 @@ const Experience = () => {
         </div>
 
         {/* Bottom Stats */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 backdrop-blur-sm rounded-2xl p-6 border border-blue-500/20 text-center">
-            <div className="text-3xl font-bold text-blue-400 mb-2">3</div>
-            <div className="text-gray-300 font-medium">Empresas</div>
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 backdrop-blur-sm rounded-xl p-4 border border-blue-500/20 text-center">
+            <div className="text-2xl font-bold text-blue-400 mb-1">3</div>
+            <div className="text-gray-300 text-sm font-medium">Empresas</div>
           </div>
-          <div className="bg-gradient-to-r from-green-500/10 to-green-600/10 backdrop-blur-sm rounded-2xl p-6 border border-green-500/20 text-center">
-            <div className="text-3xl font-bold text-green-400 mb-2">4+</div>
-            <div className="text-gray-300 font-medium">Anos de Experiência</div>
+          <div className="bg-gradient-to-r from-green-500/10 to-green-600/10 backdrop-blur-sm rounded-xl p-4 border border-green-500/20 text-center">
+            <div className="text-2xl font-bold text-green-400 mb-1">4+</div>
+            <div className="text-gray-300 text-sm font-medium">Anos de Experiência</div>
           </div>
-          <div className="bg-gradient-to-r from-purple-500/10 to-purple-600/10 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/20 text-center">
-            <div className="text-3xl font-bold text-purple-400 mb-2">Full Stack</div>
-            <div className="text-gray-300 font-medium">Especialização</div>
+          <div className="bg-gradient-to-r from-purple-500/10 to-purple-600/10 backdrop-blur-sm rounded-xl p-4 border border-purple-500/20 text-center">
+            <div className="text-2xl font-bold text-purple-400 mb-1">Full Stack</div>
+            <div className="text-gray-300 text-sm font-medium">Especialização</div>
           </div>
-          <div className="bg-gradient-to-r from-yellow-500/10 to-yellow-600/10 backdrop-blur-sm rounded-2xl p-6 border border-yellow-500/20 text-center">
-            <div className="text-3xl font-bold text-yellow-400 mb-2">15+</div>
-            <div className="text-gray-300 font-medium">Tecnologias</div>
+          <div className="bg-gradient-to-r from-yellow-500/10 to-yellow-600/10 backdrop-blur-sm rounded-xl p-4 border border-yellow-500/20 text-center">
+            <div className="text-2xl font-bold text-yellow-400 mb-1">15+</div>
+            <div className="text-gray-300 text-sm font-medium">Tecnologias</div>
           </div>
         </div>
       </div>

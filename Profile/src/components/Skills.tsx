@@ -83,69 +83,69 @@ const Skills = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 via-green-900 to-gray-800 py-8">
-      <div className="max-w-6xl w-full mx-4">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 via-green-900 to-gray-800 py-4">
+      <div className="max-w-4xl w-full mx-4">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-500/20 to-green-600/20 rounded-full border border-green-500/30 mb-4">
-            <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
-            <span className="text-sm font-semibold text-green-400 tracking-wide">Competências Técnicas</span>
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-green-500/20 to-green-600/20 rounded-full border border-green-500/30 mb-3">
+            <div className="w-1.5 h-1.5 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+            <span className="text-xs font-semibold text-green-400 tracking-wide">Competências Técnicas</span>
           </div>
-          <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-white via-green-100 to-green-300 bg-clip-text text-transparent mb-4">
+          <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white via-green-100 to-green-300 bg-clip-text text-transparent mb-3">
             Minhas Habilidades
           </h1>
-          <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-300 max-w-xl mx-auto">
             Conhecimentos técnicos e ferramentas que domino para criar soluções inovadoras e eficientes
           </p>
         </div>
 
         {/* Skills Grid */}
-        <div className="grid gap-8 lg:gap-12">
+        <div className="grid gap-6 lg:gap-8">
           {skills.map((category, categoryIndex) => {
             const colors = getColorClasses(category.color);
             return (
               <div 
                 key={category.category} 
-                className="bg-gradient-to-r from-gray-800/90 to-gray-900/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 lg:p-10 border border-gray-700/50 hover:border-gray-600/50 transition-all duration-500 group"
+                className="bg-gradient-to-r from-gray-800/90 to-gray-900/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 lg:p-8 border border-gray-700/50 hover:border-gray-600/50 transition-all duration-500 group"
                 style={{ animationDelay: `${categoryIndex * 200}ms` }}
               >
                 {/* Category Header */}
-                <div className="flex items-center mb-8">
-                  <div className={`w-14 h-14 bg-gradient-to-r ${colors.gradient} rounded-2xl flex items-center justify-center mr-4 border ${colors.border} shadow-lg ${colors.shadow}`}>
-                    <category.icon size={28} className={colors.text} />
+                <div className="flex items-center mb-6">
+                  <div className={`w-12 h-12 bg-gradient-to-r ${colors.gradient} rounded-xl flex items-center justify-center mr-3 border ${colors.border} shadow-lg ${colors.shadow}`}>
+                    <category.icon size={24} className={colors.text} />
                   </div>
                   <div>
-                    <h2 className="text-3xl font-bold text-white mb-2">{category.category}</h2>
-                    <div className="w-16 h-1 bg-gradient-to-r from-gray-600 to-gray-400 rounded-full"></div>
+                    <h2 className="text-2xl font-bold text-white mb-1">{category.category}</h2>
+                    <div className="w-12 h-0.5 bg-gradient-to-r from-gray-600 to-gray-400 rounded-full"></div>
                   </div>
                 </div>
 
                 {/* Skills List */}
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {category.items.map((skill, skillIndex) => (
                     <div 
                       key={skill.name}
                       className="group/skill"
                       style={{ animationDelay: `${(categoryIndex * 200) + (skillIndex * 100)}ms` }}
                     >
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center space-x-3">
-                          <div className={`p-2 rounded-lg ${colors.iconBg} border ${colors.border}`}>
-                            <skill.icon size={16} className={colors.text} />
-                          </div>
-                          <span className="text-gray-200 font-semibold text-lg">{skill.name}</span>
-                        </div>
+                      <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2">
-                          <span className={`text-sm font-bold ${colors.text}`}>{skill.level}%</span>
-                          <div className={`w-2 h-2 rounded-full ${skill.level >= 90 ? 'bg-green-400' : skill.level >= 70 ? 'bg-yellow-400' : 'bg-red-400'} animate-pulse`}></div>
+                          <div className={`p-1.5 rounded-md ${colors.iconBg} border ${colors.border}`}>
+                            <skill.icon size={14} className={colors.text} />
+                          </div>
+                          <span className="text-gray-200 font-semibold">{skill.name}</span>
+                        </div>
+                        <div className="flex items-center space-x-1.5">
+                          <span className={`text-xs font-bold ${colors.text}`}>{skill.level}%</span>
+                          <div className={`w-1.5 h-1.5 rounded-full ${skill.level >= 90 ? 'bg-green-400' : skill.level >= 70 ? 'bg-yellow-400' : 'bg-red-400'} animate-pulse`}></div>
                         </div>
                       </div>
                       
                       {/* Progress Bar */}
                       <div className="relative">
-                        <div className="w-full bg-gray-700/50 rounded-full h-3 overflow-hidden">
+                        <div className="w-full bg-gray-700/50 rounded-full h-2 overflow-hidden">
                           <div
-                            className={`bg-gradient-to-r ${colors.bar} h-3 rounded-full transition-all duration-1000 ease-out group-hover/skill:shadow-lg group-hover/skill:shadow-blue-500/25`}
+                            className={`bg-gradient-to-r ${colors.bar} h-2 rounded-full transition-all duration-1000 ease-out group-hover/skill:shadow-lg group-hover/skill:shadow-blue-500/25`}
                             style={{ 
                               width: `${skill.level}%`,
                               animationDelay: `${(categoryIndex * 200) + (skillIndex * 100) + 500}ms`
@@ -157,8 +157,8 @@ const Skills = () => {
                         
                         {/* Skill Level Indicator */}
                         <div 
-                          className={`absolute top-1/2 transform -translate-y-1/2 w-1 h-1 bg-white rounded-full shadow-lg transition-all duration-300`}
-                          style={{ left: `calc(${skill.level}% - 2px)` }}
+                          className={`absolute top-1/2 transform -translate-y-1/2 w-0.5 h-0.5 bg-white rounded-full shadow-lg transition-all duration-300`}
+                          style={{ left: `calc(${skill.level}% - 1px)` }}
                         ></div>
                       </div>
                     </div>
@@ -170,18 +170,18 @@ const Skills = () => {
         </div>
 
         {/* Bottom Stats */}
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 backdrop-blur-sm rounded-2xl p-6 border border-blue-500/20 text-center">
-            <div className="text-3xl font-bold text-blue-400 mb-2">16</div>
-            <div className="text-gray-300 font-medium">Tecnologias</div>
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 backdrop-blur-sm rounded-xl p-4 border border-blue-500/20 text-center">
+            <div className="text-2xl font-bold text-blue-400 mb-1">16</div>
+            <div className="text-gray-300 text-sm font-medium">Tecnologias</div>
           </div>
-          <div className="bg-gradient-to-r from-green-500/10 to-green-600/10 backdrop-blur-sm rounded-2xl p-6 border border-green-500/20 text-center">
-            <div className="text-3xl font-bold text-green-400 mb-2">4+</div>
-            <div className="text-gray-300 font-medium">Anos de Experiência</div>
+          <div className="bg-gradient-to-r from-green-500/10 to-green-600/10 backdrop-blur-sm rounded-xl p-4 border border-green-500/20 text-center">
+            <div className="text-2xl font-bold text-green-400 mb-1">4+</div>
+            <div className="text-gray-300 text-sm font-medium">Anos de Experiência</div>
           </div>
-          <div className="bg-gradient-to-r from-purple-500/10 to-purple-600/10 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/20 text-center">
-            <div className="text-3xl font-bold text-purple-400 mb-2">85%</div>
-            <div className="text-gray-300 font-medium">Nível Médio</div>
+          <div className="bg-gradient-to-r from-purple-500/10 to-purple-600/10 backdrop-blur-sm rounded-xl p-4 border border-purple-500/20 text-center">
+            <div className="text-2xl font-bold text-purple-400 mb-1">85%</div>
+            <div className="text-gray-300 text-sm font-medium">Nível Médio</div>
           </div>
         </div>
       </div>
