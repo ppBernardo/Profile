@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { Menu, X, Code2, User2, Briefcase, ChevronRight, Github, Linkedin, Instagram } from 'lucide-react';
+import { Menu, X, Code2, User2, Briefcase, ChevronRight, Github, Linkedin, Instagram, Sun, Moon, Monitor } from 'lucide-react';
 import AboutMe from './components/AboutMe';
 import Skills from './components/Skills';
 import Experience from './components/Experience';
+import { useTheme } from './hooks/useTheme';
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('about');
+  const { theme, changeTheme, isDark } = useTheme();
 
   const navigation = [
     { name: 'Sobre Mim', id: 'about', icon: User2, color: 'blue' },
@@ -27,53 +29,59 @@ function App() {
     }
   };
 
-  const getColorClasses = (color: string, isActive: boolean) => {
-    if (!isActive) return 'text-gray-300 hover:bg-gray-800/50 hover:text-white';
-    
-    switch (color) {
-      case 'blue':
-        return 'bg-gradient-to-r from-blue-500/20 to-blue-600/20 text-blue-400 border border-blue-500/30 shadow-lg shadow-blue-500/10';
-      case 'green':
-        return 'bg-gradient-to-r from-green-500/20 to-green-600/20 text-green-400 border border-green-500/30 shadow-lg shadow-green-500/10';
-      case 'purple':
-        return 'bg-gradient-to-r from-purple-500/20 to-purple-600/20 text-purple-400 border border-purple-500/30 shadow-lg shadow-purple-500/10';
+  const getColorClasses = (isActive: boolean) => {
+    if (isActive) {
+      return 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-l-4 border-blue-600 dark:border-blue-400';
+    }
+    return 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100';
+  };
+
+  const getThemeIcon = () => {
+    switch (theme) {
+      case 'light':
+        return <Sun size={18} />;
+      case 'dark':
+        return <Moon size={18} />;
       default:
-        return 'bg-gradient-to-r from-blue-500/20 to-blue-600/20 text-blue-400 border border-blue-500/30 shadow-lg shadow-blue-500/10';
+        return <Monitor size={18} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-gray-800">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {/* Mobile menu button */}
       <button
         onClick={() => setIsMenuOpen(!isMenuOpen)}
-        className="fixed top-4 right-4 z-50 p-3 rounded-xl bg-gradient-to-r from-gray-800/90 to-gray-900/90 backdrop-blur-sm shadow-xl border border-gray-700/50 md:hidden text-gray-200 hover:text-white hover:border-blue-500/50 transition-all duration-300"
+        className="fixed top-6 right-6 z-50 p-3 rounded-lg bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 md:hidden text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:shadow-xl transition-all duration-200"
       >
-        {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
       </button>
 
       {/* Sidebar */}
       <div
         className={`fixed inset-y-0 left-0 transform ${
           isMenuOpen ? 'translate-x-0' : '-translate-x-full'
-        } md:translate-x-0 transition duration-300 ease-in-out z-30 w-72 bg-gradient-to-b from-gray-800/95 to-gray-900/95 backdrop-blur-sm shadow-2xl border-r border-gray-700/50`}
+        } md:translate-x-0 transition duration-300 ease-in-out z-30 w-80 bg-white dark:bg-gray-800 shadow-xl border-r border-gray-200 dark:border-gray-700`}
       >
         <div className="h-full flex flex-col">
           {/* Header */}
-          <div className="p-6 border-b border-gray-700/30">
+          <div className="p-8 border-b border-gray-100 dark:border-gray-700">
             <div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                Portfólio
+              <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                Bernardo Pereira
               </h1>
-              <p className="text-xs text-gray-400 font-medium">Bernardo Pereira</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Desenvolvedor Full Stack</p>
+              <div className="mt-2 flex items-center space-x-2">
+                <div className={`w-2 h-2 rounded-full ${isDark ? 'bg-blue-400' : 'bg-yellow-400'}`}></div>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {theme === 'system' ? 'Sistema' : isDark ? 'Escuro' : 'Claro'}
+                </span>
+              </div>
             </div>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-3">
-            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4 px-3">
-              Navegação
-            </div>
+          <nav className="flex-1 px-6 py-6 space-y-2">
             {navigation.map((item) => (
               <button
                 key={item.id}
@@ -81,60 +89,95 @@ function App() {
                   setActiveSection(item.id);
                   setIsMenuOpen(false);
                 }}
-                className={`w-full flex items-center space-x-3 px-4 py-4 rounded-xl transition-all duration-300 group relative overflow-hidden ${
-                  getColorClasses(item.color, activeSection === item.id)
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                  getColorClasses(activeSection === item.id)
                 }`}
               >
-                <div className={`p-2 rounded-lg ${
-                  activeSection === item.id 
-                    ? 'bg-white/10' 
-                    : 'bg-gray-700/50 group-hover:bg-gray-600/50'
-                } transition-all duration-300`}>
-                  <item.icon size={18} />
-                </div>
+                <item.icon size={20} className="flex-shrink-0" />
                 <span className="font-medium flex-1 text-left">{item.name}</span>
                 {activeSection === item.id && (
-                  <div className="flex items-center space-x-1">
-                    <div className="w-2 h-2 bg-current rounded-full animate-pulse"></div>
-                    <ChevronRight size={16} />
-                  </div>
+                  <ChevronRight size={16} className="text-blue-600 dark:text-blue-400" />
                 )}
-                
-                {/* Hover effect background */}
-                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </button>
             ))}
           </nav>
 
+          {/* Theme Toggle */}
+          <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Tema</span>
+                <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                  {theme === 'system' ? 'Sistema' : theme === 'light' ? 'Claro' : 'Escuro'}
+                </div>
+              </div>
+              <div className="flex rounded-lg bg-gray-100 dark:bg-gray-700 p-1 gap-1">
+                <button
+                  onClick={() => changeTheme('light')}
+                  className={`p-2 rounded-md transition-all duration-200 ${
+                    theme === 'light' 
+                      ? 'bg-white dark:bg-gray-600 shadow-sm text-yellow-600 dark:text-yellow-400' 
+                      : 'hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                  }`}
+                  title="Tema Claro"
+                >
+                  <Sun size={16} />
+                </button>
+                <button
+                  onClick={() => changeTheme('dark')}
+                  className={`p-2 rounded-md transition-all duration-200 ${
+                    theme === 'dark' 
+                      ? 'bg-white dark:bg-gray-600 shadow-sm text-blue-600 dark:text-blue-400' 
+                      : 'hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                  }`}
+                  title="Tema Escuro"
+                >
+                  <Moon size={16} />
+                </button>
+                <button
+                  onClick={() => changeTheme('system')}
+                  className={`p-2 rounded-md transition-all duration-200 ${
+                    theme === 'system' 
+                      ? 'bg-white dark:bg-gray-600 shadow-sm text-green-600 dark:text-green-400' 
+                      : 'hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                  }`}
+                  title="Tema do Sistema"
+                >
+                  <Monitor size={16} />
+                </button>
+              </div>
+            </div>
+          </div>
+
           {/* Social Links */}
-          <div className="p-6 border-t border-gray-700/30">
-            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
+          <div className="p-6 border-t border-gray-100 dark:border-gray-700">
+            <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3">
               Redes Sociais
             </div>
-            <div className="flex space-x-3 justify-center">
+            <div className="flex space-x-3">
               <a 
                 href="https://github.com/ppBernardo" 
-                className="group p-3 rounded-xl bg-gradient-to-r from-gray-700/50 to-gray-800/50 border border-gray-600/30 hover:border-blue-500/50 hover:bg-gradient-to-r hover:from-blue-500/20 hover:to-blue-600/20 transition-all duration-300" 
+                className="p-3 rounded-lg bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200" 
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Github size={20} className="text-gray-400 group-hover:text-blue-400 transition-colors duration-300" />
+                <Github size={18} className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100" />
               </a>
               <a 
                 href="https://www.linkedin.com/in/bernardo-pereira-b80a0924a/" 
-                className="group p-3 rounded-xl bg-gradient-to-r from-gray-700/50 to-gray-800/50 border border-gray-600/30 hover:border-blue-500/50 hover:bg-gradient-to-r hover:from-blue-500/20 hover:to-blue-600/20 transition-all duration-300" 
+                className="p-3 rounded-lg bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200" 
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Linkedin size={20} className="text-gray-400 group-hover:text-blue-400 transition-colors duration-300" />
+                <Linkedin size={18} className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100" />
               </a>
               <a 
                 href="https://www.instagram.com/bernard0pereira?igsh=MWduNm9pdmdtbjBqNw==" 
-                className="group p-3 rounded-xl bg-gradient-to-r from-gray-700/50 to-gray-800/50 border border-gray-600/30 hover:border-pink-500/50 hover:bg-gradient-to-r hover:from-pink-500/20 hover:to-pink-600/20 transition-all duration-300" 
+                className="p-3 rounded-lg bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200" 
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Instagram size={20} className="text-gray-400 group-hover:text-pink-400 transition-colors duration-300" />
+                <Instagram size={18} className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100" />
               </a>
             </div>
           </div>
@@ -142,7 +185,7 @@ function App() {
       </div>
 
       {/* Main content */}
-      <div className="md:pl-72">
+      <div className="md:pl-80">
         <main className="min-h-screen">{renderSection()}</main>
       </div>
     </div>
