@@ -75,59 +75,59 @@ const Skills = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-gray-900 py-8 transition-colors duration-300">
-      <div className="max-w-6xl w-full mx-4">
+    <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-gray-900 py-4 transition-colors duration-300">
+      <div className="max-w-4xl w-full mx-4">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center px-4 py-2 bg-blue-50 dark:bg-blue-900/30 rounded-full border border-blue-200 dark:border-blue-700 mb-4 transition-colors duration-300">
-            <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Competências Técnicas</span>
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 rounded-full border border-blue-200 dark:border-blue-700 mb-3 transition-colors duration-300">
+            <span className="text-xs font-medium text-blue-700 dark:text-blue-300">Competências Técnicas</span>
           </div>
-          <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4 transition-colors duration-300">
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3 transition-colors duration-300">
             Minhas Habilidades
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto text-lg transition-colors duration-300">
+          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto text-base transition-colors duration-300">
             Conhecimentos técnicos e ferramentas que domino para criar soluções inovadoras e eficientes
           </p>
         </div>
 
         {/* Skills Grid */}
-        <div className="grid gap-8">
+        <div className="grid gap-6">
           {skills.map((category, categoryIndex) => {
             const colors = getColorClasses(category.color);
             return (
               <div 
                 key={category.category} 
-                className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-200 dark:border-gray-700 transition-colors duration-300"
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 transition-colors duration-300"
               >
                 {/* Category Header */}
-                <div className="flex items-center mb-8">
-                  <div className={`w-12 h-12 ${colors.iconBg} rounded-xl flex items-center justify-center mr-4 transition-colors duration-300`}>
-                    <category.icon size={24} className={colors.iconColor} />
+                <div className="flex items-center mb-6">
+                  <div className={`w-10 h-10 ${colors.iconBg} rounded-lg flex items-center justify-center mr-3 transition-colors duration-300`}>
+                    <category.icon size={20} className={colors.iconColor} />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 transition-colors duration-300">{category.category}</h2>
-                    <div className="w-16 h-1 bg-gray-200 dark:bg-gray-600 rounded-full mt-2 transition-colors duration-300"></div>
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 transition-colors duration-300">{category.category}</h2>
+                    <div className="w-12 h-0.5 bg-gray-200 dark:bg-gray-600 rounded-full mt-1 transition-colors duration-300"></div>
                   </div>
                 </div>
 
                 {/* Skills List */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {category.items.map((skill, skillIndex) => (
-                    <div key={skill.name} className="space-y-3">
+                    <div key={skill.name} className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className={`p-2 rounded-lg ${colors.iconBg} transition-colors duration-300`}>
-                            <skill.icon size={16} className={colors.iconColor} />
+                        <div className="flex items-center space-x-2">
+                          <div className={`p-1.5 rounded-md ${colors.iconBg} transition-colors duration-300`}>
+                            <skill.icon size={14} className={colors.iconColor} />
                           </div>
-                          <span className="text-gray-900 dark:text-gray-100 font-medium transition-colors duration-300">{skill.name}</span>
+                          <span className="text-gray-900 dark:text-gray-100 font-medium text-sm transition-colors duration-300">{skill.name}</span>
                         </div>
-                        <span className={`text-sm font-semibold ${colors.text} transition-colors duration-300`}>{skill.level}%</span>
+                        <span className={`text-xs font-semibold ${colors.text} transition-colors duration-300`}>{skill.level}%</span>
                       </div>
                       
                       {/* Progress Bar */}
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 transition-colors duration-300">
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 transition-colors duration-300">
                         <div
-                          className={`${colors.bar} h-2 rounded-full transition-all duration-1000 ease-out`}
+                          className={`${colors.bar} h-1.5 rounded-full transition-all duration-1000 ease-out`}
                           style={{ width: `${skill.level}%` }}
                         ></div>
                       </div>
@@ -140,18 +140,18 @@ const Skills = () => {
         </div>
 
         {/* Bottom Stats */}
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
-            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2 transition-colors duration-300">16</div>
-            <div className="text-gray-600 dark:text-gray-300 font-medium transition-colors duration-300">Tecnologias</div>
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1 transition-colors duration-300">16</div>
+            <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">Tecnologias</div>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
-            <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2 transition-colors duration-300">4+</div>
-            <div className="text-gray-600 dark:text-gray-300 font-medium transition-colors duration-300">Anos de Experiência</div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-1 transition-colors duration-300">4+</div>
+            <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">Anos de Experiência</div>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
-            <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2 transition-colors duration-300">85%</div>
-            <div className="text-gray-600 dark:text-gray-300 font-medium transition-colors duration-300">Nível Médio</div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
+            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1 transition-colors duration-300">85%</div>
+            <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">Nível Médio</div>
           </div>
         </div>
       </div>

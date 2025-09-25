@@ -112,17 +112,17 @@ const Experience = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-gray-900 py-8 transition-colors duration-300">
-      <div className="max-w-6xl w-full mx-4">
+    <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-gray-900 py-4 transition-colors duration-300">
+      <div className="max-w-4xl w-full mx-4">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center px-4 py-2 bg-purple-50 dark:bg-purple-900/30 rounded-full border border-purple-200 dark:border-purple-700 mb-4 transition-colors duration-300">
-            <span className="text-sm font-medium text-purple-700 dark:text-purple-300">Experiência Profissional</span>
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center px-3 py-1.5 bg-purple-50 dark:bg-purple-900/30 rounded-full border border-purple-200 dark:border-purple-700 mb-3 transition-colors duration-300">
+            <span className="text-xs font-medium text-purple-700 dark:text-purple-300">Experiência Profissional</span>
           </div>
-          <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4 transition-colors duration-300">
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3 transition-colors duration-300">
             Minha Jornada
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto text-lg transition-colors duration-300">
+          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto text-base transition-colors duration-300">
             Trajetória profissional em desenvolvimento de software, construindo soluções inovadoras e impactantes
           </p>
         </div>
@@ -132,33 +132,33 @@ const Experience = () => {
           {/* Timeline Line */}
           <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gray-300 dark:bg-gray-600 transition-colors duration-300"></div>
           
-          <div className="space-y-8">
+          <div className="space-y-6">
             {experiences.map((exp, index) => {
               const colors = getColorClasses(exp.color);
               return (
                 <div key={index} className="relative">
                   {/* Timeline Dot */}
-                  <div className={`absolute left-6 w-4 h-4 ${colors.iconBg} rounded-full border-2 border-white dark:border-gray-800 shadow-lg z-10 transition-colors duration-300`}></div>
+                  <div className={`absolute left-6 w-3 h-3 ${colors.iconBg} rounded-full border-2 border-white dark:border-gray-800 shadow-lg z-10 transition-colors duration-300`}></div>
                   
                   {/* Experience Card */}
-                  <div className="ml-16 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-200 dark:border-gray-700 transition-colors duration-300">
+                  <div className="ml-12 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 transition-colors duration-300">
                     {/* Header */}
-                    <div className="flex flex-col lg:flex-row lg:items-start justify-between mb-6">
-                      <div className="flex items-start space-x-4 mb-4 lg:mb-0">
-                        <div className={`w-12 h-12 ${colors.iconBg} rounded-xl flex items-center justify-center transition-colors duration-300`}>
-                          <exp.icon size={24} className={colors.iconColor} />
+                    <div className="flex flex-col lg:flex-row lg:items-start justify-between mb-4">
+                      <div className="flex items-start space-x-3 mb-3 lg:mb-0">
+                        <div className={`w-10 h-10 ${colors.iconBg} rounded-lg flex items-center justify-center transition-colors duration-300`}>
+                          <exp.icon size={20} className={colors.iconColor} />
                         </div>
                         <div>
-                          <h3 className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1 transition-colors duration-300">{exp.company}</h3>
-                          <p className={`text-lg font-semibold ${colors.text} mb-3 transition-colors duration-300`}>{exp.role}</p>
-                          <div className="flex flex-wrap gap-2">
-                            <span className={`px-3 py-1 rounded-lg text-sm font-medium ${colors.badge} border transition-colors duration-300`}>
+                          <h3 className="text-lg lg:text-xl font-bold text-gray-900 dark:text-gray-100 mb-1 transition-colors duration-300">{exp.company}</h3>
+                          <p className={`text-base font-semibold ${colors.text} mb-2 transition-colors duration-300`}>{exp.role}</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            <span className={`px-2 py-1 rounded-md text-xs font-medium ${colors.badge} border transition-colors duration-300`}>
                               {exp.type}
                             </span>
-                            <span className="px-3 py-1 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 transition-colors duration-300">
+                            <span className="px-2 py-1 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 transition-colors duration-300">
                               {exp.mode}
                             </span>
-                            <span className="px-3 py-1 rounded-lg text-sm font-medium bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 text-yellow-700 dark:text-yellow-300 transition-colors duration-300">
+                            <span className="px-2 py-1 rounded-md text-xs font-medium bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 text-yellow-700 dark:text-yellow-300 transition-colors duration-300">
                               {exp.duration}
                             </span>
                           </div>
@@ -166,41 +166,41 @@ const Experience = () => {
                       </div>
                       
                       <div className="text-right">
-                        <div className="flex items-center text-gray-600 dark:text-gray-400 mb-2 transition-colors duration-300">
-                          <Calendar size={18} className="mr-2" />
-                          <span className="font-medium">{exp.period}</span>
+                        <div className="flex items-center text-gray-600 dark:text-gray-400 mb-1 transition-colors duration-300">
+                          <Calendar size={16} className="mr-1.5" />
+                          <span className="font-medium text-sm">{exp.period}</span>
                         </div>
                         <div className="flex items-center text-gray-600 dark:text-gray-400 transition-colors duration-300">
-                          <MapPin size={18} className="mr-2" />
-                          <span>{exp.location}</span>
+                          <MapPin size={16} className="mr-1.5" />
+                          <span className="text-sm">{exp.location}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Description */}
-                    <div className="mb-6">
-                      <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center transition-colors duration-300">
-                        <Briefcase size={18} className="mr-2 text-purple-600 dark:text-purple-400" />
+                    <div className="mb-4">
+                      <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center transition-colors duration-300">
+                        <Briefcase size={16} className="mr-2 text-purple-600 dark:text-purple-400" />
                         Responsabilidades
                       </h4>
-                      <div className="space-y-3">
+                      <div className="space-y-2">
                         {exp.description.map((item, i) => (
-                          <p key={i} className="text-gray-600 dark:text-gray-300 leading-relaxed transition-colors duration-300">{item}</p>
+                          <p key={i} className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm transition-colors duration-300">{item}</p>
                         ))}
                       </div>
                     </div>
 
                     {/* Achievements */}
-                    <div className="mb-6">
-                      <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center transition-colors duration-300">
-                        <Zap size={18} className="mr-2 text-yellow-600 dark:text-yellow-400" />
+                    <div className="mb-4">
+                      <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center transition-colors duration-300">
+                        <Zap size={16} className="mr-2 text-yellow-600 dark:text-yellow-400" />
                         Principais Contribuições
                       </h4>
-                      <ul className="space-y-2">
+                      <ul className="space-y-1.5">
                         {exp.achievements.map((achievement, i) => (
-                          <li key={i} className="flex items-start space-x-3">
-                            <div className={`w-2 h-2 rounded-full ${colors.iconBg} mt-2 flex-shrink-0 transition-colors duration-300`}></div>
-                            <span className="text-gray-600 dark:text-gray-300 transition-colors duration-300">{achievement}</span>
+                          <li key={i} className="flex items-start space-x-2">
+                            <div className={`w-1.5 h-1.5 rounded-full ${colors.iconBg} mt-2 flex-shrink-0 transition-colors duration-300`}></div>
+                            <span className="text-gray-600 dark:text-gray-300 text-sm transition-colors duration-300">{achievement}</span>
                           </li>
                         ))}
                       </ul>
@@ -208,15 +208,15 @@ const Experience = () => {
 
                     {/* Technologies */}
                     <div>
-                      <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center transition-colors duration-300">
-                        <Code2 size={18} className="mr-2 text-blue-600 dark:text-blue-400" />
+                      <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center transition-colors duration-300">
+                        <Code2 size={16} className="mr-2 text-blue-600 dark:text-blue-400" />
                         Tecnologias
                       </h4>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-1.5">
                         {exp.technologies.map((tech, i) => (
                           <span 
                             key={i} 
-                            className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium transition-colors duration-300"
+                            className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-xs font-medium transition-colors duration-300"
                           >
                             {tech}
                           </span>
@@ -231,22 +231,22 @@ const Experience = () => {
         </div>
 
         {/* Bottom Stats */}
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
-            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2 transition-colors duration-300">3</div>
-            <div className="text-gray-600 dark:text-gray-300 font-medium transition-colors duration-300">Empresas</div>
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1 transition-colors duration-300">3</div>
+            <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">Empresas</div>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
-            <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2 transition-colors duration-300">4+</div>
-            <div className="text-gray-600 dark:text-gray-300 font-medium transition-colors duration-300">Anos de Experiência</div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-1 transition-colors duration-300">4+</div>
+            <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">Anos de Experiência</div>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
-            <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2 transition-colors duration-300">Full Stack</div>
-            <div className="text-gray-600 dark:text-gray-300 font-medium transition-colors duration-300">Especialização</div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
+            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1 transition-colors duration-300">Full Stack</div>
+            <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">Especialização</div>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
-            <div className="text-3xl font-bold text-yellow-600 dark:text-yellow-400 mb-2 transition-colors duration-300">15+</div>
-            <div className="text-gray-600 dark:text-gray-300 font-medium transition-colors duration-300">Tecnologias</div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
+            <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400 mb-1 transition-colors duration-300">15+</div>
+            <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">Tecnologias</div>
           </div>
         </div>
       </div>
