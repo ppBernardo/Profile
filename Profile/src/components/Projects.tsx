@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { FolderGit2, Globe, Github, Code2 } from 'lucide-react';
 
 type Project = {
@@ -72,10 +73,15 @@ const Projects = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {projects.map((project) => (
-          <div
+        {projects.map((project, i) => (
+          <motion.div
             key={project.name}
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 flex flex-col justify-between transition-colors duração-300"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.45, delay: i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
+            whileHover={{ y: -6, transition: { duration: 0.2 } }}
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 flex flex-col justify-between transition-colors duration-300"
           >
             <div>
               <div className="flex items-center justify-between mb-3">
@@ -116,7 +122,7 @@ const Projects = () => {
                   {project.technologies.map((tech) => (
                     <span
                       key={tech}
-                      className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-xs font-medium transition-colors duração-300"
+                      className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-xs font-medium transition-colors duration-300"
                     >
                       {tech}
                     </span>
@@ -132,7 +138,7 @@ const Projects = () => {
                         href={project.demo}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center px-2.5 py-1.5 rounded-md text-xs font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-800/60 transition-colors duração-200"
+                        className="inline-flex items-center px-2.5 py-1.5 rounded-md text-xs font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-800/60 transition-colors duration-200"
                       >
                         <Globe size={14} className="mr-1.5" />
                         Site
@@ -143,7 +149,7 @@ const Projects = () => {
                         href={project.frontendRepo}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center px-2.5 py-1.5 rounded-md text-xs font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duração-200"
+                        className="inline-flex items-center px-2.5 py-1.5 rounded-md text-xs font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
                       >
                         <Github size={14} className="mr-1.5" />
                         Frontend
@@ -154,7 +160,7 @@ const Projects = () => {
                         href={project.backendRepo}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center px-2.5 py-1.5 rounded-md text-xs font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duração-200"
+                        className="inline-flex items-center px-2.5 py-1.5 rounded-md text-xs font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
                       >
                         <Github size={14} className="mr-1.5" />
                         Backend
@@ -164,35 +170,56 @@ const Projects = () => {
                 </div>
               )}
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 
       <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duração-300">
-          <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mb-1 transition-colors duração-300">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          whileHover={{ y: -4 }}
+          className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300"
+        >
+          <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mb-1 transition-colors duration-300">
             {projects.length}
           </div>
-          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duração-300">
+          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">
             Projetos Selecionados
           </div>
-        </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duração-300">
-          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1 transition-colors duração-300">
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4, delay: 0.16 }}
+          whileHover={{ y: -4 }}
+          className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300"
+        >
+          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1 transition-colors duration-300">
             Full Stack
           </div>
-          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duração-300">
+          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">
             Atuação Principal
           </div>
-        </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duração-300">
-          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1 transition-colors duração-300">
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4, delay: 0.22 }}
+          whileHover={{ y: -4 }}
+          className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300"
+        >
+          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1 transition-colors duration-300">
             Código Limpo
           </div>
-          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duração-300">
+          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">
             Foco em Boas Práticas
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

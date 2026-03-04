@@ -83,7 +83,7 @@ const Skills = () => {
         <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3 transition-colors duration-300">
           Minhas Habilidades
         </h1>
-        <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto text-base transition-colors duração-300">
+        <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto text-base transition-colors duration-300">
           Conhecimentos técnicos e ferramentas que domino para criar soluções inovadoras e eficientes
         </p>
       </div>
@@ -146,15 +146,15 @@ const Skills = () => {
             Tecnologias
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duração-300">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
           <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-1 transition-colors duration-300">4+</div>
-          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duração-300">
+          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">
             Anos de Experiência
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duração-300">
-          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1 transition-colors duração-300">85%</div>
-          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duração-300">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
+          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1 transition-colors duration-300">85%</div>
+          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">
             Nível Médio
           </div>
         </div>

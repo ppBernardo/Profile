@@ -181,7 +181,7 @@ const Experience = () => {
                       {exp.description.map((item, i) => (
                         <p
                           key={i}
-                          className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm transition-colors duração-300"
+                          className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm transition-colors duration-300"
                         >
                           {item}
                         </p>
@@ -190,7 +190,7 @@ const Experience = () => {
                   </div>
 
                   <div className="mb-4">
-                    <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center transition-colors duração-300">
+                    <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center transition-colors duration-300">
                       <Zap size={16} className="mr-2 text-yellow-600 dark:text-yellow-400" />
                       Principais Contribuições
                     </h4>
@@ -200,7 +200,7 @@ const Experience = () => {
                           <div
                             className={`w-1.5 h-1.5 rounded-full ${colors.iconBg} mt-2 flex-shrink-0 transition-colors duration-300`}
                           />
-                          <span className="text-gray-600 dark:text-gray-300 text-sm transition-colors duração-300">
+                          <span className="text-gray-600 dark:text-gray-300 text-sm transition-colors duration-300">
                             {achievement}
                           </span>
                         </li>
@@ -209,7 +209,7 @@ const Experience = () => {
                   </div>
 
                   <div>
-                    <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center transition-colors duração-300">
+                    <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center transition-colors duration-300">
                       <Code2 size={16} className="mr-2 text-blue-600 dark:text-blue-400" />
                       Tecnologias
                     </h4>
@@ -234,31 +234,31 @@ const Experience = () => {
       <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
           <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1 transition-colors duration-300">3</div>
-          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duração-300">
+          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">
             Empresas
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duração-300">
-          <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-1 transition-colors duração-300">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
+          <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-1 transition-colors duration-300">
             4+
           </div>
-          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duração-300">
+          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">
             Anos de Experiência
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duração-300">
-          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1 transition-colors duração-300">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
+          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1 transition-colors duration-300">
             Full Stack
           </div>
-          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duração-300">
+          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">
             Especialização
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duração-300">
-          <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400 mb-1 transition-colors duração-300">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
+          <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400 mb-1 transition-colors duration-300">
             15+
           </div>
-          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duração-300">
+          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">
             Tecnologias
           </div>
         </div>
