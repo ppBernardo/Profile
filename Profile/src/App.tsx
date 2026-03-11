@@ -1,42 +1,20 @@
+import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Code2, Briefcase, Github, Linkedin, Instagram, Sun, Moon, Monitor, FolderGit2 } from 'lucide-react';
+import { Github, Linkedin, Instagram, Menu } from 'lucide-react';
 import AboutMe from './components/AboutMe';
 import heroImage from '../imgs/1736527234906.jpeg';
+import MatrixBackground from './components/MatrixBackground';
+import ScrollFollowImage from './components/ScrollFollowImage';
 import Skills from './components/Skills';
 import Experience from './components/Experience';
 import Projects from './components/Projects';
-import { useTheme } from './hooks/useTheme';
-
-const container = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
-  },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
-  },
-};
-
-const sectionVariants = {
-  hidden: { opacity: 0, y: 32 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94], staggerChildren: 0.06, delayChildren: 0.1 },
-  },
-};
-
-const sectionItem = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0 },
-};
+import {
+  viewportDefault,
+  staggerContainer,
+  fadeUpItem,
+  scaleInItem,
+  sectionReveal,
+} from './utils/animations';
 
 const scrollToSection = (id: string) => {
   const element = document.getElementById(id);
@@ -44,340 +22,265 @@ const scrollToSection = (id: string) => {
   element.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
-const App = () => {
-  const { theme, changeTheme } = useTheme();
+const navLinks = [
+  { id: 'about', label: 'Sobre' },
+  { id: 'skills', label: 'Competências' },
+  { id: 'experience', label: 'Experiência' },
+  { id: 'projects', label: 'Projetos' },
+];
 
-  const getThemeIcon = () => {
-    switch (theme) {
-      case 'light':
-        return <Sun size={18} />;
-      case 'dark':
-        return <Moon size={18} />;
-      default:
-        return <Monitor size={18} />;
-    }
-  };
+const App = () => {
+  const aboutSectionRef = useRef<HTMLElement>(null);
+  const aboutSlotRef = useRef<HTMLDivElement>(null);
+  const [imageLanded, setImageLanded] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-50 transition-colors duration-300">
-      {/* Top navigation */}
+    <div className="min-h-screen text-gray-100 font-sans relative">
+      <MatrixBackground />
+      <div className="relative z-10 min-h-screen">
+      {/* Header – minimal, estilo Lando */}
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="sticky top-0 z-40 backdrop-blur-md bg-white/80 dark:bg-gray-900/80 border-b border-gray-200/70 dark:border-gray-800/70"
+        transition={{ duration: 0.4 }}
+        className="fixed top-0 left-0 right-0 z-50 bg-lando-bg/90 backdrop-blur-md border-b border-lando-border"
       >
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.98 }}
-              className="w-9 h-9 rounded-xl bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white font-semibold shadow-md shadow-blue-500/30"
-            >
-              BP
-            </motion.div>
-            <div>
-              <p className="text-sm font-semibold">Bernardo Pereira</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Desenvolvedor Full Stack</p>
-            </div>
-          </div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+          <button
+            onClick={() => scrollToSection('hero')}
+            className="flex items-center gap-2 text-lando-lime font-display text-xl tracking-wide hover:opacity-90 transition-opacity"
+          >
+            BP
+          </button>
 
-          <nav className="hidden md:flex items-center gap-4 text-sm">
-            {['about', 'skills', 'experience', 'projects'].map((id, i) => (
-              <motion.button
+          <nav className="hidden md:flex items-center gap-8">
+            {navLinks.map(({ id, label }) => (
+              <button
                 key={id}
                 onClick={() => scrollToSection(id)}
-                whileHover={{ y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                className="px-2 py-1 rounded-md text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                className="text-sm font-medium text-gray-400 hover:text-lando-lime transition-colors uppercase tracking-wider"
               >
-                {id === 'about' && 'Sobre'}
-                {id === 'skills' && 'Competências'}
-                {id === 'experience' && 'Experiência'}
-                {id === 'projects' && 'Projetos'}
-              </motion.button>
+                {label}
+              </button>
             ))}
           </nav>
 
-          <div className="flex items-center gap-3">
-            <div className="flex rounded-lg bg-gray-100 dark:bg-gray-800 p-0.5 gap-0.5">
-              <motion.button
-                onClick={() => changeTheme('light')}
-                whileTap={{ scale: 0.92 }}
-                className={`p-1.5 rounded-md transition-all duration-200 ${
-                  theme === 'light'
-                    ? 'bg-white dark:bg-gray-700 shadow-sm text-yellow-600 dark:text-yellow-400'
-                    : 'text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                }`}
-                title="Tema Claro"
-              >
-                <Sun size={14} />
-              </motion.button>
-              <motion.button
-                onClick={() => changeTheme('dark')}
-                whileTap={{ scale: 0.92 }}
-                className={`p-1.5 rounded-md transition-all duration-200 ${
-                  theme === 'dark'
-                    ? 'bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400'
-                    : 'text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                }`}
-                title="Tema Escuro"
-              >
-                <Moon size={14} />
-              </motion.button>
-              <motion.button
-                onClick={() => changeTheme('system')}
-                whileTap={{ scale: 0.92 }}
-                className={`p-1.5 rounded-md transition-all duration-200 ${
-                  theme === 'system'
-                    ? 'bg-white dark:bg-gray-700 shadow-sm text-green-600 dark:text-green-400'
-                    : 'text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                }`}
-                title="Tema do Sistema"
-              >
-                <Monitor size={14} />
-              </motion.button>
-            </div>
-
-            <div className="flex md:hidden items-center gap-2">{getThemeIcon()}</div>
-
-            <div className="hidden md:flex items-center gap-2">
-              <motion.a
-                href="https://github.com/ppBernardo"
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ scale: 1.1, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors"
-              >
-                <Github size={16} />
-              </motion.a>
-              <motion.a
-                href="https://www.linkedin.com/in/bernardo-pereira-b80a0924a/"
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ scale: 1.1, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors"
-              >
-                <Linkedin size={16} />
-              </motion.a>
-              <motion.a
-                href="https://www.instagram.com/bernard0pereira?igsh=MWduNm9pdmdtbjBqNw=="
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ scale: 1.1, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors"
-              >
-                <Instagram size={16} />
-              </motion.a>
-            </div>
+          <div className="flex items-center gap-4">
+            <a
+              href="https://github.com/ppBernardo"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 text-gray-400 hover:text-lando-lime transition-colors"
+              aria-label="GitHub"
+            >
+              <Github size={18} />
+            </a>
+            <a
+              href="https://www.linkedin.com/in/bernardo-pereira-b80a0924a/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 text-gray-400 hover:text-lando-lime transition-colors"
+              aria-label="LinkedIn"
+            >
+              <Linkedin size={18} />
+            </a>
+            <a
+              href="https://www.instagram.com/bernard0pereira?igsh=MWduNm9pdmdtbjBqNw=="
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 text-gray-400 hover:text-lando-lime transition-colors"
+              aria-label="Instagram"
+            >
+              <Instagram size={18} />
+            </a>
+            <button className="md:hidden p-2 text-gray-400 hover:text-lando-lime" aria-label="Menu">
+              <Menu size={20} />
+            </button>
           </div>
         </div>
       </motion.header>
 
-      {/* Hero - motion stagger estilo Lando Norris */}
-      <section className="relative overflow-hidden">
-        <div className="max-w-6xl mx-auto px-4 pt-14 pb-16 lg:pt-20 lg:pb-24 relative">
-          <div className="grid lg:grid-cols-[1fr,340px] gap-10 lg:gap-12 items-center">
+      {/* Hero – animação em sequência ao carregar (estilo Lando) */}
+      <section
+        id="hero"
+        className="min-h-screen flex flex-col justify-center px-4 sm:px-6 pt-20 pb-16 relative overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-lando-surface/50 to-transparent pointer-events-none" />
+        <div className="max-w-6xl mx-auto w-full relative">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <motion.div
-              className="space-y-6 order-2 lg:order-1"
-              variants={container}
+              className="space-y-6"
+              variants={staggerContainer}
               initial="hidden"
               animate="visible"
             >
-              <motion.div
-                variants={item}
-                className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 text-xs text-blue-700 dark:text-blue-300"
+              <motion.p
+                variants={fadeUpItem}
+                className="text-lando-lime text-sm uppercase tracking-[0.2em] font-medium"
               >
-                Desenvolvimento • Produtos Digitais • Full Stack
-              </motion.div>
+                Desenvolvedor Full Stack
+              </motion.p>
               <motion.h1
-                variants={item}
-                className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight"
+                variants={fadeUpItem}
+                className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white tracking-wide"
               >
-                Transformo ideias em{' '}
-                <span className="text-blue-600 dark:text-blue-400">produtos digitais</span> modernos, escaláveis e
-                prontos para crescer.
+                Bernardo Pereira
               </motion.h1>
               <motion.p
-                variants={item}
-                className="text-gray-600 dark:text-gray-300 text-base sm:text-lg max-w-2xl"
+                variants={fadeUpItem}
+                className="text-xl sm:text-2xl text-gray-400 max-w-xl leading-relaxed"
               >
-                Atuo como desenvolvedor full stack, unindo frontends performáticos em React e Angular com backends
-                robustos em .NET e Node.js, para criar soluções que realmente geram valor para o negócio.
+                Transformando ideias em <span className="text-lando-lime font-semibold">produtos digitais</span> —
+                frontends performáticos e backends robustos, entregando valor em cada projeto.
               </motion.p>
-              <motion.div variants={item} className="flex flex-wrap gap-3">
+              <motion.div variants={fadeUpItem} className="flex flex-wrap gap-4 pt-2">
                 <motion.button
                   onClick={() => scrollToSection('projects')}
-                  whileHover={{ scale: 1.03, boxShadow: '0 10px 40px -10px rgba(37, 99, 235, 0.4)' }}
-                  whileTap={{ scale: 0.98 }}
-                  className="inline-flex items-center px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium shadow-lg shadow-blue-500/30 transition-colors"
-                >
-                  <FolderGit2 size={16} className="mr-2" />
-                  Ver projetos em destaque
-                </motion.button>
-                <motion.a
-                  href="https://wa.me/5531999999999"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="inline-flex items-center px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 text-sm font-medium text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  className="px-6 py-3 bg-lando-lime text-lando-bg font-semibold text-sm uppercase tracking-wider hover:opacity-90 transition-opacity"
                 >
-                  Fale comigo
-                </motion.a>
+                  Ver projetos
+                </motion.button>
               </motion.div>
-              <motion.div variants={item} className="grid grid-cols-3 gap-4 max-w-md pt-2">
+              <motion.div
+                variants={staggerContainer}
+                className="grid grid-cols-3 gap-4 pt-6 max-w-md"
+              >
                 {[
-                  { label: 'Experiência', value: '4+ anos' },
-                  { label: 'Stack', value: 'React • .NET • Node' },
-                  { label: 'Foco', value: 'Produtos digitais' },
+                  { label: 'Experiência', value: '4+' },
+                  { label: 'Stack', value: 'React • .NET' },
+                  { label: 'Foco', value: 'Produtos' },
                 ].map((card) => (
                   <motion.div
                     key={card.label}
-                    whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                    className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-3"
+                    variants={scaleInItem}
+                    className="border border-lando-border rounded-lg p-3 bg-lando-surface/40"
                   >
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{card.label}</p>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">{card.value}</p>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider">{card.label}</p>
+                    <p className="text-lg font-semibold text-lando-lime">{card.value}</p>
                   </motion.div>
                 ))}
               </motion.div>
             </motion.div>
 
-            <motion.div
-              className="flex justify-center lg:justify-end order-1 lg:order-2"
-              initial={{ opacity: 0, scale: 0.95, x: 20 }}
-              animate={{ opacity: 1, scale: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-            >
-              <motion.div
-                whileHover={{ y: -8, transition: { duration: 0.25 } }}
-                className="relative w-full max-w-[280px] sm:max-w-[320px] lg:max-w-none lg:w-[340px] rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl"
-              >
-                <div className="aspect-[3/4] w-full">
-                  <img
-                    src={heroImage}
-                    alt="Bernardo Pereira"
-                    className="w-full h-full object-cover object-top"
-                  />
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
-                  <div className="flex items-center justify-between flex-wrap gap-2">
-                    <span className="text-sm font-medium text-white">Full Stack Developer</span>
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-500/90 text-white text-xs font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-white mr-1.5 animate-pulse" />
-                      Disponível
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
+            {/* Espaço onde a foto aparece no hero; a foto real está em ScrollFollowImage e segue o scroll */}
+            <div className="hidden lg:block w-full max-w-[280px] sm:max-w-[320px] lg:max-w-[380px] mx-auto lg:mx-0 lg:ml-auto aspect-[4/5]" aria-hidden />
           </div>
         </div>
       </section>
 
-      {/* About */}
+      {/* Foto única que se move do hero para a seção Sobre ao scrollar (estilo Lando – capacete) */}
+      <ScrollFollowImage
+        src={heroImage}
+        alt="Bernardo Pereira"
+        aboutSectionRef={aboutSectionRef}
+        aboutSlotRef={aboutSlotRef}
+        onLanded={setImageLanded}
+      />
+
+      {/* Sobre – slot da foto à esquerda (placeholder) + conteúdo à direita */}
       <motion.section
+        ref={aboutSectionRef}
         id="about"
-        className="max-w-6xl mx-auto px-4 py-10 sm:py-14"
+        className="py-20 sm:py-28 border-t border-lando-border"
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.15 }}
-        variants={sectionVariants}
+        viewport={viewportDefault}
+        variants={sectionReveal}
       >
-        <motion.div variants={sectionItem}>
-          <AboutMe />
-        </motion.div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Slot: foto “aterrissa” aqui ao scrollar; após land, mostra cópia estática */}
+            <div
+              ref={aboutSlotRef}
+              className="relative rounded-lg border border-lando-border aspect-[4/5] max-h-[480px] w-full overflow-hidden bg-lando-surface/40"
+              aria-hidden
+            >
+              {imageLanded && (
+                <>
+                  <img
+                    src={heroImage}
+                    alt="Bernardo Pereira"
+                    className="absolute inset-0 w-full h-full object-cover object-top"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-lando-bg to-transparent">
+                    <span className="text-sm font-medium text-lando-lime">Full Stack Developer</span>
+                    <span className="ml-2 text-xs text-gray-500">Disponível</span>
+                  </div>
+                </>
+              )}
+            </div>
+            <AboutMe />
+          </div>
+        </div>
       </motion.section>
 
-      {/* Skills */}
+      {/* Competências */}
       <motion.section
         id="skills"
-        className="max-w-6xl mx-auto px-4 py-10 sm:py-14"
+        className="py-20 sm:py-28 border-t border-lando-border"
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.15 }}
-        variants={sectionVariants}
+        viewport={viewportDefault}
+        variants={sectionReveal}
       >
-        <motion.div className="flex items-center gap-2 mb-4" variants={sectionItem}>
-          <div className="w-8 h-8 rounded-lg bg-blue-600/10 dark:bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400">
-            <Code2 size={18} />
-          </div>
-          <h2 className="text-xl sm:text-2xl font-semibold">Competências Técnicas</h2>
-        </motion.div>
-        <motion.div
-          variants={sectionItem}
-          className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg overflow-hidden"
-        >
-          <Skills />
-        </motion.div>
+        <Skills />
       </motion.section>
 
-      {/* Experience */}
+      {/* Experiência */}
       <motion.section
         id="experience"
-        className="max-w-6xl mx-auto px-4 py-10 sm:py-14"
+        className="py-20 sm:py-28 border-t border-lando-border"
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.15 }}
-        variants={sectionVariants}
+        viewport={viewportDefault}
+        variants={sectionReveal}
       >
-        <motion.div className="flex items-center gap-2 mb-4" variants={sectionItem}>
-          <div className="w-8 h-8 rounded-lg bg-purple-600/10 dark:bg-purple-500/10 flex items-center justify-center text-purple-600 dark:text-purple-400">
-            <Briefcase size={18} />
-          </div>
-          <h2 className="text-xl sm:text-2xl font-semibold">Experiência Profissional</h2>
-        </motion.div>
-        <motion.div
-          variants={sectionItem}
-          className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg overflow-hidden"
-        >
-          <Experience />
-        </motion.div>
+        <Experience />
       </motion.section>
 
-      {/* Projects */}
+      {/* Projetos */}
       <motion.section
         id="projects"
-        className="max-w-6xl mx-auto px-4 py-10 sm:py-16"
+        className="py-20 sm:py-28 border-t border-lando-border"
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.15 }}
-        variants={sectionVariants}
+        viewport={viewportDefault}
+        variants={sectionReveal}
       >
-        <motion.div className="flex items-center gap-2 mb-4" variants={sectionItem}>
-          <div className="w-8 h-8 rounded-lg bg-emerald-600/10 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-            <FolderGit2 size={18} />
-          </div>
-          <h2 className="text-xl sm:text-2xl font-semibold">Projetos em Destaque</h2>
-        </motion.div>
-        <motion.div
-          variants={sectionItem}
-          className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg overflow-hidden"
-        >
-          <Projects />
-        </motion.div>
+        <Projects />
       </motion.section>
 
       {/* Footer */}
       <motion.footer
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="border-t border-gray-200 dark:border-gray-800 mt-8"
+        className="border-t border-lando-border py-12"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.6 }}
       >
-        <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500 dark:text-gray-400">
-          <span>© {new Date().getFullYear()} Bernardo Pereira. Todos os direitos reservados.</span>
-          <span className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-            Aberto a oportunidades de trabalho e parcerias.
-          </span>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="font-display text-2xl sm:text-3xl text-lando-lime tracking-wide">
+            Sempre entregando resultado.
+          </p>
+          <div className="flex items-center gap-4 text-sm text-gray-500">
+            <a href="https://github.com/ppBernardo" target="_blank" rel="noopener noreferrer" className="hover:text-lando-lime transition-colors">
+              GitHub
+            </a>
+            <a href="https://www.linkedin.com/in/bernardo-pereira-b80a0924a/" target="_blank" rel="noopener noreferrer" className="hover:text-lando-lime transition-colors">
+              LinkedIn
+            </a>
+            <a href="https://www.instagram.com/bernard0pereira?igsh=MWduNm9pdmdtbjBqNw==" target="_blank" rel="noopener noreferrer" className="hover:text-lando-lime transition-colors">
+              Instagram
+            </a>
+          </div>
+        </div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-6 pt-6 border-t border-lando-border text-center text-xs text-gray-600">
+          © {new Date().getFullYear()} Bernardo Pereira. Todos os direitos reservados.
         </div>
       </motion.footer>
+      </div>
     </div>
   );
 };

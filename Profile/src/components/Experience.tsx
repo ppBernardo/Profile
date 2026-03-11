@@ -1,271 +1,252 @@
-import { Briefcase, MapPin, Calendar, Building2, Code2, Database, Zap } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { MapPin, Briefcase, Zap } from 'lucide-react';
+import { viewportDefault, staggerContainer, fadeUpItem, fadeLeftItem } from '../utils/animations';
+
+const experiences = [
+  {
+    year: '2025',
+    period: 'Abr 2025 - Atual',
+    company: 'ALTEROSA MK',
+    role: 'Full Stack Developer',
+    location: 'Contagem, MG',
+    duration: '9 meses',
+    type: 'Tempo integral',
+    mode: 'Presencial',
+    description: [
+      'Responsável pelo desenvolvimento completo de aplicações web, atuando tanto no back-end, com foco na criação de aplicações escaláveis em .NET, quanto no front-end, utilizando Angular 19+ para interfaces modernas e performáticas.',
+      'Desenvolvimento de APIs RESTful em .NET com boas práticas de arquitetura, segurança e integração com sistemas internos e externos.',
+      'Criação de workers em .NET para processamento assíncrono e automação de rotinas críticas.',
+    ],
+    achievements: [
+      'Desenvolvimento e manutenção de APIs e sistemas internos em .NET',
+      'Implementação de interfaces ricas com Angular 19+',
+      'Integração fluida entre front-end e back-end',
+    ],
+    technologies: ['Angular 19+', '.NET', 'APIs RESTful', 'Workers .NET', 'Standalone Components', 'Signals', 'C#'],
+  },
+  {
+    year: '2024',
+    period: 'Mai 2024 - Abr 2025',
+    company: 'Mais Distribuidora LTDA',
+    role: 'Analista de desenvolvimento de Sistemas',
+    location: 'Belo Horizonte, MG',
+    duration: '1 ano',
+    type: 'Tempo integral',
+    mode: 'Presencial',
+    description: [
+      'Atuação em soluções corporativas com foco em eficiência, integrando banco de dados Oracle, redes Mikrotik e sistemas em .NET.',
+      'Desenvolvimento de interfaces modernas em React e APIs robustas em ASP.NET para integração entre sistemas.',
+    ],
+    achievements: [
+      'Otimização de processos internos com automação e integração de sistemas',
+      'Administração de Banco de Dados Oracle e redes Mikrotik',
+    ],
+    technologies: ['C#', '.NET Framework', 'Oracle', 'Mikrotik', 'React', 'ASP.NET'],
+  },
+  {
+    year: '2022',
+    period: 'Nov 2022 - Jan 2023',
+    company: 'Mais Dados Digital',
+    role: 'Desenvolvedor Full Stack Trainee',
+    location: 'Belo Horizonte, MG',
+    duration: '3 meses',
+    type: 'Trainee',
+    mode: 'Híbrida',
+    description: [
+      'Participação em projetos de software do início ao fim, do desenvolvimento ao teste e implantação.',
+      'Contato direto com metodologias de desenvolvimento, resolução de problemas e otimização de desempenho.',
+    ],
+    achievements: [
+      'Suporte no desenvolvimento e teste de funcionalidades essenciais',
+      'Aprimoramento de habilidades de trabalho em equipe e boas práticas de código',
+    ],
+    technologies: ['SQL', 'Bitbucket', 'Desenvolvimento Full Stack'],
+  },
+];
 
 const Experience = () => {
-  const experiences = [
-    {
-      company: 'ALTEROSA MK',
-      role: 'Full Stack Developer',
-      period: 'Abr 2025 - Atual',
-      location: 'Contagem, MG',
-      type: 'Tempo integral',
-      mode: 'Presencial',
-      duration: '6 meses',
-      icon: Building2,
-      color: 'blue',
-      description: [
-        'Responsável pelo desenvolvimento completo de aplicações web, atuando tanto no back-end, com foco na criação de aplicações escaláveis em .NET, quanto no front-end, utilizando Angular 19+ para interfaces modernas e performáticas.',
-        'Desenvolvimento de APIs RESTful em .NET com boas práticas de arquitetura, segurança e integração com sistemas internos e externos.',
-        'Criação de workers em .NET para processamento assíncrono e automação de rotinas críticas.',
-      ],
-      achievements: [
-        'Desenvolvimento e manutenção de APIs e sistemas internos em .NET',
-        'Implementação de interfaces ricas com Angular 19+',
-        'Integração fluida entre front-end e back-end',
-      ],
-      technologies: ['Angular 19+', '.NET', 'APIs RESTful', 'Workers .NET', 'Standalone Components', 'Signals', 'C#'],
-    },
-    {
-      company: 'Mais Distribuidora LTDA',
-      role: 'Analista de desenvolvimento de Sistemas',
-      period: 'Mai 2024 - Abr 2025',
-      location: 'Belo Horizonte, MG',
-      type: 'Tempo integral',
-      mode: 'Presencial',
-      duration: '1 ano',
-      icon: Database,
-      color: 'green',
-      description: [
-        'Atuação em soluções corporativas com foco em eficiência, integrando banco de dados Oracle, redes Mikrotik e sistemas em .NET.',
-        'Desenvolvimento de interfaces modernas em React e APIs robustas em ASP.NET para integração entre sistemas.',
-      ],
-      achievements: [
-        'Otimização de processos internos com automação e integração de sistemas',
-        'Administração de Banco de Dados Oracle e redes Mikrotik',
-      ],
-      technologies: ['C#', '.NET Framework', 'Oracle', 'Mikrotik', 'React', 'ASP.NET'],
-    },
-    {
-      company: 'Mais Dados Digital',
-      role: 'Desenvolvedor Full Stack Trainee',
-      period: 'Nov 2022 - Jan 2023',
-      location: 'Belo Horizonte, MG',
-      type: 'Trainee',
-      mode: 'Híbrida',
-      duration: '3 meses',
-      icon: Code2,
-      color: 'purple',
-      description: [
-        'Participação em projetos de software do início ao fim, do desenvolvimento ao teste e implantação.',
-        'Contato direto com metodologias de desenvolvimento, resolução de problemas e otimização de desempenho.',
-      ],
-      achievements: [
-        'Suporte no desenvolvimento e teste de funcionalidades essenciais',
-        'Aprimoramento de habilidades de trabalho em equipe e boas práticas de código',
-      ],
-      technologies: ['SQL', 'Bitbucket', 'Desenvolvimento Full Stack'],
-    },
-  ];
-
-  const getColorClasses = (color: string) => {
-    switch (color) {
-      case 'blue':
-        return {
-          iconBg: 'bg-blue-100 dark:bg-blue-900/50',
-          iconColor: 'text-blue-600 dark:text-blue-400',
-          text: 'text-blue-600 dark:text-blue-400',
-          badge: 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-300',
-        };
-      case 'green':
-        return {
-          iconBg: 'bg-green-100 dark:bg-green-900/50',
-          iconColor: 'text-green-600 dark:text-green-400',
-          text: 'text-green-600 dark:text-green-400',
-          badge:
-            'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-700 text-green-700 dark:text-green-300',
-        };
-      case 'purple':
-        return {
-          iconBg: 'bg-purple-100 dark:bg-purple-900/50',
-          iconColor: 'text-purple-600 dark:text-purple-400',
-          text: 'text-purple-600 dark:text-purple-400',
-          badge:
-            'bg-purple-50 dark:bg-purple-900/30 border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300',
-        };
-      default:
-        return {
-          iconBg: 'bg-blue-100 dark:bg-blue-900/50',
-          iconColor: 'text-blue-600 dark:text-blue-400',
-          text: 'text-blue-600 dark:text-blue-400',
-          badge: 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-300',
-        };
-    }
-  };
-
   return (
-    <div className="w-full">
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center px-3 py-1.5 bg-purple-50 dark:bg-purple-900/30 rounded-full border border-purple-200 dark:border-purple-700 mb-3 transition-colors duration-300">
-          <span className="text-xs font-medium text-purple-700 dark:text-purple-300">Experiência Profissional</span>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      {/* Título estilo Lando – "F1 Seasons" / "pre-f1 career" */}
+      <motion.p
+        variants={fadeUpItem}
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewportDefault}
+        className="text-lando-lime text-sm uppercase tracking-[0.2em] font-medium mb-2"
+      >
+        Experiência Profissional
+      </motion.p>
+      <motion.h2
+        variants={fadeUpItem}
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewportDefault}
+        className="font-display text-4xl sm:text-5xl lg:text-6xl text-white tracking-wide"
+      >
+        carreira
+      </motion.h2>
+      <motion.p
+        variants={fadeUpItem}
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewportDefault}
+        className="font-display text-3xl sm:text-4xl text-white/60 tracking-wide mt-1 mb-12"
+      >
+        & timeline
+      </motion.p>
+
+      {/* Tabela estilo "F1 Seasons" – Year | Finish | Podiums */}
+      <motion.div
+        className="rounded-lg border border-lando-border overflow-hidden bg-lando-surface/10 mb-8"
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewportDefault}
+        variants={fadeUpItem}
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-12 gap-0 border-b border-lando-border">
+          <div className="sm:col-span-2 py-3 px-4 sm:px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Year
+          </div>
+          <div className="sm:col-span-4 py-3 px-4 sm:px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Empresa
+          </div>
+          <div className="sm:col-span-4 py-3 px-4 sm:px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Cargo
+          </div>
+          <div className="sm:col-span-2 py-3 px-4 sm:px-6 text-xs font-medium text-gray-500 uppercase tracking-wider text-right sm:text-left">
+            Duração
+          </div>
         </div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3 transition-colors duration-300">
-          Minha Jornada
-        </h1>
-        <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto text-base transition-colors duration-300">
-          Trajetória profissional em desenvolvimento de software, construindo soluções inovadoras e impactantes
-        </p>
-      </div>
+        {experiences.map((exp, i) => (
+          <motion.div
+            key={exp.company}
+            className="grid grid-cols-1 sm:grid-cols-12 gap-0 border-b border-lando-border last:border-b-0 hover:bg-lando-surface/20 transition-colors"
+            initial={{ opacity: 0, x: -12 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={viewportDefault}
+            transition={{ delay: i * 0.06 }}
+          >
+            <div className="sm:col-span-2 py-4 px-4 sm:px-6">
+              <span className="font-display text-2xl text-lando-lime">{exp.year}</span>
+            </div>
+            <div className="sm:col-span-4 py-4 px-4 sm:px-6 font-medium text-white">
+              {exp.company}
+            </div>
+            <div className="sm:col-span-4 py-4 px-4 sm:px-6 text-lando-lime/90 text-sm sm:text-base">
+              {exp.role}
+            </div>
+            <div className="sm:col-span-2 py-4 px-4 sm:px-6 text-gray-500 text-sm text-right sm:text-left">
+              {exp.duration}
+            </div>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Linha do tempo detalhada – estilo "pre-f1 career" com blocos por ano */}
+      <motion.p
+        variants={fadeUpItem}
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewportDefault}
+        className="text-gray-500 text-xs uppercase tracking-wider mb-6"
+      >
+        Detalhes por período
+      </motion.p>
 
       <div className="relative">
-        <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gray-300 dark:bg-gray-600 transition-colors duration-300" />
+        {/* Linha vertical */}
+        <div className="absolute left-[11px] sm:left-4 top-0 bottom-0 w-px bg-lando-border" />
 
-        <div className="space-y-6">
-          {experiences.map((exp, index) => {
-            const colors = getColorClasses(exp.color);
-            return (
-              <div key={index} className="relative">
-                <div
-                  className={`absolute left-6 w-3 h-3 ${colors.iconBg} rounded-full border-2 border-white dark:border-gray-800 shadow-lg z-10 transition-colors duration-300`}
-                />
+        <motion.div
+          className="space-y-0"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportDefault}
+        >
+          {experiences.map((exp, i) => (
+            <motion.div
+              key={exp.company}
+              variants={fadeLeftItem}
+              className="relative pl-10 sm:pl-12 pb-12 last:pb-0"
+            >
+              {/* Nó da linha do tempo */}
+              <div className="absolute left-0 top-1.5 w-3 h-3 rounded-full bg-lando-lime border-2 border-lando-bg z-10" />
 
-                <div className="ml-12 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 transition-colors duration-300">
-                  <div className="flex flex-col lg:flex-row lg:items-start justify-between mb-4">
-                    <div className="flex items-start space-x-3 mb-3 lg:mb-0">
-                      <div
-                        className={`w-10 h-10 ${colors.iconBg} rounded-lg flex items-center justify-center transition-colors duration-300`}
-                      >
-                        <exp.icon size={20} className={colors.iconColor} />
-                      </div>
-                      <div>
-                        <h3 className="text-lg lg:text-xl font-bold text-gray-900 dark:text-gray-100 mb-1 transition-colors duration-300">
-                          {exp.company}
-                        </h3>
-                        <p
-                          className={`text-base font-semibold ${colors.text} mb-2 transition-colors duration-300`}
-                        >
-                          {exp.role}
-                        </p>
-                        <div className="flex flex-wrap gap-1.5">
-                          <span
-                            className={`px-2 py-1 rounded-md text-xs font-medium ${colors.badge} border transition-colors duration-300`}
-                          >
-                            {exp.type}
-                          </span>
-                          <span className="px-2 py-1 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 transition-colors duration-300">
-                            {exp.mode}
-                          </span>
-                          <span className="px-2 py-1 rounded-md text-xs font-medium bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 text-yellow-700 dark:text-yellow-300 transition-colors duration-300">
-                            {exp.duration}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="text-right">
-                      <div className="flex items-center text-gray-600 dark:text-gray-400 mb-1 transition-colors duration-300">
-                        <Calendar size={16} className="mr-1.5" />
-                        <span className="font-medium text-sm">{exp.period}</span>
-                      </div>
-                      <div className="flex items-center text-gray-600 dark:text-gray-400 transition-colors duration-300">
-                        <MapPin size={16} className="mr-1.5" />
-                        <span className="text-sm">{exp.location}</span>
-                      </div>
-                    </div>
-                  </div>
-
+              <div className="border border-lando-border rounded-lg p-5 sm:p-6 bg-lando-surface/20 hover:border-lando-lime/20 transition-colors">
+                <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-2">
+                  <span className="font-display text-xl text-lando-lime">{exp.year}</span>
+                  <span className="text-gray-500 text-sm">{exp.period}</span>
+                </div>
+                <h3 className="text-lg font-semibold text-white mb-0.5">{exp.company}</h3>
+                <p className="text-lando-lime text-sm font-medium mb-2">{exp.role}</p>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {'type' in exp && (
+                    <span className="px-2 py-0.5 rounded text-xs bg-lando-lime/10 text-lando-lime border border-lando-lime/30">
+                      {exp.type}
+                    </span>
+                  )}
+                  {'mode' in exp && (
+                    <span className="px-2 py-0.5 rounded text-xs border border-lando-border text-gray-500">
+                      {exp.mode}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center text-gray-500 text-xs mb-4">
+                  <MapPin size={12} className="mr-1.5 flex-shrink-0" />
+                  {exp.location}
+                </div>
+                <div className="mb-4">
+                  <h4 className="text-sm font-semibold text-white mb-2 flex items-center gap-1.5">
+                    <Briefcase size={14} className="text-lando-lime" />
+                    Responsabilidades
+                  </h4>
+                  <ul className="space-y-2">
+                    {exp.description.map((item, i) => (
+                      <li key={i} className="text-gray-400 text-sm leading-relaxed flex gap-2">
+                        <span className="text-lando-lime mt-1.5 flex-shrink-0">•</span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                {'achievements' in exp && exp.achievements.length > 0 && (
                   <div className="mb-4">
-                    <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center transition-colors duration-300">
-                      <Briefcase size={16} className="mr-2 text-purple-600 dark:text-purple-400" />
-                      Responsabilidades
-                    </h4>
-                    <div className="space-y-2">
-                      {exp.description.map((item, i) => (
-                        <p
-                          key={i}
-                          className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm transition-colors duration-300"
-                        >
-                          {item}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="mb-4">
-                    <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center transition-colors duration-300">
-                      <Zap size={16} className="mr-2 text-yellow-600 dark:text-yellow-400" />
+                    <h4 className="text-sm font-semibold text-white mb-2 flex items-center gap-1.5">
+                      <Zap size={14} className="text-lando-lime" />
                       Principais Contribuições
                     </h4>
                     <ul className="space-y-1.5">
                       {exp.achievements.map((achievement, i) => (
-                        <li key={i} className="flex items-start space-x-2">
-                          <div
-                            className={`w-1.5 h-1.5 rounded-full ${colors.iconBg} mt-2 flex-shrink-0 transition-colors duration-300`}
-                          />
-                          <span className="text-gray-600 dark:text-gray-300 text-sm transition-colors duration-300">
-                            {achievement}
-                          </span>
+                        <li key={i} className="text-gray-400 text-sm flex gap-2">
+                          <span className="text-lando-lime mt-1.5 flex-shrink-0">•</span>
+                          {achievement}
                         </li>
                       ))}
                     </ul>
                   </div>
-
-                  <div>
-                    <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center transition-colors duration-300">
-                      <Code2 size={16} className="mr-2 text-blue-600 dark:text-blue-400" />
-                      Tecnologias
-                    </h4>
-                    <div className="flex flex-wrap gap-1.5">
-                      {exp.technologies.map((tech, i) => (
-                        <span
-                          key={i}
-                          className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-xs font-medium transition-colors duration-300"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
+                )}
+                <div>
+                  <h4 className="text-sm font-semibold text-white mb-2">Tecnologias</h4>
+                  <div className="flex flex-wrap gap-1.5">
+                    {exp.technologies.map((tech) => (
+                      <span
+                        key={tech}
+                        className="px-2 py-0.5 rounded text-xs border border-lando-border text-gray-500"
+                      >
+                        {tech}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
-          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1 transition-colors duration-300">3</div>
-          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">
-            Empresas
-          </div>
-        </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
-          <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-1 transition-colors duration-300">
-            4+
-          </div>
-          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">
-            Anos de Experiência
-          </div>
-        </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
-          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1 transition-colors duration-300">
-            Full Stack
-          </div>
-          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">
-            Especialização
-          </div>
-        </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
-          <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400 mb-1 transition-colors duration-300">
-            15+
-          </div>
-          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">
-            Tecnologias
-          </div>
-        </div>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </div>
   );
 };
 
 export default Experience;
-

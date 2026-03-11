@@ -1,10 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Scroll suave e motion */
+:root {
+  --font-display: 'Bebas Neue', system-ui, sans-serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --color-lando-bg: #0a0c0a;
+  --color-lando-surface: #101400;
+  --color-lando-lime: #d2ff00;
+}
+
 html {
   scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-lando-bg);
+  color: #e5e7eb;
 }
 
 @media (prefers-reduced-motion: reduce) {

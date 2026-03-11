@@ -1,167 +1,350 @@
-import { Monitor, Server, Wrench, Code2, Database, Globe, Layers } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Code2,
+  FileCode,
+  Layout,
+  Palette,
+  Server,
+  Database,
+  Layers,
+  GitBranch,
+  Monitor,
+  Wifi,
+  Github,
+  Terminal,
+  Box,
+  Sparkles,
+  Network,
+  Search,
+  Filter,
+} from 'lucide-react';
+import { viewportDefault, staggerContainer, fadeUpItem, scaleInItem } from '../utils/animations';
+
+const AREAS = ['all', 'Frontend', 'Backend', 'Ferramentas'] as const;
+const AREA_LABELS: Record<string, string> = {
+  all: 'Todos',
+  Frontend: 'Frontend',
+  Backend: 'Backend',
+  Ferramentas: 'Ferramentas',
+};
+
+const stats = [
+  { value: '15', label: 'tecnologias' },
+  { value: '4+', label: 'anos de experiência' },
+  { value: '6.28', label: 'nível médio' },
+  { value: '3', label: 'áreas', subLabel: 'front · back · tools' },
+];
+
+const iconByTech: Record<string, typeof Code2> = {
+  React: Sparkles,
+  'Next.js': Layers,
+  Angular: Box,
+  TypeScript: FileCode,
+  'HTML5 / CSS': Layout,
+  'Tailwind CSS': Palette,
+  JavaScript: Code2,
+  'Node.js': Server,
+  'C# / .NET': Code2,
+  'ASP.NET': Server,
+  'Clean Architecture': Layers,
+  SQL: Database,
+  Git: GitBranch,
+  Windows: Monitor,
+  Mikrotik: Wifi,
+  GitHub: Github,
+  Bitbucket: Github,
+  'VS Code': Code2,
+  Terminal: Terminal,
+  'APIs REST': Network,
+};
+
+const resultsTable = [
+  { area: 'Frontend', name: 'React', level: 85 },
+  { area: 'Frontend', name: 'Next.js', level: 80 },
+  { area: 'Frontend', name: 'Angular', level: 90 },
+  { area: 'Frontend', name: 'TypeScript', level: 75 },
+  { area: 'Frontend', name: 'HTML5 / CSS', level: 95 },
+  { area: 'Frontend', name: 'Tailwind CSS', level: 70 },
+  { area: 'Frontend', name: 'JavaScript', level: 80 },
+  { area: 'Backend', name: 'Node.js', level: 85 },
+  { area: 'Backend', name: 'C# / .NET', level: 95 },
+  { area: 'Backend', name: 'ASP.NET', level: 90 },
+  { area: 'Backend', name: 'Clean Architecture', level: 95 },
+  { area: 'Backend', name: 'SQL', level: 85 },
+  { area: 'Ferramentas', name: 'Git', level: 90 },
+  { area: 'Ferramentas', name: 'Windows', level: 80 },
+  { area: 'Ferramentas', name: 'Mikrotik', level: 70 },
+];
+
+const foundations = [
+  { title: 'Versionamento', items: ['Git', 'GitHub', 'Bitbucket'] },
+  { title: 'Ambiente', items: ['Windows', 'VS Code', 'Terminal'] },
+  { title: 'Rede & Infra', items: ['Mikrotik', 'APIs REST'] },
+];
 
 const Skills = () => {
-  const skills = [
-    {
-      category: 'Frontend',
-      icon: Monitor,
-      color: 'blue',
-      items: [
-        { name: 'React', level: 85, icon: Code2 },
-        { name: 'Angular', level: 90, icon: Code2 },
-        { name: 'TypeScript', level: 75, icon: Code2 },
-        { name: 'HTML5/CSS', level: 95, icon: Globe },
-        { name: 'Tailwind CSS', level: 70, icon: Globe },
-        { name: 'JavaScript', level: 80, icon: Code2 },
-      ],
-    },
-    {
-      category: 'Backend',
-      icon: Server,
-      color: 'green',
-      items: [
-        { name: 'Node.js', level: 85, icon: Server },
-        { name: 'C#', level: 95, icon: Code2 },
-        { name: '.NET', level: 95, icon: Code2 },
-        { name: 'ASP.NET', level: 90, icon: Server },
-        { name: 'Java', level: 60, icon: Code2 },
-        { name: 'Clean Architecture', level: 95, icon: Layers },
-        { name: 'SQL', level: 85, icon: Database },
-      ],
-    },
-    {
-      category: 'Ferramentas',
-      icon: Wrench,
-      color: 'purple',
-      items: [
-        { name: 'Git', level: 90, icon: Code2 },
-        { name: 'Windows', level: 80, icon: Monitor },
-        { name: 'WinBox (Mikrotik)', level: 70, icon: Wrench },
-      ],
-    },
-  ];
+  const [areaFilter, setAreaFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const getColorClasses = (color: string) => {
-    switch (color) {
-      case 'blue':
-        return {
-          iconBg: 'bg-blue-100 dark:bg-blue-900/50',
-          iconColor: 'text-blue-600 dark:text-blue-400',
-          bar: 'bg-blue-500 dark:bg-blue-400',
-          text: 'text-blue-600 dark:text-blue-400',
-        };
-      case 'green':
-        return {
-          iconBg: 'bg-green-100 dark:bg-green-900/50',
-          iconColor: 'text-green-600 dark:text-green-400',
-          bar: 'bg-green-500 dark:bg-green-400',
-          text: 'text-green-600 dark:text-green-400',
-        };
-      case 'purple':
-        return {
-          iconBg: 'bg-purple-100 dark:bg-purple-900/50',
-          iconColor: 'text-purple-600 dark:text-purple-400',
-          bar: 'bg-purple-500 dark:bg-purple-400',
-          text: 'text-purple-600 dark:text-purple-400',
-        };
-      default:
-        return {
-          iconBg: 'bg-blue-100 dark:bg-blue-900/50',
-          iconColor: 'text-blue-600 dark:text-blue-400',
-          bar: 'bg-blue-500 dark:bg-blue-400',
-          text: 'text-blue-600 dark:text-blue-400',
-        };
-    }
-  };
+  const filteredResults = useMemo(() => {
+    return resultsTable.filter((row) => {
+      const matchArea = areaFilter === 'all' || row.area === areaFilter;
+      const matchSearch =
+        !searchQuery.trim() ||
+        row.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        row.area.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchArea && matchSearch;
+    });
+  }, [areaFilter, searchQuery]);
 
   return (
-    <div className="w-full">
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 rounded-full border border-blue-200 dark:border-blue-700 mb-3 transition-colors duration-300">
-          <span className="text-xs font-medium text-blue-700 dark:text-blue-300">Competências Técnicas</span>
-        </div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3 transition-colors duration-300">
-          Minhas Habilidades
-        </h1>
-        <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto text-base transition-colors duration-300">
-          Conhecimentos técnicos e ferramentas que domino para criar soluções inovadoras e eficientes
+    <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      {/* Título estilo "f1 career" / "since 2019" */}
+      <motion.div
+        className="mb-4"
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewportDefault}
+        variants={staggerContainer}
+      >
+        <motion.p
+          variants={fadeUpItem}
+          className="text-lando-lime text-sm uppercase tracking-[0.2em] font-medium"
+        >
+          Competências Técnicas
+        </motion.p>
+        <motion.h2
+          variants={fadeUpItem}
+          className="font-display text-4xl sm:text-5xl lg:text-6xl text-white tracking-wide mt-1"
+        >
+          carreira em dev
+        </motion.h2>
+        <motion.p variants={fadeUpItem} className="text-gray-500 text-sm mt-2 uppercase tracking-wider">
+          since 2020
+        </motion.p>
+      </motion.div>
+
+      <motion.p
+        variants={fadeUpItem}
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewportDefault}
+        className="text-gray-400 max-w-2xl mb-12 text-sm leading-relaxed"
+      >
+        Stack e ferramentas que uso no dia a dia para entregar produtos escaláveis e de qualidade.
+      </motion.p>
+
+      {/* Stats – estilo "44 podiums" / "11 wins" com números em destaque */}
+      <motion.div
+        className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-16"
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewportDefault}
+      >
+        {stats.map(({ value, label, subLabel }) => (
+          <motion.div
+            key={label}
+            variants={scaleInItem}
+            whileHover={{ scale: 1.05 }}
+            className="border border-lando-border rounded-lg p-6 sm:p-8 bg-lando-surface/30 text-center hover:border-lando-lime/30 transition-colors"
+          >
+            <p className="font-display text-4xl sm:text-5xl text-lando-lime leading-none">{value}</p>
+            <p className="text-gray-500 text-xs uppercase tracking-wider mt-2">{label}</p>
+            {subLabel && (
+              <p className="text-gray-600 text-[10px] uppercase tracking-wider mt-1">{subLabel}</p>
+            )}
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Grid stack & resultados – título + filtros */}
+      <motion.div
+        className="mb-4"
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewportDefault}
+        variants={fadeUpItem}
+      >
+        <h3 className="font-display text-2xl sm:text-3xl text-white tracking-wide">
+          stack & resultados
+        </h3>
+        <p className="text-gray-500 text-xs uppercase tracking-wider mt-1">
+          Tecnologias e nível de domínio — filtre por área ou busque pelo nome
         </p>
-      </div>
+      </motion.div>
 
-      <div className="grid gap-6">
-        {skills.map((category) => {
-          const colors = getColorClasses(category.color);
-          return (
-            <div
-              key={category.category}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 transition-colors duration-300"
+      {/* Filtros: área + busca */}
+      <motion.div
+        className="mb-6 flex flex-col sm:flex-row sm:items-center gap-4"
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewportDefault}
+        variants={fadeUpItem}
+      >
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-gray-500 text-xs uppercase tracking-wider flex items-center gap-1.5 mr-1">
+            <Filter size={14} />
+            Área
+          </span>
+          {AREAS.map((area) => (
+            <button
+              key={area}
+              onClick={() => setAreaFilter(area)}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium uppercase tracking-wider transition-colors ${
+                areaFilter === area
+                  ? 'bg-lando-lime text-lando-bg'
+                  : 'border border-lando-border text-gray-400 hover:border-lando-lime/50 hover:text-lando-lime'
+              }`}
             >
-              <div className="flex items-center mb-6">
-                <div className={`w-10 h-10 ${colors.iconBg} rounded-lg flex items-center justify-center mr-3 transition-colors duration-300`}>
-                  <category.icon size={20} className={colors.iconColor} />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 transition-colors duration-300">
-                    {category.category}
-                  </h2>
-                  <div className="w-12 h-0.5 bg-gray-200 dark:bg-gray-600 rounded-full mt-1 transition-colors duration-300" />
-                </div>
-              </div>
+              {AREA_LABELS[area]}
+            </button>
+          ))}
+        </div>
+        <div className="relative flex-1 sm:max-w-xs">
+          <Search
+            size={16}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+          />
+          <input
+            type="text"
+            placeholder="Buscar tecnologia..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-3 py-2 rounded-md bg-lando-surface/50 border border-lando-border text-sm text-white placeholder-gray-500 focus:outline-none focus:border-lando-lime/50 transition-colors"
+          />
+        </div>
+        <span className="text-gray-500 text-xs">
+          {filteredResults.length} {filteredResults.length === 1 ? 'tecnologia' : 'tecnologias'}
+        </span>
+      </motion.div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {category.items.map((skill) => (
-                  <div key={skill.name} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <div className={`p-1.5 rounded-md ${colors.iconBg} transition-colors duration-300`}>
-                          <skill.icon size={14} className={colors.iconColor} />
-                        </div>
-                        <span className="text-gray-900 dark:text-gray-100 font-medium text-sm transition-colors duration-300">
-                          {skill.name}
-                        </span>
-                      </div>
-                      <span className={`text-xs font-semibold ${colors.text} transition-colors duration-300`}>
-                        {skill.level}%
-                      </span>
+      <motion.div
+        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 mb-16"
+        layout
+      >
+        <AnimatePresence mode="popLayout">
+          {filteredResults.length === 0 ? (
+            <motion.p
+              key="empty"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="col-span-full text-center text-gray-500 py-8"
+            >
+              Nenhuma tecnologia encontrada. Tente outro filtro ou busca.
+            </motion.p>
+          ) : (
+            filteredResults.map((row, i) => {
+              const Icon = iconByTech[row.name] ?? Code2;
+              return (
+                <motion.div
+                  key={`${row.area}-${row.name}`}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.2 }}
+                  whileHover={{ scale: 1.08 }}
+                  className="group rounded-lg border border-lando-border p-4 sm:p-5 bg-lando-surface/20 hover:border-lando-lime/40 hover:bg-lando-surface/40 transition-colors cursor-default"
+                >
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <span className="text-gray-500 text-[10px] sm:text-xs uppercase tracking-wider truncate">
+                      {row.area}
+                    </span>
+                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-lando-lime/10 text-lando-lime opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all">
+                      <Icon size={18} />
                     </div>
-
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 transition-colors duration-300">
-                      <div
-                        className={`${colors.bar} h-1.5 rounded-full transition-all duration-1000 ease-out`}
-                        style={{ width: `${skill.level}%` }}
+                  </div>
+                  <p className="text-sm font-medium text-white truncate mb-2">{row.name}</p>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-lando-lime text-xs font-medium">{row.level}%</span>
+                    <div className="h-1.5 flex-1 max-w-[80px] bg-lando-surface rounded-full overflow-hidden">
+                      <motion.div
+                        className="h-full bg-lando-lime rounded-full"
+                        initial={false}
+                        animate={{ width: `${row.level}%` }}
+                        transition={{ duration: 0.4 }}
                       />
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+                </motion.div>
+              );
+            })
+          )}
+        </AnimatePresence>
+      </motion.div>
 
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
-          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1 transition-colors duration-300">16</div>
-          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">
-            Tecnologias
-          </div>
-        </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
-          <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-1 transition-colors duration-300">4+</div>
-          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">
-            Anos de Experiência
-          </div>
-        </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 text-center shadow-sm transition-colors duration-300">
-          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1 transition-colors duration-300">85%</div>
-          <div className="text-gray-600 dark:text-gray-300 font-medium text-sm transition-colors duration-300">
-            Nível Médio
-          </div>
-        </div>
-      </div>
+      {/* Bloco "pre-career" / ferramentas & base – estilo títulos de pista */}
+      <motion.h3
+        className="font-display text-2xl sm:text-3xl text-white tracking-wide mb-6"
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewportDefault}
+        variants={fadeUpItem}
+      >
+        ferramentas & base
+      </motion.h3>
+      <motion.p
+        className="text-gray-500 text-xs uppercase tracking-wider mb-6"
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewportDefault}
+        variants={fadeUpItem}
+      >
+        Versionamento, ambiente e infraestrutura no dia a dia
+      </motion.p>
+
+      <motion.div
+        className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5"
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewportDefault}
+      >
+        {foundations.map((block) => (
+          <motion.div
+            key={block.title}
+            variants={scaleInItem}
+            whileHover={{ scale: 1.05 }}
+            className="rounded-lg border border-lando-border p-5 sm:p-6 bg-lando-surface/20 hover:border-lando-lime/30 transition-colors"
+          >
+            <p className="text-lando-lime font-display text-lg tracking-wide mb-4">{block.title}</p>
+            <ul className="space-y-2">
+              {block.items.map((item) => {
+                const Icon = iconByTech[item] ?? Code2;
+                return (
+                  <motion.li
+                    key={item}
+                    className="flex items-center gap-3 text-gray-400 text-sm group/item hover:text-lando-lime/90 transition-colors"
+                    whileHover={{ x: 4 }}
+                  >
+                    <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md bg-lando-surface text-lando-lime opacity-80 group-hover/item:opacity-100 transition-opacity">
+                      <Icon size={16} />
+                    </span>
+                    {item}
+                  </motion.li>
+                );
+              })}
+            </ul>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Linha decorativa "pista" */}
+      <motion.div
+        className="mt-16 flex items-center gap-2"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={viewportDefault}
+      >
+        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-lando-lime/30 to-transparent" />
+        <span className="text-gray-600 text-xs uppercase tracking-[0.2em]">full stack</span>
+        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-lando-lime/30 to-transparent" />
+      </motion.div>
     </div>
   );
 };
 
 export default Skills;
-
