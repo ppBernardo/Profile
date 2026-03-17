@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Github, Linkedin, Instagram, Menu } from 'lucide-react';
 import AboutMe from './components/AboutMe';
@@ -33,6 +33,14 @@ const App = () => {
   const aboutSectionRef = useRef<HTMLElement>(null);
   const aboutSlotRef = useRef<HTMLDivElement>(null);
   const [imageLanded, setImageLanded] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const compute = () => setIsDesktop(window.innerWidth >= 1024);
+    compute();
+    window.addEventListener('resize', compute);
+    return () => window.removeEventListener('resize', compute);
+  }, []);
 
   return (
     <div className="min-h-screen text-gray-100 font-sans relative">
@@ -138,14 +146,14 @@ const App = () => {
                   onClick={() => scrollToSection('projects')}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-6 py-3 bg-lando-lime text-lando-bg font-semibold text-sm uppercase tracking-wider hover:opacity-90 transition-opacity"
+                  className="w-full sm:w-auto px-6 py-3 bg-lando-lime text-lando-bg font-semibold text-sm uppercase tracking-wider hover:opacity-90 transition-opacity"
                 >
                   Ver projetos
                 </motion.button>
               </motion.div>
               <motion.div
                 variants={staggerContainer}
-                className="grid grid-cols-3 gap-4 pt-6 max-w-md"
+                className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 pt-6 max-w-md"
               >
                 {[
                   { label: 'Experiência', value: '4+' },
@@ -164,6 +172,22 @@ const App = () => {
               </motion.div>
             </motion.div>
 
+            {/* Mobile: foto estática no hero (desktop usa ScrollFollowImage) */}
+            <div className="lg:hidden w-full max-w-[320px] mx-auto aspect-[4/5]">
+              <div className="relative w-full h-full rounded-lg overflow-hidden border border-lando-border bg-lando-surface/40 shadow-xl">
+                <img
+                  src={heroImage}
+                  alt="Bernardo Pereira"
+                  className="w-full h-full object-cover object-top"
+                  loading="eager"
+                />
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-lando-bg to-transparent">
+                  <span className="text-sm font-medium text-lando-lime">Full Stack Developer</span>
+                  <span className="ml-2 text-xs text-gray-500">Disponível</span>
+                </div>
+              </div>
+            </div>
+
             {/* Espaço onde a foto aparece no hero; a foto real está em ScrollFollowImage e segue o scroll */}
             <div className="hidden lg:block w-full max-w-[280px] sm:max-w-[320px] lg:max-w-[380px] mx-auto lg:mx-0 lg:ml-auto aspect-[4/5]" aria-hidden />
           </div>
@@ -171,13 +195,15 @@ const App = () => {
       </section>
 
       {/* Foto única que se move do hero para a seção Sobre ao scrollar (estilo Lando – capacete) */}
-      <ScrollFollowImage
-        src={heroImage}
-        alt="Bernardo Pereira"
-        aboutSectionRef={aboutSectionRef}
-        aboutSlotRef={aboutSlotRef}
-        onLanded={setImageLanded}
-      />
+      {isDesktop && (
+        <ScrollFollowImage
+          src={heroImage}
+          alt="Bernardo Pereira"
+          aboutSectionRef={aboutSectionRef}
+          aboutSlotRef={aboutSlotRef}
+          onLanded={setImageLanded}
+        />
+      )}
 
       {/* Sobre – slot da foto à esquerda (placeholder) + conteúdo à direita */}
       <motion.section
@@ -194,7 +220,7 @@ const App = () => {
             {/* Slot: foto “aterrissa” aqui ao scrollar; após land, mostra cópia estática */}
             <div
               ref={aboutSlotRef}
-              className="relative rounded-lg border border-lando-border aspect-[4/5] max-h-[480px] w-full overflow-hidden bg-lando-surface/40"
+              className="hidden lg:block relative rounded-lg border border-lando-border aspect-[4/5] max-h-[480px] w-full overflow-hidden bg-lando-surface/40"
               aria-hidden
             >
               {imageLanded && (

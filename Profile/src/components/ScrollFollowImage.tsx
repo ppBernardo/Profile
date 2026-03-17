@@ -23,9 +23,17 @@ export default function ScrollFollowImage({
   const slotRectRef = useRef<DOMRect | null>(null);
   const [mounted, setMounted] = useState(false);
   const [hasLanded, setHasLanded] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const compute = () => setIsDesktop(window.innerWidth >= 1024);
+    compute();
+    window.addEventListener('resize', compute);
+    return () => window.removeEventListener('resize', compute);
   }, []);
 
   const measure = () => {
@@ -92,7 +100,7 @@ export default function ScrollFollowImage({
   // Gira o card durante o scroll: 0 → 180° (mostra o verso) → 360° (volta a frente ao aterrissar)
   const rotateY = useTransform(scrollYProgress, [0, 0.5, 1], [0, 180, 360]);
 
-  if (hasLanded) return null;
+  if (!isDesktop || hasLanded) return null;
 
   return (
     <motion.div

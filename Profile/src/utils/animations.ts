@@ -3,17 +3,19 @@ import { Variants } from 'framer-motion';
 /** Viewport config padrão: anima quando ~15% do elemento está visível, só uma vez */
 export const viewportDefault = { once: true, amount: 0.15 } as const;
 
+const landoEase = [0.25, 0.46, 0.45, 0.94] as const;
+
 /** Duração e easing no estilo Lando (suave, premium) */
 export const transitionSpring = {
   type: 'tween' as const,
   duration: 0.6,
-  ease: [0.25, 0.46, 0.45, 0.94],
+  ease: landoEase,
 };
 
 export const transitionSlow = {
   type: 'tween' as const,
   duration: 0.8,
-  ease: [0.25, 0.46, 0.45, 0.94],
+  ease: landoEase,
 };
 
 /** Container: filhos entram em sequência (stagger) */
@@ -34,7 +36,7 @@ export const fadeUpItem: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: { duration: 0.55, ease: landoEase },
   },
 };
 
@@ -44,7 +46,7 @@ export const fadeLeftItem: Variants = {
   visible: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: { duration: 0.55, ease: landoEase },
   },
 };
 
@@ -54,7 +56,7 @@ export const fadeRightItem: Variants = {
   visible: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: { duration: 0.55, ease: landoEase },
   },
 };
 
@@ -65,19 +67,19 @@ export const scaleInItem: Variants = {
     opacity: 1,
     scale: 1,
     y: 0,
-    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: { duration: 0.5, ease: landoEase },
   },
 };
 
 /** Seção inteira: fade + slide up ao entrar no viewport */
-export const sectionReveal = {
+export const sectionReveal: Variants = {
   hidden: { opacity: 0, y: 40 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
       duration: 0.7,
-      ease: [0.25, 0.46, 0.45, 0.94],
+      ease: landoEase,
       staggerChildren: 0.06,
       delayChildren: 0.15,
     },
