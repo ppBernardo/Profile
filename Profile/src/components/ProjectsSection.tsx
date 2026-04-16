@@ -17,7 +17,7 @@ gsap.registerPlugin(Flip, ScrollTrigger);
 
 /* ─── Types ─── */
 
-type Category = 'TODOS' | 'WEB' | 'MOBILE' | 'DESIGN' | 'OUTROS';
+type Category = 'TODOS' | 'WEB' | 'DESIGN' | 'OUTROS';
 type Layout = 'GRID' | 'LIST';
 
 interface Project {
@@ -29,11 +29,15 @@ interface Project {
   description: string;
   stack: string[];
   link?: string;
+  /** Card com destaque visual (ex.: projeto importante com repo privado) */
+  featured?: boolean;
+  /** Sem link público — exibe aviso em vez de “abrir canal” */
+  repositoryPrivate?: boolean;
 }
 
 /* ─── Data ─── */
 
-const FILTERS: Category[] = ['TODOS', 'WEB', 'MOBILE', 'DESIGN', 'OUTROS'];
+const FILTERS: Category[] = ['TODOS', 'WEB', 'DESIGN', 'OUTROS'];
 
 const projects: Project[] = [
   {
@@ -48,8 +52,20 @@ const projects: Project[] = [
     link: 'https://moto-max-eight.vercel.app/',
   },
   {
-    id: 'finance-flow',
+    id: 'chamados',
     number: '002',
+    title: 'Sistema de Chamados',
+    category: 'OUTROS',
+    done: true,
+    featured: true,
+    repositoryPrivate: true,
+    description:
+      'Solução corporativa em produção: abertura e acompanhamento de chamados, fluxo de status, papéis de usuário e autenticação segura. O código permanece em repositório privado no GitHub.',
+    stack: ['Node.js', 'Express', 'REST API', 'React'],
+  },
+  {
+    id: 'finance-flow',
+    number: '003',
     title: 'Finance Flow',
     category: 'WEB',
     done: true,
@@ -60,7 +76,7 @@ const projects: Project[] = [
   },
   {
     id: 'izcode',
-    number: '003',
+    number: '004',
     title: 'Iz Code',
     category: 'DESIGN',
     done: true,
@@ -68,36 +84,6 @@ const projects: Project[] = [
       'Landing institucional com narrativa visual de alto impacto, foco em conversão e estrutura modular.',
     stack: ['React', 'UI System', 'Motion', 'Responsive'],
     link: 'https://izcode.com.br/',
-  },
-  {
-    id: 'chamados',
-    number: '004',
-    title: 'Sistema de Chamados',
-    category: 'OUTROS',
-    done: false,
-    description:
-      'Aplicação para abertura e acompanhamento de chamados com fluxo de status e autenticação segura.',
-    stack: ['Node.js', 'Express', 'REST API', 'React'],
-  },
-  {
-    id: 'mobile-ops',
-    number: '005',
-    title: 'Mobile Ops Tracker',
-    category: 'MOBILE',
-    done: false,
-    description:
-      'Aplicativo para monitoramento de operações em campo com sincronização e relatórios em tempo real.',
-    stack: ['React Native', 'TypeScript', 'SQLite'],
-  },
-  {
-    id: 'design-system',
-    number: '006',
-    title: 'Imperial Design System',
-    category: 'DESIGN',
-    done: true,
-    description:
-      'Biblioteca de componentes para padronização visual com tokens, variantes e documentação técnica.',
-    stack: ['Storybook', 'Tokens', 'Figma', 'Accessibility'],
   },
 ];
 
@@ -113,11 +99,24 @@ function prefersReducedMotion() {
 /* ─── Card ─── */
 
 function MissionCard({ project }: { project: Project }) {
+  const isFeatured = Boolean(project.featured);
+  const isPrivate = Boolean(project.repositoryPrivate);
+
   return (
     <article
       data-flip-id={project.id}
-      className="mission-card group relative overflow-hidden rounded-xl border border-cyan-500/12 bg-gradient-to-br from-[#080c14]/95 via-[#060a10] to-[#04060c] transition-all duration-300 hover:border-cyan-400/30 hover:shadow-[0_0_30px_rgba(34,211,238,0.07)]"
+      className={`mission-card group relative overflow-hidden rounded-xl border bg-gradient-to-br from-[#080c14]/95 via-[#060a10] to-[#04060c] transition-all duration-300 ${
+        isFeatured
+          ? 'border-vader-red/45 shadow-[0_0_40px_rgba(255,0,0,0.12)] hover:border-vader-red/60 hover:shadow-[0_0_48px_rgba(255,0,0,0.18)]'
+          : 'border-cyan-500/12 hover:border-cyan-400/30 hover:shadow-[0_0_30px_rgba(34,211,238,0.07)]'
+      }`}
     >
+      {isFeatured && (
+        <div className="absolute right-3 top-3 z-[15] rounded border border-vader-red/40 bg-black/70 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.22em] text-vader-red">
+          destaque
+        </div>
+      )}
+
       <div
         className="absolute inset-0 pointer-events-none z-[1]"
         style={{
@@ -128,33 +127,76 @@ function MissionCard({ project }: { project: Project }) {
       />
 
       <div
-        className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-cyan-400/60 via-cyan-500/20 to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-100"
+        className={`absolute left-0 top-0 h-full w-1 bg-gradient-to-b opacity-60 transition-opacity duration-300 group-hover:opacity-100 ${
+          isFeatured
+            ? 'from-vader-red via-vader-red/40 to-transparent'
+            : 'from-cyan-400/60 via-cyan-500/20 to-transparent'
+        }`}
         aria-hidden
       />
 
-      <div className="absolute top-0 left-0 w-3.5 h-3.5 border-t border-l border-cyan-500/20 rounded-tl" />
-      <div className="absolute top-0 right-0 w-3.5 h-3.5 border-t border-r border-cyan-500/20 rounded-tr" />
-      <div className="absolute bottom-0 left-0 w-3.5 h-3.5 border-b border-l border-cyan-500/20 rounded-bl" />
-      <div className="absolute bottom-0 right-0 w-3.5 h-3.5 border-b border-r border-cyan-500/20 rounded-br" />
+      <div
+        className={`absolute top-0 left-0 w-3.5 h-3.5 border-t border-l rounded-tl ${
+          isFeatured ? 'border-vader-red/45' : 'border-cyan-500/20'
+        }`}
+      />
+      <div
+        className={`absolute top-0 right-0 w-3.5 h-3.5 border-t border-r rounded-tr ${
+          isFeatured ? 'border-vader-red/45' : 'border-cyan-500/20'
+        }`}
+      />
+      <div
+        className={`absolute bottom-0 left-0 w-3.5 h-3.5 border-b border-l rounded-bl ${
+          isFeatured ? 'border-vader-red/45' : 'border-cyan-500/20'
+        }`}
+      />
+      <div
+        className={`absolute bottom-0 right-0 w-3.5 h-3.5 border-b border-r rounded-br ${
+          isFeatured ? 'border-vader-red/45' : 'border-cyan-500/20'
+        }`}
+      />
 
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-500/25 to-transparent" />
+      <div
+        className={`absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent to-transparent ${
+          isFeatured ? 'via-vader-red/45' : 'via-cyan-500/25'
+        }`}
+      />
 
       <div className="relative z-10 p-4 sm:p-6 md:p-7 font-mono">
         <div className="flex items-start justify-between gap-3 mb-4">
           <div>
-            <span className="text-[10px] uppercase tracking-[0.28em] text-cyan-500/50">
+            <span
+              className={`text-[10px] uppercase tracking-[0.28em] ${
+                isFeatured ? 'text-vader-red/70' : 'text-cyan-500/50'
+              }`}
+            >
               missão
             </span>
             <p className="mt-1.5 text-[10px] uppercase tracking-[0.2em] text-gray-600">
               {project.category}
             </p>
+            {isPrivate && (
+              <p className="mt-2 max-w-[14rem] text-[9px] uppercase leading-relaxed tracking-[0.18em] text-vader-red/55">
+                repositório privado — sem link público
+              </p>
+            )}
           </div>
-          <span className="font-display text-4xl font-bold leading-none text-cyan-400/20 transition-colors duration-300 group-hover:text-cyan-400/40">
+          <span
+            className={`font-display text-4xl font-bold leading-none transition-colors duration-300 ${
+              isFeatured
+                ? 'text-vader-red/35 group-hover:text-vader-red/55'
+                : 'text-cyan-400/20 group-hover:text-cyan-400/40'
+            }`}
+          >
             {project.number}
           </span>
         </div>
 
-        <h3 className="font-display text-lg tracking-wide text-gray-100 sm:text-xl mb-3">
+        <h3
+          className={`font-display text-lg tracking-wide sm:text-xl mb-3 ${
+            isFeatured ? 'text-white text-glow-red' : 'text-gray-100'
+          }`}
+        >
           {project.title}
         </h3>
 
@@ -182,19 +224,32 @@ function MissionCard({ project }: { project: Project }) {
             ● {project.done ? 'concluída' : 'em curso'}
           </span>
 
-          <a
-            href={project.link || '#'}
-            target={project.link ? '_blank' : undefined}
-            rel={project.link ? 'noopener noreferrer' : undefined}
-            className="inline-flex items-center gap-1.5 rounded border border-cyan-500/30 bg-cyan-500/[0.04] px-3 py-1.5 text-[10px] text-cyan-200/80 transition-all duration-200 hover:border-cyan-400/60 hover:bg-cyan-400/10 hover:text-white"
-          >
-            abrir canal
-            <span aria-hidden>↗</span>
-          </a>
+          {isPrivate ? (
+            <span
+              className="inline-flex cursor-default items-center gap-1.5 rounded border border-vader-red/35 bg-vader-red/[0.06] px-3 py-1.5 text-[10px] uppercase tracking-[0.12em] text-vader-red/90"
+              title="Código em repositório privado"
+            >
+              github privado
+            </span>
+          ) : (
+            <a
+              href={project.link || '#'}
+              target={project.link ? '_blank' : undefined}
+              rel={project.link ? 'noopener noreferrer' : undefined}
+              className="inline-flex items-center gap-1.5 rounded border border-cyan-500/30 bg-cyan-500/[0.04] px-3 py-1.5 text-[10px] text-cyan-200/80 transition-all duration-200 hover:border-cyan-400/60 hover:bg-cyan-400/10 hover:text-white"
+            >
+              abrir canal
+              <span aria-hidden>↗</span>
+            </a>
+          )}
         </div>
       </div>
 
-      <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-500/15 to-transparent group-hover:via-cyan-500/25 transition-all duration-500" />
+      <div
+        className={`absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent to-transparent transition-all duration-500 group-hover:via-cyan-500/25 ${
+          isFeatured ? 'via-vader-red/25 group-hover:via-vader-red/45' : 'via-cyan-500/15'
+        }`}
+      />
     </article>
   );
 }
