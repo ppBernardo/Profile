@@ -266,25 +266,25 @@ export default function ExperienceSection() {
       <div className="h-screen flex items-center relative z-10">
         <div
           ref={trackRef}
-          className="flex items-center gap-8 px-8"
-          style={{ paddingLeft: '10vw', opacity: 0 }}
+          className="flex items-center gap-4 sm:gap-8 px-4 sm:px-8"
+          style={{ paddingLeft: '4vw', opacity: 0 }}
         >
           <div
             ref={titleBlockRef}
-            className="flex-shrink-0 w-[45vw] sm:w-[35vw] flex flex-col justify-center pr-8"
+            className="flex-shrink-0 w-[82vw] sm:w-[45vw] md:w-[35vw] flex flex-col justify-center pr-4 sm:pr-8"
             style={{ opacity: 0 }}
           >
-            <p className="font-mono text-vader-red text-xs tracking-[0.3em] uppercase mb-4">
+            <p className="font-mono text-vader-red text-[10px] sm:text-xs tracking-[0.3em] uppercase mb-3 sm:mb-4">
               {'// EXPERIÊNCIA'}
             </p>
-            <h2 className="font-display text-5xl sm:text-6xl md:text-8xl text-white tracking-wider leading-none">
+            <h2 className="font-display text-3xl sm:text-5xl md:text-6xl lg:text-8xl text-white tracking-wider leading-none">
               CARREIRA
             </h2>
-            <p className="font-display text-3xl sm:text-4xl md:text-5xl text-white/20 tracking-wider mt-2">
+            <p className="font-display text-xl sm:text-3xl md:text-4xl lg:text-5xl text-white/20 tracking-wider mt-1 sm:mt-2">
               &amp; TIMELINE
             </p>
-            <div className="mt-8 h-px bg-gradient-to-r from-vader-red via-vader-red/30 to-transparent" />
-            <p className="text-gray-600 text-sm mt-4 max-w-xs">
+            <div className="mt-4 sm:mt-8 h-px bg-gradient-to-r from-vader-red via-vader-red/30 to-transparent" />
+            <p className="text-gray-600 text-xs sm:text-sm mt-3 sm:mt-4 max-w-xs">
               Cada experiência forjou novas habilidades. Scroll para explorar a
               jornada.
             </p>
@@ -293,30 +293,30 @@ export default function ExperienceSection() {
           {experiences.map((exp) => (
             <article
               key={exp.company}
-              className="exp-card flex-shrink-0 w-[380px] sm:w-[420px] h-[480px] rounded-lg border border-vader-border
-                         bg-gradient-to-b from-vader-surface/60 to-black/60 p-7
+              className="exp-card flex-shrink-0 w-[80vw] sm:w-[380px] md:w-[420px] min-h-[400px] sm:min-h-[480px] rounded-lg border border-vader-border
+                         bg-gradient-to-b from-vader-surface/60 to-black/60 p-5 sm:p-7
                          hover:border-vader-red/40 hover:saber-glow-strong
                          transition-all duration-500 flex flex-col relative overflow-hidden group"
             >
               <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-vader-red/0 to-transparent group-hover:via-vader-red/60 transition-all duration-700" />
 
-              <div className="flex items-baseline justify-between mb-4">
-                <span className="font-display text-4xl text-vader-red text-glow-red">
+              <div className="flex items-baseline justify-between mb-3 sm:mb-4">
+                <span className="font-display text-3xl sm:text-4xl text-vader-red text-glow-red">
                   {exp.year}
                 </span>
-                <span className="text-[10px] text-gray-600 uppercase tracking-wider font-mono">
+                <span className="text-[9px] sm:text-[10px] text-gray-600 uppercase tracking-wider font-mono">
                   {exp.type}
                 </span>
               </div>
 
-              <h3 className="text-xl font-bold text-white mb-1 tracking-wide">
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-1 tracking-wide">
                 {exp.company}
               </h3>
-              <p className="text-vader-red text-sm font-medium mb-3">
+              <p className="text-vader-red text-xs sm:text-sm font-medium mb-2 sm:mb-3">
                 {exp.role}
               </p>
 
-              <div className="flex items-center gap-4 text-gray-600 text-xs mb-4">
+              <div className="flex items-center gap-3 sm:gap-4 text-gray-600 text-[11px] sm:text-xs mb-3 sm:mb-4">
                 <span className="flex items-center gap-1">
                   <MapPin size={12} />
                   {exp.location}
@@ -327,11 +327,11 @@ export default function ExperienceSection() {
                 </span>
               </div>
 
-              <p className="text-gray-400 text-sm leading-relaxed flex-grow">
+              <p className="text-gray-400 text-xs sm:text-sm leading-relaxed flex-grow">
                 {exp.description}
               </p>
 
-              <div className="mt-4 pt-4 border-t border-vader-border">
+              <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-vader-border">
                 <div className="flex flex-wrap gap-1.5">
                   {exp.technologies.map((tech) => (
                     <span

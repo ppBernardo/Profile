@@ -139,7 +139,7 @@ function MissionCard({ project }: { project: Project }) {
 
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-500/25 to-transparent" />
 
-      <div className="relative z-10 p-6 sm:p-7 font-mono">
+      <div className="relative z-10 p-4 sm:p-6 md:p-7 font-mono">
         <div className="flex items-start justify-between gap-3 mb-4">
           <div>
             <span className="text-[10px] uppercase tracking-[0.28em] text-cyan-500/50">
@@ -390,7 +390,7 @@ export default function ProjectsSection() {
     <section
       ref={sectionRef}
       id="projects"
-      className="relative overflow-hidden bg-[#030508] py-24 sm:py-32"
+      className="relative overflow-hidden bg-[#030508] py-16 sm:py-24 md:py-32"
     >
       {/* ── Backgrounds ── */}
       <div
@@ -419,7 +419,7 @@ export default function ProjectsSection() {
 
       <div
         ref={shellRef}
-        className="relative z-10 mx-auto max-w-6xl px-6"
+        className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6"
         style={{ opacity: 0 }}
       >
         {/* ═══ Hero: R2D2 + heading ═══ */}
@@ -427,7 +427,7 @@ export default function ProjectsSection() {
           {/* R2D2 */}
           <div
             ref={canvasRef}
-            className="relative w-full max-w-[300px] shrink-0 lg:max-w-[340px]"
+            className="relative w-full max-w-[220px] shrink-0 sm:max-w-[300px] lg:max-w-[340px]"
             style={{ opacity: 0, transformStyle: 'preserve-3d' }}
           >
             <div
@@ -500,7 +500,7 @@ export default function ProjectsSection() {
             <p className="font-mono text-[10px] uppercase tracking-[0.38em] text-cyan-400/70">
               {'>'} UPLINK_ASTROMECH // REGISTRO_DE_MISSÕES
             </p>
-            <h2 className="mt-3 font-display text-3xl font-semibold uppercase tracking-[0.08em] text-gray-100 sm:text-4xl md:text-5xl">
+            <h2 className="mt-3 font-display text-2xl font-semibold uppercase tracking-[0.08em] text-gray-100 sm:text-3xl md:text-4xl lg:text-5xl">
               <span className="bg-gradient-to-r from-cyan-200 to-cyan-500/60 bg-clip-text text-transparent">
                 Projetos
               </span>{' '}

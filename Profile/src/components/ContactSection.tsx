@@ -264,7 +264,7 @@ export default function ContactSection() {
         </Canvas>
       </div>
 
-      <div className="relative z-20 mx-auto grid min-h-screen max-w-6xl grid-cols-1 px-4 py-16 sm:px-8 lg:grid-cols-[55%_45%] lg:px-10 lg:py-20">
+      <div className="relative z-20 mx-auto grid min-h-screen max-w-6xl grid-cols-1 px-4 py-12 sm:px-8 sm:py-16 lg:grid-cols-[55%_45%] lg:px-10 lg:py-20">
         <div
           ref={contentRef}
           className="flex flex-col justify-center md:max-lg:mx-auto md:max-lg:max-w-xl md:max-lg:text-center"
@@ -273,7 +273,7 @@ export default function ContactSection() {
             Setor de comunicações
           </p>
 
-          <h2 className="mt-4 font-mono text-2xl font-normal uppercase leading-tight tracking-[0.12em] text-[#e8e8e8] sm:text-3xl md:text-[1.65rem]">
+          <h2 className="mt-3 sm:mt-4 font-mono text-xl font-normal uppercase leading-tight tracking-[0.12em] text-[#e8e8e8] sm:text-2xl md:text-3xl">
             O lado sombrio está recrutando
           </h2>
 
@@ -291,7 +291,7 @@ export default function ContactSection() {
 
           <div className="my-8 h-px w-full max-w-md bg-[#1a1a1a]" aria-hidden />
 
-          <p className="max-w-xl text-sm leading-relaxed text-[#888] sm:text-base">
+          <p className="max-w-xl text-xs leading-relaxed text-[#888] sm:text-sm md:text-base">
             Estou disponível para novos projetos. Se você tem uma missão, eu tenho as habilidades para
             executá-la. Use os canais abaixo para estabelecer contato.
           </p>
@@ -309,7 +309,7 @@ export default function ContactSection() {
                       ? {}
                       : { target: '_blank', rel: 'noopener noreferrer' })}
                     aria-label={ariaLabel}
-                    className="group flex cursor-pointer items-center gap-3 rounded border border-[#1a1a1a] border-l-[3px] border-l-transparent bg-[#0a0a0a] px-3 py-3 transition-all duration-200 hover:translate-x-1.5 hover:border-l-[#ff2200] sm:gap-4"
+                    className="group flex cursor-pointer items-center gap-2.5 rounded border border-[#1a1a1a] border-l-[3px] border-l-transparent bg-[#0a0a0a] px-2.5 py-2.5 transition-all duration-200 hover:translate-x-1.5 hover:border-l-[#ff2200] sm:gap-3 sm:px-3 sm:py-3 md:gap-4"
                   >
                     <Icon className="shrink-0 text-[#666] transition-colors group-hover:text-[#ff2200]" />
                     <div className="min-w-0 flex-1 font-mono">

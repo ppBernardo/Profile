@@ -195,9 +195,9 @@ function SpaceBackdrop() {
         aria-hidden
       />
 
-      {/* Planeta 3D — área extra no topo para não cortar o disco */}
+      {/* Planeta 3D — oculto em mobile para performance */}
       <div
-        className="pointer-events-none absolute z-0"
+        className="pointer-events-none absolute z-0 hidden md:block"
         style={{
           top: '-22%',
           right: '-10%',
@@ -359,7 +359,7 @@ function TelemetryReadout({
   return (
     <div
       ref={readoutRef}
-      className="systems-readout pointer-events-auto absolute inset-x-0 bottom-0 z-[26] border-t border-white/[0.08] bg-gradient-to-t from-black via-black/88 to-transparent px-4 pb-5 pt-3 backdrop-blur-md lg:inset-x-auto lg:bottom-auto lg:left-[70%] lg:right-auto lg:top-[44%] lg:w-[min(400px,28vw)] lg:-translate-y-1/2 lg:border lg:border-white/[0.09] lg:bg-black/50 lg:px-5 lg:pb-5 lg:pt-4 lg:backdrop-blur-lg"
+      className="systems-readout pointer-events-auto absolute inset-x-0 bottom-0 z-[26] border-t border-white/[0.08] bg-gradient-to-t from-black via-black/88 to-transparent px-3 pb-4 pt-2 backdrop-blur-md sm:px-4 sm:pb-5 sm:pt-3 lg:inset-x-auto lg:bottom-auto lg:left-[70%] lg:right-auto lg:top-[44%] lg:w-[min(400px,28vw)] lg:-translate-y-1/2 lg:border lg:border-white/[0.09] lg:bg-black/50 lg:px-5 lg:pb-5 lg:pt-4 lg:backdrop-blur-lg"
       style={{
         borderLeftWidth: 3,
         borderLeftColor: node.color,
@@ -618,11 +618,11 @@ export default function CompetenciesSection() {
       <HullMarkers active={active} onPick={setActive} />
 
       {/* ── Section label ─────────────────────────────────────────────── */}
-      <div className="pointer-events-none absolute left-[30%] top-[1.5%] z-30 hidden lg:block">
-        <p className="font-mono text-[8px] uppercase tracking-[0.45em] text-cyan-500/35">
+      <div className="pointer-events-none absolute left-4 top-3 z-30 sm:left-6 sm:top-4 lg:left-[30%] lg:top-[1.5%]">
+        <p className="font-mono text-[7px] sm:text-[8px] uppercase tracking-[0.45em] text-cyan-500/35">
           {'>'} IMPERIAL_SKILL_MATRIX
         </p>
-        <h2 className="mt-0.5 font-display text-lg font-semibold uppercase tracking-[0.12em]">
+        <h2 className="mt-0.5 font-display text-sm sm:text-base lg:text-lg font-semibold uppercase tracking-[0.12em]">
           <span className="text-glow-red text-vader-red">Competências</span>{' '}
           <span className="text-gray-600">da Nave</span>
         </h2>

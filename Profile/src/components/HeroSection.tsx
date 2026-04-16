@@ -159,7 +159,7 @@ export default function HeroSection({ scrollProgress }: Props) {
         </Canvas>
       </div>
 
-      <div className="hero-content relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
+      <div className="hero-content relative z-10 h-full flex flex-col items-center justify-center text-center px-3 sm:px-4">
         <p className="hero-subtitle font-mono text-vader-red text-xs sm:text-sm tracking-[0.3em] uppercase mb-6">
           &gt; Full Stack Developer_
         </p>
@@ -171,7 +171,7 @@ export default function HeroSection({ scrollProgress }: Props) {
           </span>
         </h1>
 
-        <p className="hero-tagline text-gray-600 text-sm sm:text-base mt-8 max-w-md font-light tracking-wide">
+        <p className="hero-tagline text-gray-600 text-xs sm:text-sm md:text-base mt-5 sm:mt-8 max-w-md font-light tracking-wide">
           Transformando código em poder.
           <br />
           <span className="text-gray-500">
@@ -179,7 +179,7 @@ export default function HeroSection({ scrollProgress }: Props) {
           </span>
         </p>
 
-        <div className="flex gap-8 sm:gap-12 mt-12">
+        <div className="flex gap-6 sm:gap-8 md:gap-12 mt-8 sm:mt-12">
           {[
             { value: '4+', label: 'Anos' },
             { value: '15+', label: 'Tecnologias' },
@@ -197,7 +197,7 @@ export default function HeroSection({ scrollProgress }: Props) {
         </div>
       </div>
 
-      <div className="hero-scroll-hint absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+      <div className="hero-scroll-hint absolute bottom-5 sm:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
         <span className="text-[10px] text-gray-600 uppercase tracking-[0.2em] font-mono">
           scroll
         </span>

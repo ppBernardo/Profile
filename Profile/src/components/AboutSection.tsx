@@ -191,7 +191,7 @@ export default function AboutSection() {
         }}
       />
 
-      <div className="max-w-6xl mx-auto px-6 relative z-10 py-24 sm:py-32">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10 py-16 sm:py-24 md:py-32">
         {/* Label */}
         <p
           className="about-label font-mono text-vader-red text-xs tracking-[0.3em] uppercase mb-6"
@@ -201,8 +201,8 @@ export default function AboutSection() {
         </p>
 
         {/* Title */}
-        <div className="about-title-area mb-6" style={{ perspective: '800px' }}>
-          <h2 className="font-display text-5xl sm:text-7xl md:text-8xl text-white tracking-wider leading-[0.9]">
+        <div className="about-title-area mb-4 sm:mb-6" style={{ perspective: '800px' }}>
+          <h2 className="font-display text-3xl sm:text-5xl md:text-7xl lg:text-8xl text-white tracking-wider leading-[0.9]">
             <span className="about-title-word inline-block" style={{ opacity: 0 }}>
               BERNARDO
             </span>
@@ -224,7 +224,7 @@ export default function AboutSection() {
 
         {/* Horizontal accent line */}
         <div
-          className="about-accent-line h-px mb-16 origin-left"
+          className="about-accent-line h-px mb-8 sm:mb-16 origin-left"
           style={{
             background: 'linear-gradient(90deg, #ff0000, rgba(255,0,0,0.3) 50%, transparent)',
             transform: 'scaleX(0)',
@@ -232,16 +232,16 @@ export default function AboutSection() {
         />
 
         {/* Main grid: Visual + Content */}
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+        <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-20 items-start">
           {/* Left — Photo + 3D Lightsaber */}
           <div className="about-visual relative">
             <div className="relative flex items-stretch gap-0">
               {/* 3D Lightsaber Canvas */}
               <div
-                className="about-saber-wrap relative w-16 sm:w-20 flex-shrink-0 -mr-4 z-20"
+                className="about-saber-wrap relative w-12 sm:w-16 md:w-20 flex-shrink-0 -mr-3 sm:-mr-4 z-20"
                 style={{ opacity: 0 }}
               >
-                <div className="h-full min-h-[400px] min-w-0 w-full sm:min-h-[480px]">
+                <div className="h-full min-h-[320px] min-w-0 w-full sm:min-h-[400px] md:min-h-[480px]">
                   <Canvas
                     className="h-full w-full min-h-[inherit] touch-none"
                     camera={{ position: [0, 0, 3], fov: 45 }}
@@ -263,7 +263,7 @@ export default function AboutSection() {
               </div>
 
               {/* Photo */}
-              <div className="relative flex-1 max-w-[340px]">
+              <div className="relative flex-1 max-w-[280px] sm:max-w-[340px]">
                 <div
                   className="about-photo-reveal relative aspect-[3/4] rounded-lg overflow-hidden border border-vader-border/50 group"
                   style={{
