@@ -1,28 +1,151 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --font-display: 'Bebas Neue', system-ui, sans-serif;
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --color-lando-bg: #0a0c0a;
-  --color-lando-surface: #101400;
-  --color-lando-lime: #d2ff00;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 body {
-  background-color: var(--color-lando-bg);
-  color: #e5e7eb;
+  background-color: #000;
+  color: #e0e0e0;
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* R3F / WebGL: alinhar buffer interno ao tamanho do container (evita mismatch com CSS) */
+canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  vertical-align: top;
+}
+
+::selection {
+  background: rgba(255, 0, 0, 0.3);
+  color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 0, 0, 0.3);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 0, 0, 0.5);
+}
+
+@layer utilities {
+  .text-glow-red {
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5), 0 0 30px rgba(255, 0, 0, 0.2);
+  }
+
+  .text-glow-blue {
+    text-shadow: 0 0 10px rgba(0, 136, 255, 0.5), 0 0 30px rgba(0, 136, 255, 0.2);
+  }
+
+  .text-glow-red-strong {
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.7), 0 0 40px rgba(255, 0, 0, 0.4), 0 0 80px rgba(255, 0, 0, 0.2);
+  }
+
+  .saber-glow {
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.3), 0 0 30px rgba(255, 0, 0, 0.1);
+  }
+
+  .saber-glow-strong {
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.5), 0 0 30px rgba(255, 0, 0, 0.3), inset 0 0 15px rgba(255, 0, 0, 0.05);
+  }
+
+  .border-glow-red {
+    border-color: rgba(255, 0, 0, 0.3);
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.1);
+  }
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+@keyframes holo-flicker {
+  0%, 100% { opacity: 0.04; }
+  25% { opacity: 0.07; }
+  50% { opacity: 0.03; }
+  75% { opacity: 0.06; }
+}
+
+@keyframes beam-flow {
+  from { background-position: 0 0; }
+  to { background-position: 0 50px; }
+}
+
+/* ── HUD / Competencies overlay animations ───────── */
+
+@keyframes hud-flicker {
+  0%, 94%, 100% { opacity: 1; }
+  96%           { opacity: 0.80; }
+  98%           { opacity: 1; }
+  99%           { opacity: 0.74; }
+}
+
+/* SVG connector line draw-on (used by GSAP stroke-dashoffset) */
+@keyframes svg-draw {
+  from { stroke-dashoffset: 24; }
+  to   { stroke-dashoffset: 0; }
+}
+
+/* Idle pulse on SVG lines — applied as CSS class */
+@keyframes hud-line-idle-pulse {
+  0%, 100% { opacity: 0.42; }
+  50%       { opacity: 0.80; }
+}
+
+/* Idle pulse on anchor dots */
+@keyframes hud-dot-idle-pulse {
+  0%, 100% { opacity: 0.52; }
+  50%       { opacity: 0.92; }
+}
+
+/* Power bar shimmer */
+@keyframes hud-power-bar {
+  0%, 100% { opacity: 0.65; }
+  50%       { opacity: 1.0; }
+}
+
+@layer utilities {
+  .text-glow-cyan {
+    text-shadow: 0 0 10px rgba(0,200,255,0.55), 0 0 30px rgba(0,200,255,0.2);
+  }
+  .hud-flicker {
+    animation: hud-flicker 7s ease-in-out infinite;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }
