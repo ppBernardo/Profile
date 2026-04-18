@@ -167,7 +167,7 @@ export default function AboutSection() {
     <section
       ref={sectionRef}
       id="about"
-      className="relative min-h-screen overflow-hidden bg-black"
+      className="relative min-h-screen touch-pan-y overflow-hidden bg-black"
     >
       {/* Background */}
       <div className="absolute inset-0">
@@ -241,9 +241,9 @@ export default function AboutSection() {
                 className="about-saber-wrap relative w-12 sm:w-16 md:w-20 flex-shrink-0 -mr-3 sm:-mr-4 z-20"
                 style={{ opacity: 0 }}
               >
-                <div className="h-full min-h-[320px] min-w-0 w-full sm:min-h-[400px] md:min-h-[480px]">
+                <div className="pointer-events-none h-full min-h-[320px] min-w-0 w-full [&_canvas]:pointer-events-none sm:min-h-[400px] md:min-h-[480px]">
                   <Canvas
-                    className="h-full w-full min-h-[inherit] touch-none"
+                    className="h-full w-full min-h-[inherit] pointer-events-none"
                     camera={{ position: [0, 0, 3], fov: 45 }}
                     dpr={[1, 1.5]}
                     gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}

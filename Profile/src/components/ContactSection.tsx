@@ -198,7 +198,7 @@ export default function ContactSection() {
     <section
       ref={sectionRef}
       id="contact"
-      className="relative min-h-screen overflow-hidden bg-[#060606] text-[#e8e8e8]"
+      className="relative min-h-screen touch-pan-y overflow-hidden bg-[#060606] text-[#e8e8e8]"
     >
       <div
         className="pointer-events-none absolute inset-0 z-[5] opacity-[1]"
@@ -214,7 +214,7 @@ export default function ContactSection() {
         className="absolute inset-0 z-10 min-h-0 min-w-0 pointer-events-none opacity-[0.06] md:opacity-[0.12] lg:opacity-0"
       >
         <Canvas
-          className="h-full w-full touch-none"
+          className="h-full w-full pointer-events-none"
           camera={{ position: [0, 0.15, 5.4], fov: 42 }}
           dpr={[1, 1.25]}
           gl={{

@@ -25,6 +25,8 @@ canvas {
   width: 100% !important;
   height: 100% !important;
   vertical-align: top;
+  /* Mobile: não bloquear o gesto de scroll vertical sobre WebGL */
+  touch-action: pan-y;
 }
 
 ::selection {

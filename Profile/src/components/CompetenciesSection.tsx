@@ -208,7 +208,7 @@ function SpaceBackdrop() {
         aria-hidden
       >
         <Canvas
-          className="h-full min-h-[70vh] w-full"
+          className="h-full min-h-[70vh] w-full pointer-events-none"
           camera={{ position: [0, -0.45, 8.2], fov: 48 }}
           gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
           dpr={[1, 1.25]}
@@ -563,7 +563,7 @@ export default function CompetenciesSection() {
     <section
       ref={sectionRef}
       id="competencies"
-      className="relative h-screen w-full overflow-x-hidden overflow-y-visible bg-black"
+      className="relative h-screen w-full touch-pan-y overflow-x-hidden overflow-y-visible bg-black"
       aria-label="Competências"
     >
       {/* Espaço: gradiente + nebulosa + estrelas em camadas */}
@@ -589,17 +589,21 @@ export default function CompetenciesSection() {
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-red-500/20 to-transparent" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-rose-900/15 to-transparent" />
 
-      {/* ── 3D Canvas ─────────────────────────────────────────────────── */}
-      <div ref={canvasRef} className="absolute inset-0 z-[1]" style={{ opacity: 0 }}>
+      {/* ── 3D Canvas — pointer-events none para o scroll vertical no mobile passar através do WebGL */}
+      <div
+        ref={canvasRef}
+        className="pointer-events-none absolute inset-0 z-[1] [&_canvas]:pointer-events-none"
+        style={{ opacity: 0 }}
+      >
         <Suspense
           fallback={
-            <div className="flex h-full items-center justify-center font-mono text-[9px] uppercase tracking-[0.25em] text-gray-700">
+            <div className="pointer-events-none flex h-full items-center justify-center font-mono text-[9px] uppercase tracking-[0.25em] text-gray-700">
               sincronizando propulsores…
             </div>
           }
         >
           <Canvas
-            className="h-full w-full touch-none"
+            className="h-full w-full pointer-events-none"
             camera={{ position: [1.35, 0.88, 5.35], fov: 44 }}
             gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
           >

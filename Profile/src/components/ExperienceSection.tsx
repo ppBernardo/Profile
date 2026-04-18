@@ -230,15 +230,15 @@ export default function ExperienceSection() {
     <section
       ref={sectionRef}
       id="experience"
-      className="relative overflow-hidden bg-black"
+      className="relative touch-pan-y overflow-hidden bg-black"
     >
       {/* ── Canvas 3D fullscreen — TIE Fighter voa pelo espaço ── */}
       <div
         ref={canvasWrapRef}
-        className="absolute inset-0 z-30 min-h-0 min-w-0 pointer-events-none"
+        className="absolute inset-0 z-30 min-h-0 min-w-0 pointer-events-none [&_canvas]:pointer-events-none"
       >
         <Canvas
-          className="h-full w-full touch-none"
+          className="h-full w-full pointer-events-none"
           camera={{ position: [0, 0, 6], fov: 55 }}
           dpr={[1, 1.5]}
           gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
@@ -262,11 +262,11 @@ export default function ExperienceSection() {
         style={{ opacity: 0 }}
       />
 
-      {/* ── Conteúdo da timeline ── */}
-      <div className="h-screen flex items-center relative z-10">
+      {/* ── Conteúdo da timeline — touch vertical passa através do canvas (pointer-events none no WebGL) */}
+      <div className="relative z-10 flex h-screen touch-pan-y items-center">
         <div
           ref={trackRef}
-          className="flex items-center gap-4 sm:gap-8 px-4 sm:px-8"
+          className="pointer-events-auto flex items-center gap-4 sm:gap-8 px-4 sm:px-8"
           style={{ paddingLeft: '4vw', opacity: 0 }}
         >
           <div

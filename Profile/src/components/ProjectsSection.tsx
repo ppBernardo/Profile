@@ -445,7 +445,7 @@ export default function ProjectsSection() {
     <section
       ref={sectionRef}
       id="projects"
-      className="relative overflow-hidden bg-[#030508] py-16 sm:py-24 md:py-32"
+      className="relative touch-pan-y overflow-hidden bg-[#030508] py-16 sm:py-24 md:py-32"
     >
       {/* ── Backgrounds ── */}
       <div
@@ -482,7 +482,7 @@ export default function ProjectsSection() {
           {/* R2D2 */}
           <div
             ref={canvasRef}
-            className="relative w-full max-w-[220px] shrink-0 sm:max-w-[300px] lg:max-w-[340px]"
+            className="pointer-events-none relative w-full max-w-[220px] shrink-0 sm:max-w-[300px] lg:max-w-[340px]"
             style={{ opacity: 0, transformStyle: 'preserve-3d' }}
           >
             <div
@@ -490,7 +490,7 @@ export default function ProjectsSection() {
               aria-hidden
             />
 
-            <div className="relative aspect-square overflow-hidden rounded-2xl border border-cyan-500/15 bg-gradient-to-b from-[#0a1018] to-[#030508] shadow-[0_0_35px_rgba(34,211,238,0.06)]">
+            <div className="pointer-events-none relative aspect-square overflow-hidden rounded-2xl border border-cyan-500/15 bg-gradient-to-b from-[#0a1018] to-[#030508] shadow-[0_0_35px_rgba(34,211,238,0.06)]">
               {/* HUD label */}
               <div className="absolute left-3.5 top-3.5 z-10 flex items-center gap-2">
                 <span className="relative flex h-1.5 w-1.5">
@@ -516,7 +516,7 @@ export default function ProjectsSection() {
                 }
               >
                 <Canvas
-                  className="h-full min-h-[280px] w-full touch-none"
+                  className="h-full min-h-[280px] w-full pointer-events-none"
                   camera={{ position: [0, 0.35, 4.5], fov: 40 }}
                   gl={{
                     alpha: true,

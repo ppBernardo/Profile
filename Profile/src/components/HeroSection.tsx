@@ -124,11 +124,14 @@ export default function HeroSection({ scrollProgress }: Props) {
     <section
       ref={sectionRef}
       id="hero"
-      className="relative h-screen overflow-hidden bg-black"
+      className="relative h-screen touch-pan-y overflow-hidden bg-black"
     >
-      <div ref={canvasWrapRef} className="absolute inset-0 min-h-0 min-w-0">
+      <div
+        ref={canvasWrapRef}
+        className="absolute inset-0 min-h-0 min-w-0 pointer-events-none [&_canvas]:pointer-events-none"
+      >
         <Canvas
-          className="h-full w-full touch-none"
+          className="h-full w-full pointer-events-none"
           camera={{ position: [0, 0.3, 5], fov: 45 }}
           dpr={[1, 1.5]}
           gl={{ antialias: true, alpha: true, toneMapping: 3, powerPreference: 'high-performance' }}
@@ -159,7 +162,7 @@ export default function HeroSection({ scrollProgress }: Props) {
         </Canvas>
       </div>
 
-      <div className="hero-content relative z-10 h-full flex flex-col items-center justify-center text-center px-3 sm:px-4">
+      <div className="hero-content pointer-events-auto relative z-10 flex h-full flex-col items-center justify-center px-3 text-center sm:px-4">
         <p className="hero-subtitle font-mono text-vader-red text-xs sm:text-sm tracking-[0.3em] uppercase mb-6">
           &gt; Full Stack Developer_
         </p>

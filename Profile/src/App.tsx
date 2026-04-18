@@ -42,6 +42,9 @@ export default function App() {
       duration: 1.2,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
+      /** Necessário no mobile: sem isso o scroll por toque não acompanha o Lenis corretamente */
+      syncTouch: true,
+      touchMultiplier: 1,
     });
 
     lenis.on('scroll', ScrollTrigger.update);
@@ -88,7 +91,11 @@ export default function App() {
       )}
 
       {showContent && (
-        <div ref={contentRef} className="bg-black min-h-screen text-gray-200 relative" style={{ opacity: 0 }}>
+        <div
+          ref={contentRef}
+          className="relative min-h-screen touch-pan-y bg-black text-gray-200"
+          style={{ opacity: 0 }}
+        >
           <MouseTrail />
           <ScrollProgress />
           <Navigation />
