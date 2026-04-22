@@ -8,17 +8,50 @@ import CanvasViewportSync from './CanvasViewportSync';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const experiences = [
+interface ExperienceItem {
+  year: string;
+  period: string;
+  company: string;
+  role: string;
+  location: string;
+  duration: string;
+  type: string;
+  logoLabel?: string;
+  description: string;
+  technologies: string[];
+}
+
+const experiences: ExperienceItem[] = [
+  {
+    year: '2026',
+    period: 'dez de 2025 - fev de 2026',
+    company: 'MyLegal',
+    role: 'Desenvolvedor Full Stack',
+    location: 'Remoto · Remoto',
+    duration: '5 meses',
+    type: 'Tempo integral',
+    description:
+      'Atuei na sustentacao e evolucao de sistemas legados em ASP e no desenvolvimento de novas funcionalidades em C# para o sistema interno. Desenvolvi telas com padrao MVC e participei da implementacao de integracao com banco de dados e API externa, lidando com alto volume de dados para garantir performance e estabilidade, seguindo principios de Clean Architecture com foco em organizacao, escalabilidade e manutenibilidade.',
+    technologies: [
+      'Desenvolvimento de aplicativos da web',
+      'Desenvolvimento de software',
+      'ASP',
+      'C#',
+      'MVC',
+      'Clean Architecture',
+      'API Externa',
+    ],
+  },
   {
     year: '2025',
-    period: 'Abr 2025 – Atual',
+    period: 'Abr 2025 – Nov 2025',
     company: 'ALTEROSA MK',
     role: 'Full Stack Developer',
     location: 'Contagem, MG',
     duration: '9 meses',
     type: 'Tempo integral',
     description:
-      'Desenvolvimento completo de aplicações web — APIs escaláveis em .NET, interfaces modernas com Angular 19+, workers para processamento assíncrono.',
+      'Atuação como desenvolvedor Full Stack com foco em backend .NET, responsável pelo desenvolvimento e evolução de sistemas internos corporativos, seguindo princípios de Clean Architecture e boas práticas de engenharia de software.No backend, desenvolvimento de APIs REST utilizando .NET 6+, com separação em camadas (Domain, Application e Infrastructure), aplicação de injeção de dependência e implementação de autenticação e autorização com JWT e controle de acesso baseado em roles.Experiência na implementação de testes automatizados com xUnit (unitários e de integração), incluindo testes mockados e não mockados para validação de regras de negócio, services e controllers, garantindo maior confiabilidade e estabilidade das aplicações.',
     technologies: ['Angular 19+', '.NET', 'C#', 'APIs RESTful', 'Workers'],
   },
   {
@@ -30,7 +63,7 @@ const experiences = [
     duration: '1 ano',
     type: 'Tempo integral',
     description:
-      'Soluções corporativas integrando Oracle, redes Mikrotik e sistemas .NET. Interfaces React e APIs ASP.NET para integração entre sistemas.',
+      'Atualmente, atuo como Analista de Desenvolvedor de Sistemas, com foco em soluções eficientes e inovadoras. Tenho sólida experiência em Banco de Dados Oracle, administração de redes utilizando Mikrotik, além de desenvolvimento em C# e .NET Framework. No meu dia a dia, estou sempre buscando novas formas de otimizar processos e aprimorar minhas habilidades técnicas, contribuindo diretamente para a evolução dos projetos em que atuo e para o crescimento da empresa.',
     technologies: ['React', 'C#', '.NET', 'Oracle', 'Mikrotik', 'ASP.NET'],
   },
   {
@@ -42,7 +75,7 @@ const experiences = [
     duration: '3 meses',
     type: 'Trainee',
     description:
-      'Participação em projetos do início ao fim. Contato direto com metodologias de desenvolvimento, resolução de problemas e otimização.',
+      'Como Trainee de Desenvolvimento de Software, estive ativamente envolvido na criação e aprimoramento de soluções de software inovadoras. Colaborei com equipes multifuncionais para desenvolver, testar e implementar funcionalidades essenciais em diversos projetos de software.Adquiri conhecimento prático em diversas linguagens de programação e metodologias de desenvolvimento, contribuindo desde a resolução de desafios técnicos até a depuração de código e otimização de desempenho.Minha trajetória como Trainee de Desenvolvimento de Software me proporcionou um sólido entendimento do ciclo de vida do desenvolvimento de software, fortalecendo minhas habilidades de resolução de problemas e aprimorando minha capacidade de colaborar eficazmente em um ambiente dinâmico de programação.',
     technologies: ['SQL', 'Bitbucket', 'Full Stack'],
   },
 ];
@@ -71,8 +104,20 @@ export default function ExperienceSection() {
     const titleBlock = titleBlockRef.current;
     if (!section || !track || !canvasWrap || !overlay || !titleBlock) return;
 
+    const isMobile = window.matchMedia('(max-width: 767px)').matches;
+    if (isMobile) {
+      // Mobile usa apenas layout/scroll nativo (sem GSAP nesta seção).
+      return;
+    }
+
     const ctx = gsap.context(() => {
-      const horizontalScroll = track.scrollWidth - window.innerWidth;
+      const viewportWidth = section.clientWidth || window.innerWidth;
+      // Baseado no ultimo card real para garantir que toda a timeline seja exibida no mobile.
+      const lastCard = track.querySelector('.exp-card:last-of-type') as HTMLElement | null;
+      const trailingOffset = viewportWidth < 768 ? 96 : 32;
+      const horizontalScroll = lastCard
+        ? Math.max(0, lastCard.offsetLeft + lastCard.offsetWidth - viewportWidth + trailingOffset)
+        : Math.max(0, track.scrollWidth - viewportWidth + trailingOffset);
       const tiePhase = window.innerHeight * 1.8;
       const totalPin = tiePhase + horizontalScroll;
 
@@ -235,7 +280,7 @@ export default function ExperienceSection() {
       {/* ── Canvas 3D fullscreen — TIE Fighter voa pelo espaço ── */}
       <div
         ref={canvasWrapRef}
-        className="absolute inset-0 z-30 min-h-0 min-w-0 pointer-events-none [&_canvas]:pointer-events-none"
+        className="absolute inset-0 z-30 min-h-0 min-w-0 pointer-events-none hidden md:block [&_canvas]:pointer-events-none"
       >
         <Canvas
           className="h-full w-full pointer-events-none"
@@ -258,12 +303,12 @@ export default function ExperienceSection() {
       {/* Overlay cinematográfico */}
       <div
         ref={overlayRef}
-        className="absolute inset-0 z-20 pointer-events-none bg-black"
+        className="absolute inset-0 z-20 pointer-events-none bg-black hidden md:block"
         style={{ opacity: 0 }}
       />
 
       {/* ── Conteúdo da timeline — touch vertical passa através do canvas (pointer-events none no WebGL) */}
-      <div className="relative z-10 flex h-screen touch-pan-y items-center">
+      <div className="relative z-10 hidden h-screen touch-pan-y items-center md:flex">
         <div
           ref={trackRef}
           className="pointer-events-auto flex items-center gap-4 sm:gap-8 px-4 sm:px-8"
@@ -312,8 +357,16 @@ export default function ExperienceSection() {
               <h3 className="text-lg sm:text-xl font-bold text-white mb-1 tracking-wide">
                 {exp.company}
               </h3>
+              {exp.logoLabel && (
+                <span className="mb-2 inline-flex w-fit items-center rounded border border-vader-red/30 bg-vader-red/10 px-2 py-0.5 font-mono text-[10px] tracking-[0.18em] text-vader-red">
+                  {exp.logoLabel}
+                </span>
+              )}
               <p className="text-vader-red text-xs sm:text-sm font-medium mb-2 sm:mb-3">
                 {exp.role}
+              </p>
+              <p className="text-gray-500 text-[11px] sm:text-xs mb-2 sm:mb-3 font-mono uppercase tracking-wider">
+                {exp.period}
               </p>
 
               <div className="flex items-center gap-3 sm:gap-4 text-gray-600 text-[11px] sm:text-xs mb-3 sm:mb-4">
@@ -359,6 +412,69 @@ export default function ExperienceSection() {
             </p>
           </div>
         </div>
+      </div>
+
+      {/* ── Mobile: lista vertical para garantir visualização de todos os cards */}
+      <div className="relative z-10 md:hidden px-4 py-10 space-y-4">
+        <div className="mb-6">
+          <p className="font-mono text-vader-red text-[10px] tracking-[0.3em] uppercase mb-3">
+            {'// EXPERIÊNCIA'}
+          </p>
+          <h2 className="font-display text-3xl text-white tracking-wider leading-none">
+            CARREIRA
+          </h2>
+          <p className="font-display text-xl text-white/20 tracking-wider mt-1">
+            &amp; TIMELINE
+          </p>
+          <div className="mt-4 h-px bg-gradient-to-r from-vader-red via-vader-red/30 to-transparent" />
+        </div>
+
+        {experiences.map((exp) => (
+          <article
+            key={`mobile-${exp.company}`}
+            className="w-full rounded-lg border border-vader-border bg-gradient-to-b from-vader-surface/60 to-black/60 p-5 transition-all duration-500 flex flex-col relative overflow-hidden"
+          >
+            <div className="flex items-baseline justify-between mb-3">
+              <span className="font-display text-3xl text-vader-red text-glow-red">{exp.year}</span>
+              <span className="text-[10px] text-gray-600 uppercase tracking-wider font-mono">{exp.type}</span>
+            </div>
+
+            <h3 className="text-lg font-bold text-white mb-1 tracking-wide">{exp.company}</h3>
+            {exp.logoLabel && (
+              <span className="mb-2 inline-flex w-fit items-center rounded border border-vader-red/30 bg-vader-red/10 px-2 py-0.5 font-mono text-[10px] tracking-[0.18em] text-vader-red">
+                {exp.logoLabel}
+              </span>
+            )}
+            <p className="text-vader-red text-xs font-medium mb-2">{exp.role}</p>
+            <p className="text-gray-500 text-[11px] mb-2 font-mono uppercase tracking-wider">{exp.period}</p>
+
+            <div className="flex items-center gap-3 text-gray-600 text-[11px] mb-3">
+              <span className="flex items-center gap-1">
+                <MapPin size={12} />
+                {exp.location}
+              </span>
+              <span className="flex items-center gap-1">
+                <Calendar size={12} />
+                {exp.duration}
+              </span>
+            </div>
+
+            <p className="text-gray-400 text-xs leading-relaxed">{exp.description}</p>
+
+            <div className="mt-3 pt-3 border-t border-vader-border">
+              <div className="flex flex-wrap gap-1.5">
+                {exp.technologies.map((tech) => (
+                  <span
+                    key={`mobile-tech-${exp.company}-${tech}`}
+                    className="px-2 py-0.5 rounded text-[10px] border border-vader-border text-gray-500 transition-all duration-500 font-mono"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </article>
+        ))}
       </div>
 
       <svg

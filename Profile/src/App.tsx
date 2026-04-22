@@ -20,6 +20,7 @@ export default function App() {
   const scrollProgressRef = useRef(0);
   const { progress, loaded } = useAssetLoader();
   const [showContent, setShowContent] = useState(false);
+  const [deferredSectionsReady, setDeferredSectionsReady] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const handleLoadingComplete = useCallback(() => {
@@ -80,6 +81,35 @@ export default function App() {
     };
   }, [showContent]);
 
+  useEffect(() => {
+    if (!showContent) {
+      setDeferredSectionsReady(false);
+      return;
+    }
+
+    // Deixa o primeiro paint acontecer antes de montar seções pesadas.
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    let idleId: number | undefined;
+
+    const markReady = () => {
+      setDeferredSectionsReady(true);
+      setTimeout(() => ScrollTrigger.refresh(), 0);
+    };
+
+    if ('requestIdleCallback' in window) {
+      idleId = window.requestIdleCallback(markReady, { timeout: 180 });
+    } else {
+      timeoutId = setTimeout(markReady, 80);
+    }
+
+    return () => {
+      if (idleId !== undefined && 'cancelIdleCallback' in window) {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
+    };
+  }, [showContent]);
+
   return (
     <>
       {!showContent && (
@@ -101,58 +131,62 @@ export default function App() {
           <Navigation />
 
           <HeroSection scrollProgress={scrollProgressRef} />
-          <AboutSection />
-          <ExperienceSection />
-          <ProjectsSection />
-          <CompetenciesSection />
-          <ContactSection />
+          {deferredSectionsReady && (
+            <>
+              <AboutSection />
+              <ExperienceSection />
+              <ProjectsSection />
+              <CompetenciesSection />
+              <ContactSection />
 
-          <footer className="relative border-t border-vader-border py-16">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-            <div>
-              <p className="font-display text-2xl sm:text-3xl text-vader-red text-glow-red tracking-wider">
-                O LADO SOMBRIO DO CÓDIGO.
-              </p>
-              <p className="text-gray-700 text-xs font-mono mt-2 tracking-wider">
-                {'>'} sempre entregando resultado
-              </p>
-            </div>
-            <div className="flex items-center gap-6 text-xs text-gray-600 font-mono">
-              <a
-                href="https://github.com/ppBernardo"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-vader-red transition-colors"
-              >
-                GitHub
-              </a>
-              <a
-                href="https://www.linkedin.com/in/bernardo-pereira-b80a0924a/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-vader-red transition-colors"
-              >
-                LinkedIn
-              </a>
-              <a
-                href="https://www.instagram.com/bernard0pereira?igsh=MWduNm9pdmdtbjBqNw=="
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-vader-red transition-colors"
-              >
-                Instagram
-              </a>
-            </div>
-          </div>
-          <div className="mt-8 pt-6 border-t border-vader-border text-center">
-            <p className="text-gray-700 text-[10px] font-mono tracking-[0.2em] uppercase">
-              &copy; {new Date().getFullYear()} Bernardo Pereira &bull; Todos os
-              direitos reservados
-            </p>
-          </div>
-        </div>
-      </footer>
+              <footer className="relative border-t border-vader-border py-16">
+                <div className="max-w-5xl mx-auto px-6">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+                    <div>
+                      <p className="font-display text-2xl sm:text-3xl text-vader-red text-glow-red tracking-wider">
+                        O LADO SOMBRIO DO CÓDIGO.
+                      </p>
+                      <p className="text-gray-700 text-xs font-mono mt-2 tracking-wider">
+                        {'>'} sempre entregando resultado
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-6 text-xs text-gray-600 font-mono">
+                      <a
+                        href="https://github.com/ppBernardo"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-vader-red transition-colors"
+                      >
+                        GitHub
+                      </a>
+                      <a
+                        href="https://www.linkedin.com/in/bernardo-pereira-b80a0924a/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-vader-red transition-colors"
+                      >
+                        LinkedIn
+                      </a>
+                      <a
+                        href="https://www.instagram.com/bernard0pereira?igsh=MWduNm9pdmdtbjBqNw=="
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-vader-red transition-colors"
+                      >
+                        Instagram
+                      </a>
+                    </div>
+                  </div>
+                  <div className="mt-8 pt-6 border-t border-vader-border text-center">
+                    <p className="text-gray-700 text-[10px] font-mono tracking-[0.2em] uppercase">
+                      &copy; {new Date().getFullYear()} Bernardo Pereira &bull; Todos os
+                      direitos reservados
+                    </p>
+                  </div>
+                </div>
+              </footer>
+            </>
+          )}
         </div>
       )}
     </>
