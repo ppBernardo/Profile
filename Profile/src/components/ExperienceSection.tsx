@@ -1,493 +1,228 @@
-import { useRef, useLayoutEffect, Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { MapPin, Calendar } from 'lucide-react';
-import TIEFighter, { type TIEFighterMotion } from './TIEFighter';
-import CanvasViewportSync from './CanvasViewportSync';
+import { Calendar, MapPin } from 'lucide-react';
+import Mascot, { type Pose } from './Mascot';
+import { EXPERIENCES } from '../data/profile';
+import { prefersReducedMotion } from '../lib/scroll';
 
 gsap.registerPlugin(ScrollTrigger);
-
-interface ExperienceItem {
-  year: string;
-  period: string;
-  company: string;
-  role: string;
-  location: string;
-  duration: string;
-  type: string;
-  logoLabel?: string;
-  description: string;
-  technologies: string[];
-}
-
-const experiences: ExperienceItem[] = [
-  {
-    year: '2026',
-    period: 'dez de 2025 - fev de 2026',
-    company: 'MyLegal',
-    role: 'Desenvolvedor Full Stack',
-    location: 'Remoto · Remoto',
-    duration: '5 meses',
-    type: 'Tempo integral',
-    description:
-      'Atuei na sustentacao e evolucao de sistemas legados em ASP e no desenvolvimento de novas funcionalidades em C# para o sistema interno. Desenvolvi telas com padrao MVC e participei da implementacao de integracao com banco de dados e API externa, lidando com alto volume de dados para garantir performance e estabilidade, seguindo principios de Clean Architecture com foco em organizacao, escalabilidade e manutenibilidade.',
-    technologies: [
-      'Desenvolvimento de aplicativos da web',
-      'Desenvolvimento de software',
-      'ASP',
-      'C#',
-      'MVC',
-      'Clean Architecture',
-      'API Externa',
-    ],
-  },
-  {
-    year: '2025',
-    period: 'Abr 2025 – Nov 2025',
-    company: 'ALTEROSA MK',
-    role: 'Full Stack Developer',
-    location: 'Contagem, MG',
-    duration: '9 meses',
-    type: 'Tempo integral',
-    description:
-      'Atuação como desenvolvedor Full Stack com foco em backend .NET, responsável pelo desenvolvimento e evolução de sistemas internos corporativos, seguindo princípios de Clean Architecture e boas práticas de engenharia de software.No backend, desenvolvimento de APIs REST utilizando .NET 6+, com separação em camadas (Domain, Application e Infrastructure), aplicação de injeção de dependência e implementação de autenticação e autorização com JWT e controle de acesso baseado em roles.Experiência na implementação de testes automatizados com xUnit (unitários e de integração), incluindo testes mockados e não mockados para validação de regras de negócio, services e controllers, garantindo maior confiabilidade e estabilidade das aplicações.',
-    technologies: ['Angular 19+', '.NET', 'C#', 'APIs RESTful', 'Workers'],
-  },
-  {
-    year: '2024',
-    period: 'Mai 2024 – Abr 2025',
-    company: 'Mais Distribuidora',
-    role: 'Analista de Desenvolvimento',
-    location: 'Belo Horizonte, MG',
-    duration: '1 ano',
-    type: 'Tempo integral',
-    description:
-      'Atualmente, atuo como Analista de Desenvolvedor de Sistemas, com foco em soluções eficientes e inovadoras. Tenho sólida experiência em Banco de Dados Oracle, administração de redes utilizando Mikrotik, além de desenvolvimento em C# e .NET Framework. No meu dia a dia, estou sempre buscando novas formas de otimizar processos e aprimorar minhas habilidades técnicas, contribuindo diretamente para a evolução dos projetos em que atuo e para o crescimento da empresa.',
-    technologies: ['React', 'C#', '.NET', 'Oracle', 'Mikrotik', 'ASP.NET'],
-  },
-  {
-    year: '2022',
-    period: 'Nov 2022 – Jan 2023',
-    company: 'Mais Dados Digital',
-    role: 'Full Stack Trainee',
-    location: 'Belo Horizonte, MG',
-    duration: '3 meses',
-    type: 'Trainee',
-    description:
-      'Como Trainee de Desenvolvimento de Software, estive ativamente envolvido na criação e aprimoramento de soluções de software inovadoras. Colaborei com equipes multifuncionais para desenvolver, testar e implementar funcionalidades essenciais em diversos projetos de software.Adquiri conhecimento prático em diversas linguagens de programação e metodologias de desenvolvimento, contribuindo desde a resolução de desafios técnicos até a depuração de código e otimização de desempenho.Minha trajetória como Trainee de Desenvolvimento de Software me proporcionou um sólido entendimento do ciclo de vida do desenvolvimento de software, fortalecendo minhas habilidades de resolução de problemas e aprimorando minha capacidade de colaborar eficazmente em um ambiente dinâmico de programação.',
-    technologies: ['SQL', 'Bitbucket', 'Full Stack'],
-  },
-];
 
 export default function ExperienceSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const canvasWrapRef = useRef<HTMLDivElement>(null);
-  const overlayRef = useRef<HTMLDivElement>(null);
-  const titleBlockRef = useRef<HTMLDivElement>(null);
-  const tieMotionRef = useRef<TIEFighterMotion>({
-    x: 5.8,
-    y: 0,
-    z: -3,
-    scale: 0.38,
-    yaw: 0,
-    roll: 0,
-    pitch: 0,
-  });
+  const walkerRef = useRef<HTMLDivElement>(null);
+  const [pose, setPose] = useState<Pose>('idle');
+  const [facing, setFacing] = useState<'left' | 'right'>('right');
+  const idleTimer = useRef<number | undefined>(undefined);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
     const track = trackRef.current;
-    const canvasWrap = canvasWrapRef.current;
-    const overlay = overlayRef.current;
-    const titleBlock = titleBlockRef.current;
-    if (!section || !track || !canvasWrap || !overlay || !titleBlock) return;
+    const walker = walkerRef.current;
+    if (!section || !track || !walker) return;
 
-    const isMobile = window.matchMedia('(max-width: 767px)').matches;
-    if (isMobile) {
-      // Mobile usa apenas layout/scroll nativo (sem GSAP nesta seção).
-      return;
-    }
+    const reduced = prefersReducedMotion();
+    const mm = gsap.matchMedia();
 
-    const ctx = gsap.context(() => {
-      const viewportWidth = section.clientWidth || window.innerWidth;
-      // Baseado no ultimo card real para garantir que toda a timeline seja exibida no mobile.
-      const lastCard = track.querySelector('.exp-card:last-of-type') as HTMLElement | null;
-      const trailingOffset = viewportWidth < 768 ? 96 : 32;
-      const horizontalScroll = lastCard
-        ? Math.max(0, lastCard.offsetLeft + lastCard.offsetWidth - viewportWidth + trailingOffset)
-        : Math.max(0, track.scrollWidth - viewportWidth + trailingOffset);
-      const tiePhase = window.innerHeight * 1.8;
-      const totalPin = tiePhase + horizontalScroll;
+    mm.add('(min-width: 768px)', () => {
+      const getDist = () => Math.max(0, track.scrollWidth - window.innerWidth + 96);
+      const cards = track.querySelectorAll<HTMLElement>('.campaign-card');
+      const header = track.querySelector<HTMLElement>('.campaign-header');
 
-      const tieRatio = tiePhase / totalPin;
+      if (!reduced) {
+        gsap.set(cards, { opacity: 0, y: 48, filter: 'blur(10px)' });
+        if (header) gsap.set(header, { opacity: 0, y: 30, filter: 'blur(10px)' });
+      }
 
-      const tl = gsap.timeline({
+      const scroll = gsap.to(track, {
+        x: () => -getDist(),
+        ease: 'none',
         scrollTrigger: {
           trigger: section,
+          start: 'top top',
+          end: () => `+=${getDist()}`,
           pin: true,
-          scrub: 1.2,
-          end: () => `+=${totalPin}`,
+          scrub: 1,
           invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            const vw = window.innerWidth;
+            gsap.set(walker, { x: vw * 0.06 + self.progress * vw * 0.86 });
+            setFacing(self.direction < 0 ? 'left' : 'right');
+            setPose('walk');
+            window.clearTimeout(idleTimer.current);
+            idleTimer.current = window.setTimeout(() => setPose('idle'), 170);
+          },
         },
       });
 
-      /* ── Fase 1: TIE Fighter voa da direita para a esquerda ── */
-      // 4 keyframes GSAP encadeados = trajetória curva contínua sem saltos
-
-      // KF1: entrada — entra no viewport pela direita, começa a crescer
-      const kf1 = tieRatio * 0.28;
-      tl.to(
-        tieMotionRef.current,
-        {
-          x: 2.4,
-          y: 0.3,
-          z: -1.2,
-          scale: 0.6,
-          yaw: -Math.PI * 0.12,
-          roll: -0.04,
-          pitch: 0.015,
-          duration: kf1,
-          ease: 'power2.in',
-        },
-        0
-      );
-
-      // KF2: meio — cruza o centro, mais perto da câmera, arco no topo
-      const kf2 = tieRatio * 0.34;
-      tl.to(
-        tieMotionRef.current,
-        {
-          x: -1.2,
-          y: 0.5,
-          z: 1.4,
-          scale: 1.05,
-          yaw: -Math.PI * 0.3,
-          roll: -0.11,
-          pitch: 0.03,
-          duration: kf2,
-          ease: 'power1.inOut',
-        },
-        kf1
-      );
-
-      // KF3: saída — acelera para a esquerda, ainda aproximando
-      const kf3 = tieRatio * 0.22;
-      tl.to(
-        tieMotionRef.current,
-        {
-          x: -4.2,
-          y: 0.2,
-          z: 2.2,
-          scale: 1.32,
-          yaw: -Math.PI * 0.42,
-          roll: -0.16,
-          pitch: 0.015,
-          duration: kf3,
-          ease: 'power1.in',
-        },
-        kf1 + kf2
-      );
-
-      // KF4: exit — sai da tela pela esquerda sem parar
-      const kf4 = tieRatio * 0.16;
-      tl.to(
-        tieMotionRef.current,
-        {
-          x: -7.8,
-          y: 0.0,
-          z: 2.8,
-          scale: 1.52,
-          yaw: -Math.PI / 2,
-          roll: -0.18,
-          pitch: 0.005,
-          duration: kf4,
-          ease: 'power2.in',
-        },
-        kf1 + kf2 + kf3
-      );
-
-      // Canvas 3D visível durante a fase TIE, fade out depois
-      tl.fromTo(
-        canvasWrap,
-        { opacity: 1 },
-        { opacity: 0, duration: tieRatio * 0.2, ease: 'power2.in' },
-        tieRatio * 0.85
-      );
-
-      // Overlay pulsa no centro da travessia
-      tl.fromTo(
-        overlay,
-        { opacity: 0 },
-        { opacity: 0.5, duration: tieRatio * 0.35, ease: 'power2.in' },
-        tieRatio * 0.1
-      );
-      tl.to(
-        overlay,
-        { opacity: 0, duration: tieRatio * 0.35, ease: 'power2.out' },
-        tieRatio * 0.55
-      );
-
-      /* ── Fase 2: Timeline revela ── */
-
-      tl.fromTo(
-        titleBlock,
-        { opacity: 0, y: 60, scale: 0.92 },
-        { opacity: 1, y: 0, scale: 1, duration: tieRatio * 0.3, ease: 'power3.out' },
-        tieRatio * 0.65
-      );
-
-      tl.fromTo(
-        track,
-        { opacity: 0, x: 80 },
-        { opacity: 1, x: 0, duration: tieRatio * 0.3, ease: 'power2.out' },
-        tieRatio * 0.7
-      );
-
-      const cards = track.querySelectorAll('.exp-card');
-      tl.fromTo(
-        cards,
-        { opacity: 0, y: 50, rotateY: -8 },
-        {
+      if (header) {
+        gsap.to(header, {
           opacity: 1,
           y: 0,
-          rotateY: 0,
-          duration: tieRatio * 0.25,
-          stagger: 0.03,
-          ease: 'power2.out',
-        },
-        tieRatio * 0.78
-      );
+          filter: 'blur(0px)',
+          duration: 0.9,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: section, start: 'top 70%', once: true },
+        });
+      }
+      cards.forEach((card) => {
+        gsap.to(card, {
+          opacity: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          duration: 0.85,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: card,
+            containerAnimation: scroll,
+            start: 'left 88%',
+            once: true,
+          },
+        });
+      });
+    });
 
-      /* ── Fase 3: Scroll horizontal ── */
-      tl.to(
-        track,
-        { x: -horizontalScroll, duration: 1 - tieRatio, ease: 'none' },
-        tieRatio
-      );
-    }, sectionRef);
+    mm.add('(max-width: 767px)', () => {
+      const items = track.querySelectorAll<HTMLElement>('.campaign-card, .campaign-header');
+      if (reduced) return;
+      items.forEach((item) => {
+        gsap.fromTo(
+          item,
+          { opacity: 0, y: 40, filter: 'blur(10px)' },
+          {
+            opacity: 1,
+            y: 0,
+            filter: 'blur(0px)',
+            duration: 0.8,
+            ease: 'power3.out',
+            scrollTrigger: { trigger: item, start: 'top 85%', once: true },
+          }
+        );
+      });
+    });
 
-    return () => ctx.revert();
+    return () => {
+      mm.revert();
+      window.clearTimeout(idleTimer.current);
+    };
   }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      id="experience"
-      className="relative touch-pan-y overflow-hidden bg-black"
-    >
-      {/* ── Canvas 3D fullscreen — TIE Fighter voa pelo espaço ── */}
+    <section ref={sectionRef} id="campanhas" className="relative overflow-hidden bg-sith-void">
+      <div className="pointer-events-none absolute inset-x-0 top-0 hairline" />
+
+      {/* Trilha no chão (desktop) */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-[9%] hidden md:block" aria-hidden>
+        <div
+          className="h-px w-full"
+          style={{
+            background:
+              'repeating-linear-gradient(90deg, rgba(227,36,43,0.35) 0 10px, transparent 10px 22px)',
+          }}
+        />
+      </div>
       <div
-        ref={canvasWrapRef}
-        className="absolute inset-0 z-30 min-h-0 min-w-0 pointer-events-none hidden md:block [&_canvas]:pointer-events-none"
+        ref={walkerRef}
+        className="pointer-events-none absolute bottom-[9%] left-0 z-20 hidden md:block"
+        aria-hidden
       >
-        <Canvas
-          className="h-full w-full pointer-events-none"
-          camera={{ position: [0, 0, 6], fov: 55 }}
-          dpr={[1, 1.5]}
-          gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
-          shadows
-          style={{ width: '100%', height: '100%', background: 'transparent' }}
-          resize={{ debounce: 0, scroll: true, offsetSize: false }}
-        >
-          <CanvasViewportSync maxDpr={1.5} />
-          <ambientLight intensity={0.25} />
-          <fog attach="fog" args={['#000000', 14, 24]} />
-          <Suspense fallback={null}>
-            <TIEFighter motionRef={tieMotionRef} />
-          </Suspense>
-        </Canvas>
+        <Mascot pose={pose} facing={facing} scale={4} bob={false} />
       </div>
 
-      {/* Overlay cinematográfico */}
-      <div
-        ref={overlayRef}
-        className="absolute inset-0 z-20 pointer-events-none bg-black hidden md:block"
-        style={{ opacity: 0 }}
-      />
-
-      {/* ── Conteúdo da timeline — touch vertical passa através do canvas (pointer-events none no WebGL) */}
-      <div className="relative z-10 hidden h-screen touch-pan-y items-center md:flex">
+      <div className="flex min-h-screen items-center py-24 md:h-screen md:py-0">
         <div
           ref={trackRef}
-          className="pointer-events-auto flex items-center gap-4 sm:gap-8 px-4 sm:px-8"
-          style={{ paddingLeft: '4vw', opacity: 0 }}
+          className="flex flex-col gap-6 px-5 sm:px-8 md:flex-row md:items-stretch md:gap-8 md:pl-[6vw] md:pr-[8vw]"
         >
-          <div
-            ref={titleBlockRef}
-            className="flex-shrink-0 w-[82vw] sm:w-[45vw] md:w-[35vw] flex flex-col justify-center pr-4 sm:pr-8"
-            style={{ opacity: 0 }}
-          >
-            <p className="font-mono text-vader-red text-[10px] sm:text-xs tracking-[0.3em] uppercase mb-3 sm:mb-4">
-              {'// EXPERIÊNCIA'}
-            </p>
-            <h2 className="font-display text-3xl sm:text-5xl md:text-6xl lg:text-8xl text-white tracking-wider leading-none">
-              CARREIRA
+          <div className="campaign-header flex shrink-0 flex-col justify-center md:w-[34vw] md:pr-6">
+            <p className="eyebrow">registro de missões</p>
+            <h2 className="mt-4 font-display text-5xl font-light leading-[0.95] tracking-tight text-sith-ink sm:text-6xl lg:text-7xl">
+              Campanhas<span className="text-sith-crimson">.</span>
             </h2>
-            <p className="font-display text-xl sm:text-3xl md:text-4xl lg:text-5xl text-white/20 tracking-wider mt-1 sm:mt-2">
-              &amp; TIMELINE
+            <p className="mt-6 max-w-sm text-sm leading-relaxed text-sith-muted sm:text-base">
+              Cada empresa foi um campo de batalha diferente. Cada entrega, uma habilidade
+              forjada. <span className="hidden md:inline">Role para avançar na linha do tempo.</span>
             </p>
-            <div className="mt-4 sm:mt-8 h-px bg-gradient-to-r from-vader-red via-vader-red/30 to-transparent" />
-            <p className="text-gray-600 text-xs sm:text-sm mt-3 sm:mt-4 max-w-xs">
-              Cada experiência forjou novas habilidades. Scroll para explorar a
-              jornada.
-            </p>
+            <div className="mt-8 h-px w-32 bg-gradient-to-r from-sith-crimson to-transparent" />
           </div>
 
-          {experiences.map((exp) => (
+          {EXPERIENCES.map((exp, i) => (
             <article
               key={exp.company}
-              className="exp-card flex-shrink-0 w-[80vw] sm:w-[380px] md:w-[420px] min-h-[400px] sm:min-h-[480px] rounded-lg border border-vader-border
-                         bg-gradient-to-b from-vader-surface/60 to-black/60 p-5 sm:p-7
-                         hover:border-vader-red/40 hover:saber-glow-strong
-                         transition-all duration-500 flex flex-col relative overflow-hidden group"
+              className="campaign-card panel group relative flex shrink-0 flex-col p-6 sm:p-7 md:w-[440px] lg:w-[470px]"
             >
-              <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-vader-red/0 to-transparent group-hover:via-vader-red/60 transition-all duration-700" />
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sith-crimson/0 to-transparent transition-all duration-700 group-hover:via-sith-crimson/70" />
+              <span className="absolute right-5 top-5 font-mono text-[9px] uppercase tracking-[0.3em] text-sith-faint">
+                {exp.current ? (
+                  <span className="flex items-center gap-1.5 text-sith-crimson">
+                    <span className="blink-dot inline-block h-1.5 w-1.5 rounded-full bg-sith-crimson" />
+                    em curso
+                  </span>
+                ) : (
+                  `missão ${String(EXPERIENCES.length - i).padStart(2, '0')}`
+                )}
+              </span>
 
-              <div className="flex items-baseline justify-between mb-3 sm:mb-4">
-                <span className="font-display text-3xl sm:text-4xl text-vader-red text-glow-red">
-                  {exp.year}
-                </span>
-                <span className="text-[9px] sm:text-[10px] text-gray-600 uppercase tracking-wider font-mono">
-                  {exp.type}
-                </span>
-              </div>
+              <p className="font-display text-6xl font-light leading-none tracking-tight text-sith-crimson text-glow-crimson">
+                {exp.year}
+              </p>
 
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-1 tracking-wide">
+              <h3 className="mt-5 font-display text-[28px] font-medium leading-tight text-sith-ink">
                 {exp.company}
               </h3>
-              {exp.logoLabel && (
-                <span className="mb-2 inline-flex w-fit items-center rounded border border-vader-red/30 bg-vader-red/10 px-2 py-0.5 font-mono text-[10px] tracking-[0.18em] text-vader-red">
-                  {exp.logoLabel}
-                </span>
-              )}
-              <p className="text-vader-red text-xs sm:text-sm font-medium mb-2 sm:mb-3">
+              <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.2em] text-sith-crimson/80">
                 {exp.role}
               </p>
-              <p className="text-gray-500 text-[11px] sm:text-xs mb-2 sm:mb-3 font-mono uppercase tracking-wider">
-                {exp.period}
-              </p>
 
-              <div className="flex items-center gap-3 sm:gap-4 text-gray-600 text-[11px] sm:text-xs mb-3 sm:mb-4">
+              <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-[0.16em] text-sith-faint">
+                <span>{exp.period}</span>
                 <span className="flex items-center gap-1">
-                  <MapPin size={12} />
-                  {exp.location}
+                  <MapPin size={11} /> {exp.location}
                 </span>
                 <span className="flex items-center gap-1">
-                  <Calendar size={12} />
-                  {exp.duration}
+                  <Calendar size={11} /> {exp.duration}
                 </span>
+                <span>{exp.type}</span>
               </div>
 
-              <p className="text-gray-400 text-xs sm:text-sm leading-relaxed flex-grow">
-                {exp.description}
-              </p>
+              <p className="mt-5 text-[13px] leading-relaxed text-sith-muted">{exp.summary}</p>
 
-              <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-vader-border">
-                <div className="flex flex-wrap gap-1.5">
-                  {exp.technologies.map((tech) => (
-                    <span
-                      key={tech}
-                      className="px-2 py-0.5 rounded text-[10px] border border-vader-border text-gray-500
-                                 group-hover:border-vader-red/20 group-hover:text-vader-red/60
-                                 transition-all duration-500 font-mono"
-                    >
-                      {tech}
-                    </span>
+              {exp.highlights && (
+                <ul className="mt-3 flex-grow space-y-1.5">
+                  {exp.highlights.map((h) => (
+                    <li key={h} className="flex gap-2 text-[12px] leading-relaxed text-sith-muted">
+                      <span className="mt-[7px] h-1 w-1 shrink-0 bg-sith-crimson" aria-hidden />
+                      <span>{h}</span>
+                    </li>
                   ))}
-                </div>
-              </div>
+                </ul>
+              )}
 
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-vader-red/0 via-vader-red/0 to-vader-red/0 group-hover:from-vader-red/40 group-hover:via-vader-red/60 group-hover:to-vader-red/40 transition-all duration-700" />
-            </article>
-          ))}
-
-          <div className="flex-shrink-0 w-[200px] flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 rounded-full border border-vader-red/30 flex items-center justify-center mb-4">
-              <span className="font-display text-lg text-vader-red">+</span>
-            </div>
-            <p className="text-gray-600 text-xs uppercase tracking-wider font-mono">
-              Em evolução
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Mobile: lista vertical para garantir visualização de todos os cards */}
-      <div className="relative z-10 md:hidden px-4 py-10 space-y-4">
-        <div className="mb-6">
-          <p className="font-mono text-vader-red text-[10px] tracking-[0.3em] uppercase mb-3">
-            {'// EXPERIÊNCIA'}
-          </p>
-          <h2 className="font-display text-3xl text-white tracking-wider leading-none">
-            CARREIRA
-          </h2>
-          <p className="font-display text-xl text-white/20 tracking-wider mt-1">
-            &amp; TIMELINE
-          </p>
-          <div className="mt-4 h-px bg-gradient-to-r from-vader-red via-vader-red/30 to-transparent" />
-        </div>
-
-        {experiences.map((exp) => (
-          <article
-            key={`mobile-${exp.company}`}
-            className="w-full rounded-lg border border-vader-border bg-gradient-to-b from-vader-surface/60 to-black/60 p-5 transition-all duration-500 flex flex-col relative overflow-hidden"
-          >
-            <div className="flex items-baseline justify-between mb-3">
-              <span className="font-display text-3xl text-vader-red text-glow-red">{exp.year}</span>
-              <span className="text-[10px] text-gray-600 uppercase tracking-wider font-mono">{exp.type}</span>
-            </div>
-
-            <h3 className="text-lg font-bold text-white mb-1 tracking-wide">{exp.company}</h3>
-            {exp.logoLabel && (
-              <span className="mb-2 inline-flex w-fit items-center rounded border border-vader-red/30 bg-vader-red/10 px-2 py-0.5 font-mono text-[10px] tracking-[0.18em] text-vader-red">
-                {exp.logoLabel}
-              </span>
-            )}
-            <p className="text-vader-red text-xs font-medium mb-2">{exp.role}</p>
-            <p className="text-gray-500 text-[11px] mb-2 font-mono uppercase tracking-wider">{exp.period}</p>
-
-            <div className="flex items-center gap-3 text-gray-600 text-[11px] mb-3">
-              <span className="flex items-center gap-1">
-                <MapPin size={12} />
-                {exp.location}
-              </span>
-              <span className="flex items-center gap-1">
-                <Calendar size={12} />
-                {exp.duration}
-              </span>
-            </div>
-
-            <p className="text-gray-400 text-xs leading-relaxed">{exp.description}</p>
-
-            <div className="mt-3 pt-3 border-t border-vader-border">
-              <div className="flex flex-wrap gap-1.5">
-                {exp.technologies.map((tech) => (
+              <div className="mt-5 flex flex-wrap gap-1.5 border-t border-sith-line pt-4">
+                {exp.technologies.map((t) => (
                   <span
-                    key={`mobile-tech-${exp.company}-${tech}`}
-                    className="px-2 py-0.5 rounded text-[10px] border border-vader-border text-gray-500 transition-all duration-500 font-mono"
+                    key={t}
+                    className="border border-sith-line px-2 py-0.5 font-mono text-[10px] tracking-[0.1em] text-sith-muted transition-colors group-hover:border-sith-crimson/30 group-hover:text-sith-ink"
                   >
-                    {tech}
+                    {t}
                   </span>
                 ))}
               </div>
-            </div>
-          </article>
-        ))}
-      </div>
+            </article>
+          ))}
 
-      <svg
-        className="absolute top-1/2 left-0 w-full h-px pointer-events-none z-0"
-        preserveAspectRatio="none"
-      >
-        <line
-          x1="0" y1="0" x2="100%" y2="0"
-          stroke="rgba(255,0,0,0.1)"
-          strokeWidth="1"
-          strokeDasharray="8 8"
-        />
-      </svg>
+          <div className="campaign-card flex shrink-0 flex-col items-center justify-center text-center md:w-[220px]">
+            <div className="flex h-16 w-16 items-center justify-center border border-sith-crimson/40 font-display text-2xl text-sith-crimson">
+              +
+            </div>
+            <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.3em] text-sith-faint">
+              próxima campanha
+            </p>
+            <p className="mt-1 font-display text-xl italic text-sith-muted">em aberto.</p>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }

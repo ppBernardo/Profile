@@ -4,36 +4,33 @@ export default {
   theme: {
     extend: {
       colors: {
-        vader: {
-          black: '#000000',
-          bg: '#050505',
-          surface: '#0a0a0f',
-          red: '#ff0000',
-          redDim: 'rgba(255, 0, 0, 0.15)',
-          redGlow: 'rgba(255, 0, 0, 0.4)',
-          metal: '#1a1a2e',
-          metalLight: '#2a2a3e',
-          border: 'rgba(255, 255, 255, 0.06)',
-          borderRed: 'rgba(255, 0, 0, 0.2)',
+        sith: {
+          void: '#050405',
+          bg: '#0a0809',
+          surface: '#120f12',
+          raised: '#1a1519',
+          line: 'rgba(255,255,255,0.07)',
+          ink: '#ece4dc',
+          muted: '#9a9098',
+          faint: '#5a525a',
+          crimson: '#e3242b',
+          ember: '#ff5a3c',
+          blood: '#7a0f14',
+          gold: '#c9a44c',
+          goldDim: '#8a6f2e',
+          violet: '#a855f7',
         },
       },
       fontFamily: {
-        display: ['Orbitron', 'system-ui', 'sans-serif'],
+        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        pixel: ['VT323', 'monospace'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
         sans: ['Inter', 'system-ui', 'sans-serif'],
-        mono: ['Share Tech Mono', 'monospace'],
       },
-      animation: {
-        'pulse-red': 'pulse-red 2s ease-in-out infinite',
-        blink: 'blink 1s step-end infinite',
-      },
-      keyframes: {
-        'pulse-red': {
-          '0%, 100%': { boxShadow: '0 0 5px rgba(255,0,0,0.3)' },
-          '50%': { boxShadow: '0 0 20px rgba(255,0,0,0.6)' },
-        },
-        blink: {
-          '50%': { opacity: '0' },
-        },
+      boxShadow: {
+        glow: '0 0 12px rgba(227,36,43,0.6), 0 0 32px rgba(227,36,43,0.25)',
+        'glow-soft': '0 0 24px rgba(227,36,43,0.18)',
+        pixel: '4px 4px 0 0 #000',
       },
     },
   },

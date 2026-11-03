@@ -1,96 +1,133 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { useGLTF, useProgress } from '@react-three/drei';
+import Mascot from './Mascot';
+import { TIE_URL } from './TieFighter';
+import portrait from '../../imgs/busto-sith.png';
+import { prefersReducedMotion } from '../lib/scroll';
 
 interface Props {
-  progress: number;
-  finished: boolean;
   onComplete: () => void;
 }
 
-export default function LoadingScreen({ progress, finished, onComplete }: Props) {
-  const containerRef = useRef<HTMLDivElement>(null);
+function preloadImage(src: string) {
+  return new Promise<void>((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve();
+    img.onerror = () => resolve();
+    img.src = src;
+  });
+}
+
+async function preloadFonts() {
+  if (!('fonts' in document)) return;
+  const loads = [
+    '300 40px "Cormorant Garamond"',
+    'italic 300 40px "Cormorant Garamond"',
+    '500 20px "Cormorant Garamond"',
+    '20px VT323',
+    '400 12px "JetBrains Mono"',
+    '400 14px Inter',
+  ].map((f) => document.fonts.load(f).catch(() => undefined));
+  await Promise.race([Promise.all(loads), new Promise((r) => setTimeout(r, 3500))]);
+}
+
+/** Baixa o TIE Fighter e resolve quando o loader do three.js terminar (ou após o limite). */
+function preloadTie(onProgress: (pct: number) => void) {
+  return new Promise<void>((resolve) => {
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      unsub();
+      resolve();
+    };
+    const unsub = useProgress.subscribe((s) => {
+      if (s.total > 0) onProgress(s.progress);
+      if (!s.active && s.total > 0 && s.loaded >= s.total) finish();
+    });
+    useGLTF.preload(TIE_URL);
+    // Já estava em cache: o loader nunca fica "active".
+    window.setTimeout(() => {
+      const s = useProgress.getState();
+      if (!s.active && (s.total === 0 || s.loaded >= s.total)) finish();
+    }, 1200);
+    window.setTimeout(finish, 12000);
+  });
+}
+
+export default function LoadingScreen({ onComplete }: Props) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
-  const percentRef = useRef<HTMLSpanElement>(null);
-  const hasExited = useRef(false);
+  const pctRef = useRef<HTMLSpanElement>(null);
+  const labelRef = useRef<HTMLSpanElement>(null);
+  const done = useRef(false);
 
   useEffect(() => {
-    if (!barRef.current || !percentRef.current) return;
+    const bar = barRef.current;
+    const pct = pctRef.current;
+    const root = rootRef.current;
+    if (!bar || !pct || !root) return;
 
-    gsap.to(barRef.current, {
-      width: `${progress}%`,
-      duration: 0.5,
-      ease: 'power2.out',
+    const prog = { v: 0 };
+    const render = () => {
+      bar.style.width = `${prog.v}%`;
+      pct.textContent = String(Math.round(prog.v));
+    };
+
+    // Primeira metade: fontes e retrato; segunda metade: o TIE Fighter.
+    const creep = gsap.to(prog, { v: 42, duration: 1.4, ease: 'power2.out', onUpdate: render });
+    const minWait = new Promise((r) => setTimeout(r, prefersReducedMotion() ? 200 : 1400));
+    const tieDone = preloadTie((p) => {
+      const target = 42 + p * 0.5;
+      if (target > prog.v) {
+        creep.kill();
+        gsap.to(prog, { v: target, duration: 0.35, ease: 'power1.out', onUpdate: render, overwrite: true });
+      }
+      if (labelRef.current) labelRef.current.textContent = 'rastreando o TIE Fighter';
     });
 
-    gsap.to(percentRef.current, {
-      textContent: progress,
-      duration: 0.4,
-      snap: { textContent: 1 },
-      ease: 'power1.out',
+    Promise.all([preloadFonts(), preloadImage(portrait), tieDone, minWait]).then(() => {
+      if (done.current) return;
+      done.current = true;
+      creep.kill();
+      gsap
+        .timeline({ onComplete })
+        .to(prog, { v: 100, duration: 0.35, ease: 'power1.out', onUpdate: render, overwrite: true })
+        .to(root, {
+          yPercent: -100,
+          filter: 'blur(14px)',
+          duration: prefersReducedMotion() ? 0.01 : 0.75,
+          ease: 'power3.inOut',
+        });
     });
-  }, [progress]);
 
-  useEffect(() => {
-    if (!finished || hasExited.current || !containerRef.current) return;
-    hasExited.current = true;
-
-    const tl = gsap.timeline({
-      onComplete,
-    });
-
-    tl.to(containerRef.current, {
-      opacity: 0,
-      duration: 0.8,
-      delay: 0.35,
-      ease: 'power3.inOut',
-    });
-  }, [finished, onComplete]);
+    return () => {
+      creep.kill();
+    };
+  }, [onComplete]);
 
   return (
     <div
-      ref={containerRef}
-      className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center"
+      ref={rootRef}
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-sith-void"
+      aria-label="Carregando"
     >
-      <div className="flex flex-col items-center gap-8 w-full max-w-md px-8">
-        {/* Logo / título */}
-        <div className="text-center">
-          <p className="font-display text-4xl sm:text-5xl text-vader-red text-glow-red tracking-[0.2em]">
-            VADER
-          </p>
-          <p className="font-mono text-[10px] text-gray-600 tracking-[0.4em] uppercase mt-2">
-            Inicializando sistema
-          </p>
-        </div>
-
-        {/* Barra de progresso */}
-        <div className="w-full">
-          <div className="relative w-full h-[2px] bg-vader-border overflow-hidden rounded-full">
-            <div
-              ref={barRef}
-              className="absolute inset-y-0 left-0 bg-vader-red rounded-full"
-              style={{ width: '0%', boxShadow: '0 0 12px rgba(255,0,0,0.6), 0 0 30px rgba(255,0,0,0.2)' }}
-            />
-          </div>
-
-          <div className="flex justify-between items-center mt-3">
-            <p className="font-mono text-[10px] text-gray-700 tracking-wider">
-              Carregando assets 3D...
-            </p>
-            <p className="font-mono text-xs text-vader-red">
-              <span ref={percentRef}>0</span>
-              <span className="text-gray-600">%</span>
-            </p>
-          </div>
-        </div>
-
-        {/* Indicador pulsante */}
-        <div className="flex items-center gap-2 mt-4">
-          <span className="w-1.5 h-1.5 rounded-full bg-vader-red animate-pulse-red" />
-          <span className="font-mono text-[9px] text-gray-600 uppercase tracking-[0.3em]">
-            {finished ? 'Pronto' : 'Processando'}
-          </span>
-        </div>
+      <div className="relative">
+        <Mascot pose="walk" scale={5} facing="right" bob={false} />
+        <div className="absolute -bottom-2 left-1/2 h-px w-24 -translate-x-1/2 bg-gradient-to-r from-transparent via-sith-faint to-transparent" />
       </div>
+
+      <div className="relative mt-9 h-[2px] w-56 overflow-hidden bg-sith-raised">
+        <div ref={barRef} className="absolute inset-y-0 left-0 w-0 bg-sith-crimson shadow-glow" />
+      </div>
+
+      <p className="mt-4 font-pixel text-xl text-sith-muted">
+        <span ref={labelRef}>carregando o lado sombrio</span>{' '}
+        <span className="text-sith-ink">
+          <span ref={pctRef}>0</span>%
+        </span>
+      </p>
     </div>
   );
 }

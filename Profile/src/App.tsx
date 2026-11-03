@@ -1,194 +1,93 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import useAssetLoader from './hooks/useAssetLoader';
+import { SkinProvider } from './context/SkinContext';
+import { HyperspaceProvider } from './components/Hyperspace';
+import { setLenis } from './lib/scroll';
+import Grain from './components/Grain';
 import LoadingScreen from './components/LoadingScreen';
 import Navigation from './components/Navigation';
 import HeroSection from './components/HeroSection';
+import MasterSection from './components/MasterSection';
 import AboutSection from './components/AboutSection';
+import CommitsSection from './components/CommitsSection';
 import ExperienceSection from './components/ExperienceSection';
-import ProjectsSection from './components/ProjectsSection';
-import CompetenciesSection from './components/CompetenciesSection';
+import FleetSection from './components/FleetSection';
+import HolocronSection from './components/HolocronSection';
 import ContactSection from './components/ContactSection';
-import MouseTrail from './components/MouseTrail';
-import ScrollProgress from './components/ScrollProgress';
+import Footer from './components/Footer';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function App() {
-  const scrollProgressRef = useRef(0);
-  const { progress, loaded } = useAssetLoader();
-  const [showContent, setShowContent] = useState(false);
-  const [deferredSectionsReady, setDeferredSectionsReady] = useState(false);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const [loading, setLoading] = useState(true);
+  const [ready, setReady] = useState(false);
 
-  const handleLoadingComplete = useCallback(() => {
-    setShowContent(true);
+  const handleLoaded = useCallback(() => {
+    setLoading(false);
+    setReady(true);
   }, []);
 
   useEffect(() => {
-    if (!showContent) return;
-
-    // Fade-in do conteúdo após loading screen desaparecer
-    if (contentRef.current) {
-      gsap.fromTo(
-        contentRef.current,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.8, ease: 'power2.out' }
-      );
-    }
-
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
-      /** Necessário no mobile: sem isso o scroll por toque não acompanha o Lenis corretamente */
       syncTouch: true,
       touchMultiplier: 1,
     });
-
+    setLenis(lenis);
     lenis.on('scroll', ScrollTrigger.update);
 
-    const rafCallback = (time: number) => {
-      lenis.raf(time * 1000);
-    };
-
-    gsap.ticker.add(rafCallback);
+    const raf = (time: number) => lenis.raf(time * 1000);
+    gsap.ticker.add(raf);
     gsap.ticker.lagSmoothing(0);
-
-    // Recalcula ScrollTrigger após conteúdo montar
-    setTimeout(() => ScrollTrigger.refresh(), 100);
 
     let resizeTimer: ReturnType<typeof setTimeout> | undefined;
     const onResize = () => {
       if (resizeTimer !== undefined) clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        ScrollTrigger.refresh();
-        resizeTimer = undefined;
-      }, 120);
+      resizeTimer = setTimeout(() => ScrollTrigger.refresh(), 150);
     };
     window.addEventListener('resize', onResize);
-    window.visualViewport?.addEventListener('resize', onResize);
 
     return () => {
       window.removeEventListener('resize', onResize);
-      window.visualViewport?.removeEventListener('resize', onResize);
       if (resizeTimer !== undefined) clearTimeout(resizeTimer);
-      gsap.ticker.remove(rafCallback);
+      gsap.ticker.remove(raf);
       lenis.destroy();
+      setLenis(null);
       ScrollTrigger.getAll().forEach((t) => t.kill());
     };
-  }, [showContent]);
+  }, []);
 
   useEffect(() => {
-    if (!showContent) {
-      setDeferredSectionsReady(false);
-      return;
-    }
-
-    // Deixa o primeiro paint acontecer antes de montar seções pesadas.
-    let timeoutId: ReturnType<typeof setTimeout> | undefined;
-    let idleId: number | undefined;
-
-    const markReady = () => {
-      setDeferredSectionsReady(true);
-      setTimeout(() => ScrollTrigger.refresh(), 0);
-    };
-
-    if ('requestIdleCallback' in window) {
-      idleId = window.requestIdleCallback(markReady, { timeout: 180 });
-    } else {
-      timeoutId = setTimeout(markReady, 80);
-    }
-
-    return () => {
-      if (idleId !== undefined && 'cancelIdleCallback' in window) {
-        window.cancelIdleCallback(idleId);
-      }
-      if (timeoutId !== undefined) clearTimeout(timeoutId);
-    };
-  }, [showContent]);
+    // Fontes e layout já estão prontos: recalcula os triggers após a tela de carregamento sair.
+    if (!ready) return;
+    const id = window.setTimeout(() => ScrollTrigger.refresh(), 120);
+    return () => window.clearTimeout(id);
+  }, [ready]);
 
   return (
-    <>
-      {!showContent && (
-        <LoadingScreen
-          progress={progress}
-          finished={loaded}
-          onComplete={handleLoadingComplete}
-        />
-      )}
-
-      {showContent && (
-        <div
-          ref={contentRef}
-          className="relative min-h-screen touch-pan-y bg-black text-gray-200"
-          style={{ opacity: 0 }}
-        >
-          <MouseTrail />
-          <ScrollProgress />
+    <SkinProvider>
+      <HyperspaceProvider>
+        {loading && <LoadingScreen onComplete={handleLoaded} />}
+        <div className="relative min-h-screen bg-sith-void text-sith-ink">
+          <Grain />
           <Navigation />
-
-          <HeroSection scrollProgress={scrollProgressRef} />
-          {deferredSectionsReady && (
-            <>
-              <AboutSection />
-              <ExperienceSection />
-              <ProjectsSection />
-              <CompetenciesSection />
-              <ContactSection />
-
-              <footer className="relative border-t border-vader-border py-16">
-                <div className="max-w-5xl mx-auto px-6">
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-                    <div>
-                      <p className="font-display text-2xl sm:text-3xl text-vader-red text-glow-red tracking-wider">
-                        O LADO SOMBRIO DO CÓDIGO.
-                      </p>
-                      <p className="text-gray-700 text-xs font-mono mt-2 tracking-wider">
-                        {'>'} sempre entregando resultado
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-6 text-xs text-gray-600 font-mono">
-                      <a
-                        href="https://github.com/ppBernardo"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:text-vader-red transition-colors"
-                      >
-                        GitHub
-                      </a>
-                      <a
-                        href="https://www.linkedin.com/in/bernardo-pereira-b80a0924a/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:text-vader-red transition-colors"
-                      >
-                        LinkedIn
-                      </a>
-                      <a
-                        href="https://www.instagram.com/bernard0pereira?igsh=MWduNm9pdmdtbjBqNw=="
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:text-vader-red transition-colors"
-                      >
-                        Instagram
-                      </a>
-                    </div>
-                  </div>
-                  <div className="mt-8 pt-6 border-t border-vader-border text-center">
-                    <p className="text-gray-700 text-[10px] font-mono tracking-[0.2em] uppercase">
-                      &copy; {new Date().getFullYear()} Bernardo Pereira &bull; Todos os
-                      direitos reservados
-                    </p>
-                  </div>
-                </div>
-              </footer>
-            </>
-          )}
+          <main>
+            <HeroSection ready={ready} />
+            <MasterSection />
+            <AboutSection />
+            <CommitsSection />
+            <ExperienceSection />
+            <FleetSection />
+            <HolocronSection />
+            <ContactSection />
+          </main>
+          <Footer />
         </div>
-      )}
-    </>
+      </HyperspaceProvider>
+    </SkinProvider>
   );
 }

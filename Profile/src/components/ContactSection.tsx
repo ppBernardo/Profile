@@ -1,334 +1,287 @@
-import { useRef, useLayoutEffect, useEffect, Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
-import * as THREE from 'three';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import DeathStar, { type DeathStarMotion } from './DeathStar';
-import CanvasViewportSync from './CanvasViewportSync';
+import { ArrowUpRight, Copy } from 'lucide-react';
+import Mascot, { type Pose } from './Mascot';
+import { useWhipIn } from '../hooks/useWhipIn';
+import { CONTACTS, type ContactChannel } from '../data/profile';
+import { prefersReducedMotion } from '../lib/scroll';
 
-gsap.registerPlugin(ScrollTrigger);
+function Temple({ variant, active, glyph }: { variant: ContactChannel['variant']; active: boolean; glyph: string }) {
+  const door = active ? '#ff3b43' : '#2a0a0d';
+  const doorStyle = { transition: 'fill 0.35s ease, filter 0.35s ease', filter: active ? 'drop-shadow(0 0 10px #ff2a2a)' : 'none' };
+  const trim = active ? 0.9 : 0.35;
+  const stone = '#1c1517';
+  const stone2 = '#231a1d';
+  const stone3 = '#2a1f22';
+  const edge = '#0d0a0b';
 
-const EASE_ENTRY = 'cubic-bezier(0.16, 1, 0.3, 1)';
-
-/** Escala após entrada (100% presença). Final do pin = 68% disso — mantém peso visual à direita. */
-const DS_HERO_SCALE = 1.12;
-const DS_PIN_END_SCALE = DS_HERO_SCALE * 0.68;
-
-const socialChannels = [
-  {
-    id: 'github',
-    name: 'GITHUB',
-    handle: '@ppBernardo',
-    href: 'https://github.com/ppBernardo',
-    ariaLabel: 'GitHub — perfil ppBernardo',
-    Icon: IconGitHub,
-  },
-  {
-    id: 'linkedin',
-    name: 'LINKEDIN',
-    handle: 'bernardo-pereira',
-    href: 'https://www.linkedin.com/in/bernardo-pereira-b80a0924a/',
-    ariaLabel: 'LinkedIn — Bernardo Pereira',
-    Icon: IconLinkedIn,
-  },
-  {
-    id: 'instagram',
-    name: 'INSTAGRAM',
-    handle: '@bernard0pereira',
-    href: 'https://www.instagram.com/bernard0pereira?igsh=MWduNm9pdmdtbjBqNw==',
-    ariaLabel: 'Instagram — bernard0pereira',
-    Icon: IconInstagram,
-  },
-  {
-    id: 'email',
-    name: 'EMAIL',
-    handle: 'bernardo0kneezm@gmail.com',
-    href: 'mailto:bernardo0kneezm@gmail.com',
-    ariaLabel: 'Enviar e-mail para Bernardo',
-    Icon: IconMail,
-  },
-] as const;
-
-function IconGitHub({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" width="20" height="20" aria-hidden fill="currentColor">
-      <path d="M12 2C6.48 2 2 6.58 2 12.26c0 4.5 2.87 8.32 6.84 9.67.5.1.68-.22.68-.48 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.63.07-.62.07-.62 1 .07 1.53 1.05 1.53 1.05.89 1.56 2.34 1.11 2.91.85.09-.67.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.72 0 0 .84-.27 2.75 1.05A9.38 9.38 0 0 1 12 6.84c.85.004 1.71.12 2.51.35 1.91-1.32 2.75-1.05 2.75-1.05.55 1.42.2 2.46.1 2.72.64.721.03 1.63 1.03 2.75 0 3.94-2.34 4.8-4.57 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.59.69.48A10.01 10.01 0 0 0 22 12.26C22 6.58 17.52 2 12 2z" />
+    <svg viewBox="0 0 160 150" className="block w-full" aria-hidden>
+      {variant === 'ziggurat' && (
+        <>
+          <rect x="8" y="118" width="144" height="26" fill={stone} stroke={edge} />
+          <rect x="28" y="90" width="104" height="28" fill={stone2} stroke={edge} />
+          <rect x="48" y="62" width="64" height="28" fill={stone3} stroke={edge} />
+          <polygon points="62,62 98,62 80,24" fill={stone3} stroke={edge} />
+          <line x1="8" y1="118" x2="152" y2="118" stroke="#e3242b" strokeWidth="1.2" opacity={trim} />
+          <line x1="28" y1="90" x2="132" y2="90" stroke="#e3242b" strokeWidth="1.2" opacity={trim} />
+          <line x1="48" y1="62" x2="112" y2="62" stroke="#e3242b" strokeWidth="1.2" opacity={trim} />
+          <rect x="70" y="118" width="20" height="26" fill={door} style={doorStyle} />
+          <rect x="80" y="22" width="1.5" height="6" fill="#c9a44c" />
+          <text x="80" y="50" textAnchor="middle" fontFamily="JetBrains Mono, monospace" fontSize="11" fill="#c9a44c">
+            {glyph}
+          </text>
+        </>
+      )}
+      {variant === 'tower' && (
+        <>
+          <rect x="20" y="130" width="120" height="14" fill={stone} stroke={edge} />
+          <rect x="52" y="40" width="56" height="90" fill={stone2} stroke={edge} />
+          {[52, 66, 80, 94].map((x) => (
+            <rect key={x} x={x} y="32" width="8" height="10" fill={stone3} stroke={edge} />
+          ))}
+          <rect x="52" y="42" width="56" height="2" fill="#e3242b" opacity={trim} />
+          <rect x="77" y="58" width="6" height="34" fill={door} style={doorStyle} />
+          <rect x="70" y="104" width="20" height="26" fill={door} style={doorStyle} />
+          <text x="80" y="24" textAnchor="middle" fontFamily="JetBrains Mono, monospace" fontSize="11" fill="#c9a44c">
+            {glyph}
+          </text>
+        </>
+      )}
+      {variant === 'rotunda' && (
+        <>
+          <rect x="18" y="130" width="124" height="14" fill={stone} stroke={edge} />
+          <path d="M34 82 A46 46 0 0 1 126 82 Z" fill={stone3} stroke={edge} />
+          <rect x="30" y="80" width="100" height="6" fill={stone2} stroke={edge} />
+          {[36, 56, 96, 116].map((x) => (
+            <rect key={x} x={x} y="86" width="8" height="44" fill={stone2} stroke={edge} />
+          ))}
+          <rect x="30" y="86" width="100" height="1.5" fill="#e3242b" opacity={trim} />
+          <rect x="72" y="92" width="16" height="38" fill={door} style={doorStyle} />
+          <circle cx="80" cy="40" r="3" fill="#c9a44c" />
+          <text x="80" y="66" textAnchor="middle" fontFamily="JetBrains Mono, monospace" fontSize="11" fill="#c9a44c">
+            {glyph}
+          </text>
+        </>
+      )}
+      {variant === 'bunker' && (
+        <>
+          <polygon points="10,144 150,144 136,88 24,88" fill={stone} stroke={edge} />
+          <rect x="50" y="70" width="60" height="18" fill={stone2} stroke={edge} />
+          <rect x="24" y="88" width="112" height="1.5" fill="#e3242b" opacity={trim} />
+          <line x1="80" y1="70" x2="80" y2="48" stroke="#c9a44c" strokeWidth="1.5" />
+          <rect x="70" y="112" width="20" height="32" fill={door} style={doorStyle} />
+          <text x="80" y="44" textAnchor="middle" fontFamily="JetBrains Mono, monospace" fontSize="11" fill="#c9a44c">
+            {glyph}
+          </text>
+        </>
+      )}
     </svg>
   );
 }
 
-function IconLinkedIn({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" width="20" height="20" aria-hidden fill="currentColor">
-      <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5zM.5 8h4V24h-4V8zm7.5 0h3.84v2.18h.05c.53-1 1.84-2.06 3.79-2.06 4.05 0 4.8 2.67 4.8 6.14V24h-4v-6.93c0-1.65-.03-3.77-2.3-3.77-2.3 0-2.65 1.8-2.65 3.65V24h-4V8z" />
-    </svg>
-  );
-}
-
-function IconInstagram({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" width="20" height="20" aria-hidden fill="currentColor">
-      <path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8C2 4.6 4.6 2 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8A3.6 3.6 0 0 0 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 4.86 18.14 3 15.4 3H7.6m9.65 1.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5M12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10m0 2a3 3 0 1 0 .001 6.001A3 3 0 0 0 12 9z" />
-    </svg>
-  );
-}
-
-function IconMail({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" width="20" height="20" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.6">
-      <path d="M4 6h16v12H4z" />
-      <path d="M4 8l8 6 8-6" />
-    </svg>
-  );
-}
+const OFFSET_CLASSES = ['md:mt-0', 'md:mt-[70px]', 'md:mt-6', 'md:mt-[92px]'];
 
 export default function ContactSection() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const canvasWrapRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const introPlayedRef = useRef(false);
+  const wrapRef = useWhipIn<HTMLDivElement>();
+  const stageRef = useRef<HTMLDivElement>(null);
+  const walkerRef = useRef<HTMLDivElement>(null);
+  const doorRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [active, setActive] = useState(0);
+  const [pose, setPose] = useState<Pose>('idle');
+  const [facing, setFacing] = useState<'left' | 'right'>('left');
+  const [say, setSay] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const firstPlacement = useRef(true);
 
-  const dsMotionRef = useRef<DeathStarMotion>({
-    x: 0,
-    y: 0,
-    z: -3.8,
-    scale: 0.3,
-    rotY: 0,
-  });
-
-  useEffect(() => {
-    const section = sectionRef.current;
-    const wrap = canvasWrapRef.current;
-    if (!section || !wrap) return;
-
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry?.isIntersecting || introPlayedRef.current) return;
-        introPlayedRef.current = true;
-
-        const mqDesktop = window.matchMedia('(min-width: 1024px)');
-        const mqTablet = window.matchMedia('(min-width: 768px)');
-
-        if (mqDesktop.matches) {
-          gsap.fromTo(wrap, { opacity: 0 }, { opacity: 1, duration: 1.6, ease: EASE_ENTRY });
-        } else if (mqTablet.matches) {
-          gsap.set(wrap, { opacity: 0.12 });
-        } else {
-          gsap.set(wrap, { opacity: 0.06 });
-        }
-
-        gsap.to(dsMotionRef.current, {
-          scale: DS_HERO_SCALE,
-          z: -1.35,
-          duration: 1.6,
-          ease: EASE_ENTRY,
-        });
+  const moveWalker = useCallback((toIndex: number, instant: boolean) => {
+    const stage = stageRef.current;
+    const walker = walkerRef.current;
+    const door = doorRefs.current[toIndex];
+    if (!stage || !walker || !door) return;
+    const sr = stage.getBoundingClientRect();
+    const dr = door.getBoundingClientRect();
+    const x = dr.left - sr.left + dr.width / 2 + 40;
+    const y = dr.bottom - sr.top;
+    const cur = gsap.getProperty(walker, 'x') as number;
+    if (instant || prefersReducedMotion()) {
+      gsap.set(walker, { x, y });
+      return;
+    }
+    setFacing(x < cur ? 'left' : 'right');
+    setPose('walk');
+    gsap.to(walker, {
+      x,
+      y,
+      duration: Math.min(1.1, 0.35 + Math.abs(x - cur) / 520),
+      ease: 'power2.inOut',
+      onComplete: () => {
+        setPose('idle');
+        setFacing('left');
       },
-      { threshold: 0.12 }
-    );
-
-    obs.observe(section);
-    return () => obs.disconnect();
+    });
   }, []);
 
   useLayoutEffect(() => {
-    const section = sectionRef.current;
-    const content = contentRef.current;
-    if (!section || !content) return;
+    if (!window.matchMedia('(min-width: 768px)').matches) return;
+    moveWalker(active, firstPlacement.current);
+    firstPlacement.current = false;
+  }, [active, moveWalker]);
 
-    const ctx = gsap.context(() => {
-      gsap.set(content, { opacity: 0, y: 40 });
+  useEffect(() => {
+    const onResize = () => moveWalker(active, true);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [active, moveWalker]);
 
-      const mm = gsap.matchMedia();
-
-      mm.add('(min-width: 1024px)', () => {
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: section,
-            start: 'top top',
-            end: '+=130%',
-            scrub: 1.2,
-            pin: true,
-            invalidateOnRefresh: true,
-          },
-        });
-
-        tl.fromTo(
-          dsMotionRef.current,
-          { x: 0, y: 0, scale: DS_HERO_SCALE, z: -1.35, rotY: 0 },
-          {
-            x: 2.35,
-            y: 0.38,
-            scale: DS_PIN_END_SCALE,
-            z: -2.45,
-            rotY: Math.PI * 1.72,
-            ease: 'none',
-          },
-          0
-        );
-
-        tl.fromTo(
-          content,
-          { opacity: 0, y: 40 },
-          { opacity: 1, y: 0, ease: 'none' },
-          0
-        );
-      });
-
-      mm.add('(max-width: 1023px)', () => {
-        gsap.to(content, {
-          opacity: 1,
-          y: 0,
-          duration: 0.9,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: section,
-            start: 'top 78%',
-          },
-        });
-      });
-
-      return () => mm.revert();
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
+  const copyEmail = async (value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      setSay('copiado.');
+      window.setTimeout(() => {
+        setCopied(false);
+        setSay(null);
+      }, 1800);
+    } catch {
+      setSay('não deu. copia na mão.');
+      window.setTimeout(() => setSay(null), 2200);
+    }
+  };
 
   return (
-    <section
-      ref={sectionRef}
-      id="contact"
-      className="relative min-h-screen touch-pan-y overflow-hidden bg-[#060606] text-[#e8e8e8]"
-    >
+    <section id="contato" className="relative overflow-hidden bg-sith-void pt-28 sm:pt-36">
+      <div className="pointer-events-none absolute inset-x-0 top-0 hairline" />
+
+      {/* Mustafar */}
       <div
-        className="pointer-events-none absolute inset-0 z-[5] opacity-[1]"
+        className="pointer-events-none absolute inset-0"
         style={{
-          backgroundImage:
-            'repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 3px)',
+          background:
+            'linear-gradient(180deg, #050405 0%, #0b0608 38%, #2a0d0b 72%, #5a1a10 92%, #3a1009 100%)',
         }}
         aria-hidden
       />
-
+      <svg className="pointer-events-none absolute inset-x-0 bottom-0 h-[52%] w-full" viewBox="0 0 1440 400" preserveAspectRatio="none" aria-hidden>
+        <polygon points="0,400 0,260 120,190 260,250 380,150 520,230 640,120 760,210 900,160 1020,240 1180,140 1300,220 1440,170 1440,400" fill="#120b0d" />
+        <polygon points="0,400 0,320 160,300 300,340 460,280 620,330 780,290 940,340 1120,300 1280,340 1440,300 1440,400" fill="#1a0f10" />
+        <polygon points="620,120 640,110 660,120" fill="#ff6a3c" opacity="0.8" />
+        <polygon points="1170,145 1180,136 1192,146" fill="#ff6a3c" opacity="0.7" />
+      </svg>
       <div
-        ref={canvasWrapRef}
-        className="absolute inset-0 z-10 min-h-0 min-w-0 pointer-events-none opacity-[0.06] md:opacity-[0.12] lg:opacity-0"
-      >
-        <Canvas
-          className="h-full w-full pointer-events-none"
-          camera={{ position: [0, 0.15, 5.4], fov: 42 }}
-          dpr={[1, 1.25]}
-          gl={{
-            antialias: true,
-            alpha: true,
-            toneMapping: THREE.ACESFilmicToneMapping,
-            toneMappingExposure: 1.05,
-            outputColorSpace: THREE.SRGBColorSpace,
-            powerPreference: 'high-performance',
-          }}
-          style={{ width: '100%', height: '100%', background: 'transparent' }}
-          resize={{ debounce: 0, scroll: true, offsetSize: false }}
-        >
-          <CanvasViewportSync maxDpr={1.25} />
-          <ambientLight intensity={0.22} color="#1a1f28" />
-          <directionalLight
-            castShadow={false}
-            position={[7, 10, 5]}
-            intensity={0.48}
-            color="#f0f3f8"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-20 lava-flow opacity-90"
+        style={{
+          backgroundImage: 'linear-gradient(90deg, #ff4a1a, #ffb347, #ff2e00, #ff8a3c, #ff4a1a)',
+          clipPath:
+            'polygon(0 62%, 10% 46%, 22% 60%, 36% 40%, 50% 56%, 64% 36%, 78% 52%, 90% 40%, 100% 50%, 100% 100%, 0 100%)',
+          boxShadow: '0 -20px 60px rgba(255,90,60,0.35)',
+        }}
+        aria-hidden
+      />
+      <div className="pointer-events-none absolute inset-0" aria-hidden>
+        {Array.from({ length: 16 }).map((_, i) => (
+          <span
+            key={i}
+            className="ember-float"
+            style={{
+              left: `${4 + ((i * 61) % 92)}%`,
+              bottom: `${2 + ((i * 17) % 18)}%`,
+              ['--d' as string]: `${5 + (i % 4) * 1.6}s`,
+              ['--delay' as string]: `${(i * 0.7) % 5}s`,
+              ['--x' as string]: `${((i % 3) - 1) * 30}px`,
+            }}
           />
-          <directionalLight
-            position={[-10, 4, -6]}
-            intensity={0.32}
-            color="#6b7f9e"
-          />
-          <directionalLight
-            position={[0, -6, 3]}
-            intensity={0.14}
-            color="#2a3344"
-          />
-          <pointLight
-            position={[4, 1, 6]}
-            intensity={0.35}
-            distance={28}
-            decay={2}
-            color="#ff3b2a"
-          />
-          <Suspense fallback={null}>
-            <DeathStar
-              motionRef={dsMotionRef}
-              smoothedScrollRotation
-              rotationLerp={9}
-              continuousSpin={0.06}
-            />
-          </Suspense>
-        </Canvas>
+        ))}
       </div>
 
-      <div className="relative z-20 mx-auto grid min-h-screen max-w-6xl grid-cols-1 px-4 py-12 sm:px-8 sm:py-16 lg:grid-cols-[55%_45%] lg:px-10 lg:py-20">
-        <div
-          ref={contentRef}
-          className="flex flex-col justify-center md:max-lg:mx-auto md:max-lg:max-w-xl md:max-lg:text-center"
-        >
-          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#666]">
-            Setor de comunicações
+      <div ref={wrapRef} className="relative mx-auto max-w-6xl px-5 pb-24 sm:px-8 sm:pb-32">
+        <div className="text-center">
+          <p data-reveal className="eyebrow">
+            setor de comunicações
           </p>
-
-          <h2 className="mt-3 sm:mt-4 font-mono text-xl font-normal uppercase leading-tight tracking-[0.12em] text-[#e8e8e8] sm:text-2xl md:text-3xl">
-            O lado sombrio está recrutando
+          <h2 data-reveal className="mt-4 font-display text-5xl font-light tracking-tight text-sith-ink sm:text-6xl lg:text-7xl">
+            Contato<span className="text-sith-crimson">.</span>
           </h2>
-
-          <div
-            role="status"
-            aria-live="polite"
-            className="mt-5 inline-flex w-fit items-center gap-2 rounded border border-[#00ff4430] bg-transparent px-3 py-1 font-mono text-[11px] uppercase tracking-[0.15em] text-[#888]"
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#00ff44] opacity-40" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00ff44]" />
-            </span>
-            ● DISPONÍVEL PARA PROJETOS
-          </div>
-
-          <div className="my-8 h-px w-full max-w-md bg-[#1a1a1a]" aria-hidden />
-
-          <p className="max-w-xl text-xs leading-relaxed text-[#888] sm:text-sm md:text-base">
-            Estou disponível para novos projetos. Se você tem uma missão, eu tenho as habilidades para
-            executá-la. Use os canais abaixo para estabelecer contato.
+          <p data-reveal className="mt-4 text-sm text-sith-muted sm:text-base">
+            Escolha uma porta. O lado sombrio está recrutando.
           </p>
-
-          <div className="mt-10">
-            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-[#666]">
-              Canais de comunicação do Império
-            </p>
-            <ul className="mt-4 space-y-2 md:max-lg:mx-auto md:max-lg:max-w-md">
-              {socialChannels.map(({ id, name, handle, href, ariaLabel, Icon }) => (
-                <li key={id}>
-                  <a
-                    href={href}
-                    {...(id === 'email'
-                      ? {}
-                      : { target: '_blank', rel: 'noopener noreferrer' })}
-                    aria-label={ariaLabel}
-                    className="group flex cursor-pointer items-center gap-2.5 rounded border border-[#1a1a1a] border-l-[3px] border-l-transparent bg-[#0a0a0a] px-2.5 py-2.5 transition-all duration-200 hover:translate-x-1.5 hover:border-l-[#ff2200] sm:gap-3 sm:px-3 sm:py-3 md:gap-4"
-                  >
-                    <Icon className="shrink-0 text-[#666] transition-colors group-hover:text-[#ff2200]" />
-                    <div className="min-w-0 flex-1 font-mono">
-                      <span className="block text-[11px] uppercase tracking-[0.14em] text-[#e8e8e8]">
-                        {name}
-                      </span>
-                      <span className="block truncate text-xs text-[#666]">{handle}</span>
-                    </div>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
 
-        <div className="relative hidden min-h-[280px] lg:block">
-          <p className="absolute bottom-12 left-1/2 hidden max-w-[12rem] -translate-x-1/2 text-center font-mono text-[9px] uppercase leading-relaxed tracking-[0.2em] text-[#444] lg:block">
-            Vigilância orbital ativa
-          </p>
+        <div ref={stageRef} data-reveal className="relative mt-16 sm:mt-20">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-4 md:gap-x-6">
+            {CONTACTS.map((c, i) => {
+              const isActive = active === i;
+              return (
+                <div
+                  key={c.id}
+                  className={`relative ${OFFSET_CLASSES[i]}`}
+                  onMouseEnter={() => setActive(i)}
+                  onFocus={() => setActive(i)}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setActive(i)}
+                    className="group block w-full"
+                    aria-label={`${c.label}: ${c.value}`}
+                  >
+                    <div className="relative mx-auto w-full max-w-[200px] transition-transform duration-500 group-hover:-translate-y-1">
+                      <Temple variant={c.variant} active={isActive} glyph={c.glyph} />
+                      <div
+                        ref={(el) => {
+                          doorRefs.current[i] = el;
+                        }}
+                        className="pointer-events-none absolute bottom-[4%] left-1/2 h-px w-px"
+                      />
+                    </div>
+                  </button>
+
+                  {/* Placa */}
+                  <div
+                    className="relative mx-auto mt-3 max-w-[220px] origin-top transition-all duration-500"
+                    style={{
+                      transform: isActive ? 'scaleY(1)' : 'scaleY(0.96)',
+                      opacity: isActive ? 1 : 0.72,
+                    }}
+                  >
+                    <div className="h-[6px] w-full bg-gradient-to-r from-[#8a6f2e] via-[#e6c467] to-[#8a6f2e]" />
+                    <div className="border-x border-[#3a2a1c] bg-[#14100f] px-3 py-3 text-center">
+                      <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-sith-goldDim">{c.label}</p>
+                      <p className="mt-1 break-all font-pixel text-[17px] leading-tight text-sith-ink sm:text-[19px]">{c.value}</p>
+                      <div className="mt-2.5 flex justify-center">
+                        {c.copy ? (
+                          <button type="button" className="pixel-btn inline-flex items-center gap-1.5 !px-3 !py-1.5 !text-[16px]" onClick={() => copyEmail(c.value)}>
+                            <Copy size={12} /> {copied && isActive ? 'copiado' : 'copiar'}
+                          </button>
+                        ) : (
+                          <a
+                            href={c.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="pixel-btn inline-flex items-center gap-1.5 !px-3 !py-1.5 !text-[16px]"
+                          >
+                            abrir <ArrowUpRight size={12} />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                    <div className="h-[6px] w-full bg-gradient-to-r from-[#8a6f2e] via-[#e6c467] to-[#8a6f2e]" />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Mascote caminhando entre os templos (desktop) */}
+          <div
+            ref={walkerRef}
+            className="pointer-events-none absolute left-0 top-0 z-20 hidden -translate-y-full md:block"
+            style={{ marginTop: -2 }}
+            aria-hidden
+          >
+            <div className="-translate-x-1/2">
+              <Mascot pose={pose} facing={facing} scale={3.5} say={say} bob={false} />
+            </div>
+          </div>
         </div>
       </div>
     </section>

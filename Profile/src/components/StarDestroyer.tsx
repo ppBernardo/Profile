@@ -1,171 +1,114 @@
-import { useRef, useMemo, useEffect } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
-import { useGLTF, Center } from '@react-three/drei';
+import { useEffect, useMemo, useRef, type MutableRefObject, type ReactNode } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { Center, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 
-/* ─── Public interface ───────────────────────────────────────────────── */
+export const DESTROYER_URL = '/star_destroyer.glb';
 
-export interface StarDestroyerMotion {
-  /** 0–1: section scroll progress, used for subtle parallax */
-  scroll: number;
-  /**
-   * Entrada da nave: 0 = pequena e mais à esquerda; 1 = pose final.
-   * Animado por GSAP (ease forte no fim).
-   */
-  intro: number;
+export interface FleetMotion {
+  /** 0..1 — progresso do scroll na seção. */
+  p: number;
+  /** Ponteiro normalizado (-1..1). */
+  pointer: { x: number; y: number };
 }
 
 interface Props {
-  motionRef: React.MutableRefObject<StarDestroyerMotion>;
+  motion: MutableRefObject<FleetMotion>;
+  onReady?: () => void;
+  /** Marcadores HTML (drei <Html>) posicionados em coordenadas da nave normalizada. */
+  children?: ReactNode;
 }
 
-useGLTF.preload('/star_destroyer.glb');
+const smooth = (a: number, b: number, t: number) => {
+  const u = THREE.MathUtils.clamp((t - a) / (b - a), 0, 1);
+  return u * u * (3 - 2 * u);
+};
 
-/* ─── Camera setup (one-time, sets lookAt direction) ──────────────────── */
-
-function CameraSetup() {
-  const { camera } = useThree();
-  useEffect(() => {
-    // Olha mais à esquerda — encaixa nave maior e mais deslocada.
-    // Ponto de interesse na massa da nave (esquerda); câmera perto = nave enorme na tela.
-    camera.lookAt(-4.6, -0.02, 0);
-    (camera as THREE.PerspectiveCamera).updateProjectionMatrix();
-  }, [camera]);
-  return null;
-}
-
-/* ─── Star Destroyer ─────────────────────────────────────────────────── */
-
-export default function StarDestroyer({ motionRef }: Props) {
-  const { scene } = useGLTF('/star_destroyer.glb');
-  const groupRef = useRef<THREE.Group>(null);
-
-  const keyRef    = useRef<THREE.DirectionalLight>(null);
-  const fillRef   = useRef<THREE.PointLight>(null);
-  const rimRef    = useRef<THREE.PointLight>(null);
+/**
+ * Star Destroyer: passa por cima da câmera (abertura de Star Wars) e assenta em vista 3/4.
+ * A proa do modelo aponta para -Z; o grupo é normalizado para comprimento 1.
+ */
+export default function StarDestroyer({ motion, onReady, children }: Props) {
+  const { scene } = useGLTF(DESTROYER_URL);
+  const rig = useRef<THREE.Group>(null);
   const engineRef = useRef<THREE.PointLight>(null);
   const bridgeRef = useRef<THREE.PointLight>(null);
 
-  // Normalize so the largest dimension equals 3.8 units
-  const normalizedScale = useMemo(() => {
-    scene.updateMatrixWorld(true);
-    const box = new THREE.Box3().setFromObject(scene);
-    const size = box.getSize(new THREE.Vector3());
-    const maxDim = Math.max(size.x, size.y, size.z);
-    return maxDim > 0 ? 3.8 / maxDim : 1;
+  const base = useMemo(() => {
+    const probe = scene.clone(true);
+    probe.position.set(0, 0, 0);
+    probe.rotation.set(0, 0, 0);
+    probe.scale.set(1, 1, 1);
+    probe.updateMatrixWorld(true);
+    const size = new THREE.Box3().setFromObject(probe).getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z) || 1;
+    return 1 / maxDim;
   }, [scene]);
 
-  useFrame(({ clock }) => {
-    if (!groupRef.current) return;
-    const t = clock.elapsedTime;
-    const { scroll, intro } = motionRef.current;
-    const i = Math.max(0, Math.min(1, intro));
+  useEffect(() => {
+    scene.traverse((obj) => {
+      if (!(obj instanceof THREE.Mesh)) return;
+      const mat = obj.material;
+      if (!mat || Array.isArray(mat)) return;
+      if (!(mat instanceof THREE.MeshStandardMaterial || mat instanceof THREE.MeshPhysicalMaterial)) return;
+      mat.metalness = THREE.MathUtils.clamp(mat.metalness * 1.05, 0.3, 0.9);
+      mat.roughness = THREE.MathUtils.clamp(mat.roughness, 0.35, 0.8);
+      mat.envMapIntensity = 1.2;
+      mat.needsUpdate = true;
+    });
+    onReady?.();
+  }, [scene, onReady]);
 
-    /* ── Idle float — very subtle (só após intro quase completo) ─────── */
-    const floatBlend = THREE.MathUtils.smoothstep(i, 0.82, 1);
-    const floatY = Math.sin(t * 0.33) * 0.036 * floatBlend;
-    const floatZ = Math.sin(t * 0.18) * 0.008 * floatBlend;
+  useFrame((state, delta) => {
+    const g = rig.current;
+    if (!g) return;
+    const { p, pointer } = motion.current;
+    const t = state.clock.elapsedTime;
 
-    /* ── Scroll parallax — barely perceptible ────────────────────────── */
-    const parallaxY = scroll * -0.09 * floatBlend;
+    // Fase A (0→0.5): rasante por cima da câmera, afastando-se.
+    // Fase B (0.5→0.85): vira para a vista 3/4 e aproxima.
+    const a = smooth(0, 0.5, p);
+    const b = smooth(0.5, 0.85, p);
 
-    /* ── Entrada: pequena e longe à esquerda → pose final (GSAP interpola i) ─ */
-    const startX = -12.8;
-    const endX = -5.55;
-    const startScaleMult = 2.35;
-    const endScaleMult = 9.25;
-    const posX = THREE.MathUtils.lerp(startX, endX, i);
-    const scaleMult = THREE.MathUtils.lerp(startScaleMult, endScaleMult, i);
+    // Entra pelo alto do quadro, enorme, e recua até virar um ponto; depois volta em 3/4.
+    const x = THREE.MathUtils.lerp(THREE.MathUtils.lerp(0.6, 0.2, a), -0.6, b) + pointer.x * 0.25 * b;
+    const y = THREE.MathUtils.lerp(THREE.MathUtils.lerp(2.3, 1.1, a), 0.05, b) + pointer.y * -0.15 * b + Math.sin(t * 0.35) * 0.03 * b;
+    const z = THREE.MathUtils.lerp(THREE.MathUtils.lerp(8.5, -16, a), -3.2, b);
+    const len = THREE.MathUtils.lerp(THREE.MathUtils.lerp(34, 12, a), 15, b);
+    const yaw = THREE.MathUtils.lerp(0, -0.95, b) + pointer.x * 0.06 * b + Math.sin(t * 0.21) * 0.01 * b;
+    const pitch = THREE.MathUtils.lerp(-0.05, 0.12, b) + Math.sin(t * 0.17) * 0.006 * b;
+    const roll = THREE.MathUtils.lerp(0.03, -0.08, b);
 
-    groupRef.current.position.set(posX, floatY + parallaxY, 0);
+    const k = 6;
+    g.position.x = THREE.MathUtils.damp(g.position.x, x, k, delta);
+    g.position.y = THREE.MathUtils.damp(g.position.y, y, k, delta);
+    g.position.z = THREE.MathUtils.damp(g.position.z, z, k, delta);
+    g.rotation.x = THREE.MathUtils.damp(g.rotation.x, pitch, k, delta);
+    g.rotation.y = THREE.MathUtils.damp(g.rotation.y, yaw, k, delta);
+    g.rotation.z = THREE.MathUtils.damp(g.rotation.z, roll, k, delta);
+    g.scale.setScalar(THREE.MathUtils.damp(g.scale.x || len, len, k, delta));
 
-    /* ── Micro rotation — quase imperceptível (blend com intro) ─────── */
-    groupRef.current.rotation.set(
-      -0.08 + Math.sin(t * 0.13) * 0.005 * floatBlend,
-      Math.sin(t * 0.21) * 0.012 * floatBlend,
-      0.018 + Math.sin(t * 0.09) * 0.004 * floatBlend + floatZ,
-    );
-
-    groupRef.current.scale.setScalar(normalizedScale * scaleMult);
-
-    /* ── Lighting pulse ──────────────────────────────────────────────── */
-    const pulse    = 0.92 + Math.sin(t * 1.3) * 0.08;
-    const engPulse = 0.84 + Math.sin(t * 2.5) * 0.16;  // engine flicker
-    const brgPulse = 0.88 + Math.sin(t * 1.9) * 0.12;  // bridge glow
-
-    if (keyRef.current)    keyRef.current.intensity    = 3.0 * pulse;
-    if (fillRef.current)   fillRef.current.intensity   = 1.6;
-    if (rimRef.current)    rimRef.current.intensity    = 2.3 * pulse;
-    if (engineRef.current) engineRef.current.intensity = 1.8 * engPulse;
-    if (bridgeRef.current) bridgeRef.current.intensity = 1.1 * brgPulse;
+    const eng = 0.84 + Math.sin(t * 2.5) * 0.16;
+    if (engineRef.current) engineRef.current.intensity = 2.4 * eng;
+    if (bridgeRef.current) bridgeRef.current.intensity = 0.9 + Math.sin(t * 1.9) * 0.3;
   });
 
   return (
-    <>
-      <CameraSetup />
-
-      <group ref={groupRef}>
-        {/* +PI/2 on Y: rotates model so nose points toward -X (screen-left) */}
-        <group rotation={[0, Math.PI * 0.5, 0]}>
-          <Center>
-            <primitive object={scene} />
-          </Center>
-        </group>
-
-        {/* Key light: top-front, cool white */}
-        <directionalLight
-          ref={keyRef}
-          color="#dce8ff"
-          intensity={3.0}
-          position={[3, 5, 5]}
-          castShadow={false}
-        />
-        {/* Fill: deep blue-navy */}
-        <pointLight
-          ref={fillRef}
-          color="#1a3355"
-          intensity={1.6}
-          distance={22}
-          decay={1.5}
-          position={[-3, 1, 3]}
-        />
-        {/* Rim: white backlight for silhouette separation */}
-        <pointLight
-          ref={rimRef}
-          color="#ffffff"
-          intensity={2.3}
-          distance={25}
-          decay={1.4}
-          position={[0, 3, -9]}
-        />
-        {/* Engine glow (rear-left of ship) */}
-        <pointLight
-          ref={engineRef}
-          color="#99bbff"
-          intensity={1.8}
-          distance={9}
-          decay={2}
-          position={[-2.2, -0.1, -0.3]}
-        />
-        {/* Bridge / cockpit glow (cyan) */}
-        <pointLight
-          ref={bridgeRef}
-          color="#00ccff"
-          intensity={1.1}
-          distance={5}
-          decay={2}
-          position={[0.8, 0.9, 0.4]}
-        />
-        {/* Imperial red underlight */}
-        <pointLight
-          color="#ff1111"
-          intensity={0.55}
-          distance={11}
-          decay={2}
-          position={[0, -2.5, 0]}
-        />
-        <ambientLight intensity={0.08} color="#5566778" />
+    <group ref={rig} position={[0.6, 2.3, 8.5]} scale={34}>
+      {/* Modelo normalizado (comprimento 1), girado para a proa apontar para -Z */}
+      <group scale={base} rotation={[0, Math.PI, 0]}>
+        <Center>
+          <primitive object={scene} />
+        </Center>
       </group>
-    </>
+
+      {/* Marcadores presos ao casco */}
+      {children}
+
+      {/* Motores (popa, +Z) e ponte */}
+      <pointLight ref={engineRef} color="#9fc4ff" intensity={2.4} distance={1.6} decay={2} position={[0, -0.02, 0.56]} />
+      <pointLight ref={bridgeRef} color="#8ad6ff" intensity={0.9} distance={0.5} decay={2} position={[0, 0.2, 0.34]} />
+      <pointLight color="#ff1a1a" intensity={0.9} distance={1.8} decay={2} position={[0, -0.35, 0]} />
+    </group>
   );
 }
