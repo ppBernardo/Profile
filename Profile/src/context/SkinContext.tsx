@@ -9,6 +9,7 @@ import {
 } from 'react';
 import { SKINS, UNLOCKABLE, type Skin, type SkinId } from '../lib/sprites';
 import { CRYSTALS_PER_PROJECT, PROJECTS } from '../data/profile';
+import { useSide } from './SideContext';
 
 const STORAGE_KEY = 'sith-inventory-v1';
 
@@ -46,6 +47,9 @@ function load(): Stored {
 
 export function SkinProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<Stored>(load);
+  const { config } = useSide();
+  // Na Resistência o mascote é o Jedi; as patentes Sith do inventário valem para o lado sombrio.
+  const skinId: SkinId = config.id === 'rebel' ? config.skin : state.skinId;
 
   useEffect(() => {
     try {
@@ -87,8 +91,8 @@ export function SkinProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<SkinContextValue>(
     () => ({
-      skin: SKINS[state.skinId],
-      skinId: state.skinId,
+      skin: SKINS[skinId],
+      skinId,
       setSkinId,
       crystals,
       totalCrystals,
@@ -96,7 +100,7 @@ export function SkinProvider({ children }: { children: ReactNode }) {
       collect,
       isUnlocked,
     }),
-    [state.skinId, state.collected, setSkinId, crystals, totalCrystals, collect, isUnlocked]
+    [skinId, state.collected, setSkinId, crystals, totalCrystals, collect, isUnlocked]
   );
 
   return <SkinContext.Provider value={value}>{children}</SkinContext.Provider>;

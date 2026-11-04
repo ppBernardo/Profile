@@ -210,7 +210,7 @@ export default function CommitsSection() {
             <div className="rivet bottom-2.5 left-2.5" />
             <div className="rivet bottom-2.5 right-2.5" />
 
-            <div className="relative bg-[#0a0709] p-3 shadow-[inset_0_0_30px_rgba(0,0,0,0.9)] sm:p-4">
+            <div className="relative bg-sith-bg p-3 sm:p-4" style={{ boxShadow: 'inset 0 0 30px rgb(var(--c-void) / 0.9)' }}>
               <div
                 className="pointer-events-none absolute inset-0 opacity-50"
                 style={{

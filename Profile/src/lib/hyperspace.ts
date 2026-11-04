@@ -22,6 +22,10 @@ export interface DrawOptions {
   flash?: boolean;
   maxLen?: number;
   tint?: string;
+  /** RGB do clarão final, "r,g,b". */
+  flashRgb?: string;
+  /** RGB do escurecimento de fundo (cor do tema), "r,g,b". */
+  dimRgb?: string;
 }
 
 export function drawHyperspace(
@@ -38,11 +42,13 @@ export function drawHyperspace(
     flash = true,
     maxLen = 460,
     tint = 'rgba(255,110,110,0.95)',
+    flashRgb = '255,228,228',
+    dimRgb = '5,4,5',
   } = opts;
   const e = p * p;
   ctx.clearRect(0, 0, w, h);
   if (dim) {
-    ctx.fillStyle = `rgba(5,4,5,${Math.min(1, p * 1.5)})`;
+    ctx.fillStyle = `rgba(${dimRgb},${Math.min(1, p * 1.5)})`;
     ctx.fillRect(0, 0, w, h);
   }
   for (const st of streaks) {
@@ -64,7 +70,7 @@ export function drawHyperspace(
   }
   if (flash && p > 0.72) {
     const f = (p - 0.72) / 0.28;
-    ctx.fillStyle = `rgba(255,228,228,${f * 0.92})`;
+    ctx.fillStyle = `rgba(${flashRgb},${f * 0.92})`;
     ctx.fillRect(0, 0, w, h);
   }
 }

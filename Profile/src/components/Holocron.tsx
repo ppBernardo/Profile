@@ -3,16 +3,24 @@ interface Props {
   size: number;
   numeral: string;
   dim?: boolean;
+  /** Cristal vermelho (Sith) ou azul (Jedi). */
+  hue?: 'crimson' | 'azure';
 }
 
 const EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
+const HUES = {
+  crimson: { l0: '#8e1419', l1: '#3a070b', r0: '#d8262e', r1: '#6d0f15', beam0: '#ff6b6b', beam: '#ff2a2a', core0: '#ffd9d9', core1: '#ff4040' },
+  azure: { l0: '#143f8e', l1: '#07183a', r0: '#2a7fd8', r1: '#0f3a6d', beam0: '#7ab8ff', beam: '#3a9bff', core0: '#dceeff', core1: '#4aa8ff' },
+};
+
 /**
- * Holocron Sith — pirâmide de cristal vermelho com arestas douradas.
+ * Holocron — pirâmide de cristal com arestas douradas.
  * A tampa levanta e um feixe de luz sobe quando `open` é verdadeiro.
  */
-export default function Holocron({ open, size, numeral, dim = false }: Props) {
+export default function Holocron({ open, size, numeral, dim = false, hue = 'crimson' }: Props) {
   const id = `holo-${numeral}`;
+  const c = HUES[hue];
   return (
     <svg
       width={size}
@@ -28,22 +36,22 @@ export default function Holocron({ open, size, numeral, dim = false }: Props) {
     >
       <defs>
         <linearGradient id={`${id}-l`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#8e1419" />
-          <stop offset="1" stopColor="#3a070b" />
+          <stop offset="0" stopColor={c.l0} />
+          <stop offset="1" stopColor={c.l1} />
         </linearGradient>
         <linearGradient id={`${id}-r`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#d8262e" />
-          <stop offset="1" stopColor="#6d0f15" />
+          <stop offset="0" stopColor={c.r0} />
+          <stop offset="1" stopColor={c.r1} />
         </linearGradient>
         <linearGradient id={`${id}-beam`} x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0" stopColor="#ff6b6b" stopOpacity="0.85" />
-          <stop offset="0.5" stopColor="#ff2a2a" stopOpacity="0.28" />
-          <stop offset="1" stopColor="#ff2a2a" stopOpacity="0" />
+          <stop offset="0" stopColor={c.beam0} stopOpacity="0.85" />
+          <stop offset="0.5" stopColor={c.beam} stopOpacity="0.28" />
+          <stop offset="1" stopColor={c.beam} stopOpacity="0" />
         </linearGradient>
         <radialGradient id={`${id}-core`} cx="0.5" cy="0.5" r="0.5">
-          <stop offset="0" stopColor="#ffd9d9" />
-          <stop offset="0.4" stopColor="#ff4040" />
-          <stop offset="1" stopColor="#ff2a2a" stopOpacity="0" />
+          <stop offset="0" stopColor={c.core0} />
+          <stop offset="0.4" stopColor={c.core1} />
+          <stop offset="1" stopColor={c.beam} stopOpacity="0" />
         </radialGradient>
         <clipPath id={`${id}-top`}>
           <rect x="-20" y="-60" width="160" height="110" />
@@ -54,7 +62,7 @@ export default function Holocron({ open, size, numeral, dim = false }: Props) {
       </defs>
 
       {/* Pedestal */}
-      <rect x="16" y="112" width="88" height="10" fill="#15100f" stroke="#2a2022" />
+      <rect x="16" y="112" width="88" height="10" style={{ fill: 'var(--surface)', stroke: 'var(--raised)' }} />
       <rect x="22" y="110" width="76" height="2" fill="#c9a44c" opacity="0.55" />
 
       {/* Feixe de luz */}

@@ -1,3 +1,5 @@
+import { SIDES, type SideId } from './sides';
+
 export const PROFILE = {
   firstName: 'Bernardo',
   name: 'Bernardo Pereira',
@@ -320,9 +322,23 @@ export interface FleetSystem {
   desc: string;
   level: number;
   color: string;
-  /** Ponto no casco, em unidades da nave normalizada (comprimento 1, proa em -Z). */
+  /** Ponto no casco, em unidades da nave normalizada (comprimento 1, proa em +Z, torre em -Z). */
   anchor: [number, number, number];
   techs: Skill[];
+}
+
+/** Sistemas da capitânia do lado escolhido: nomes e pontos no casco mudam com o modelo. */
+export function fleetSystems(side: SideId): FleetSystem[] {
+  const s = SIDES[side];
+  return FLEET_SYSTEMS.map((f) => {
+    const o = s.copy.fleet.systems[f.id as keyof typeof s.copy.fleet.systems];
+    return {
+      ...f,
+      region: o?.region ?? f.region,
+      anchor: o?.anchor ?? f.anchor,
+      color: f.id === 'ponte' ? s.accent : f.color,
+    };
+  });
 }
 
 export const FLEET_SYSTEMS: FleetSystem[] = [
@@ -334,18 +350,18 @@ export const FLEET_SYSTEMS: FleetSystem[] = [
     desc: 'Interfaces Angular 19 e React/Next.js com TypeScript, Signals, Tailwind e motion sob medida.',
     level: SKILLS.frontend.score,
     color: '#e3242b',
-    anchor: [0, 0.09, 0.27],
+    anchor: [0, 0.11, -0.3],
     techs: SKILLS.frontend.items,
   },
   {
-    id: 'reator',
+    id: 'armas',
     code: '02',
-    region: 'Reator principal',
+    region: 'Armas · turbolasers',
     domain: 'Backend',
     desc: 'APIs REST em C#/ASP.NET Core e Node.js, Entity Framework com MySQL, PostgreSQL e Redis.',
     level: SKILLS.backend.score,
     color: '#ff6a3c',
-    anchor: [0, -0.03, 0.47],
+    anchor: [-0.08, 0.035, -0.06],
     techs: SKILLS.backend.items,
   },
   {
@@ -356,7 +372,7 @@ export const FLEET_SYSTEMS: FleetSystem[] = [
     desc: 'Mensageria, tempo real e agentes com tool calling conectando sistemas e parceiros.',
     level: 88,
     color: '#a855f7',
-    anchor: [0.1, -0.09, 0.03],
+    anchor: [0, -0.07, 0.12],
     techs: [
       { name: 'REST / JWT', pct: 91 },
       { name: 'RabbitMQ / Hangfire', pct: 84 },
@@ -373,7 +389,7 @@ export const FLEET_SYSTEMS: FleetSystem[] = [
     desc: 'Clean Architecture, testes automatizados, logs estruturados e entrega contínua.',
     level: 87,
     color: '#4aa8ff',
-    anchor: [0.01, 0.01, -0.3],
+    anchor: [0, -0.01, 0.46],
     techs: [
       { name: 'Clean Architecture / SOLID', pct: 90 },
       { name: 'xUnit · Jest · Vitest · TDD', pct: 88 },
@@ -390,7 +406,8 @@ export interface ContactChannel {
   value: string;
   href: string;
   copy?: boolean;
-  variant: 'ziggurat' | 'tower' | 'rotunda' | 'bunker';
+  /** Casa de Tatooine que abriga o canal. */
+  variant: 'homestead' | 'vaporator' | 'cantina' | 'tower';
   glyph: string;
 }
 
@@ -401,7 +418,7 @@ export const CONTACTS: ContactChannel[] = [
     value: PROFILE.email,
     href: `mailto:${PROFILE.email}`,
     copy: true,
-    variant: 'ziggurat',
+    variant: 'homestead',
     glyph: '✉',
   },
   {
@@ -417,7 +434,7 @@ export const CONTACTS: ContactChannel[] = [
     label: 'GitHub',
     value: '@ppBernardo',
     href: PROFILE.github,
-    variant: 'bunker',
+    variant: 'cantina',
     glyph: '</>',
   },
   {
@@ -425,7 +442,7 @@ export const CONTACTS: ContactChannel[] = [
     label: 'Instagram',
     value: '@bernard0pereira',
     href: PROFILE.instagram,
-    variant: 'rotunda',
+    variant: 'vaporator',
     glyph: '◎',
   },
 ];

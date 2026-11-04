@@ -1,0 +1,81 @@
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { SIDES, type SideConfig, type SideId } from '../data/sides';
+
+const KEY = 'force-side-v1';
+const SKIP_KEY = 'force-side-skip';
+
+function readStored(): SideId | null {
+  try {
+    const v = localStorage.getItem(KEY);
+    return v === 'sith' || v === 'rebel' ? v : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Lado a aplicar sem perguntar (logo depois de "trocar de lado"); consome a flag. */
+export function consumeAutoSide(): SideId | null {
+  try {
+    if (localStorage.getItem(SKIP_KEY) !== '1') return null;
+    localStorage.removeItem(SKIP_KEY);
+    return readStored();
+  } catch {
+    return null;
+  }
+}
+
+interface SideValue {
+  /** Lado escolhido nesta visita (null até a tela de carregamento perguntar). */
+  side: SideId | null;
+  /** Configuração em vigor (do lado escolhido, do lembrado, ou Sith por padrão). */
+  config: SideConfig;
+  remembered: SideId | null;
+  choose: (s: SideId) => void;
+  /** Troca o lado e recarrega a página já no outro tema. */
+  switchSide: () => void;
+}
+
+const SideContext = createContext<SideValue | null>(null);
+
+export function SideProvider({ children }: { children: ReactNode }) {
+  const [side, setSide] = useState<SideId | null>(null);
+  const [remembered] = useState<SideId | null>(readStored);
+  const effective: SideId = side ?? remembered ?? 'sith';
+
+  useEffect(() => {
+    document.documentElement.dataset.side = effective;
+  }, [effective]);
+
+  const choose = useCallback((s: SideId) => {
+    setSide(s);
+    try {
+      localStorage.setItem(KEY, s);
+    } catch {
+      /* storage indisponível */
+    }
+  }, []);
+
+  const switchSide = useCallback(() => {
+    const next: SideId = effective === 'sith' ? 'rebel' : 'sith';
+    try {
+      localStorage.setItem(KEY, next);
+      localStorage.setItem(SKIP_KEY, '1');
+    } catch {
+      /* storage indisponível */
+    }
+    window.location.reload();
+  }, [effective]);
+
+  const value = useMemo<SideValue>(
+    () => ({ side, config: SIDES[effective], remembered, choose, switchSide }),
+    [side, effective, remembered, choose, switchSide]
+  );
+
+  return <SideContext.Provider value={value}>{children}</SideContext.Provider>;
+}
+
+export function useSide() {
+  const ctx = useContext(SideContext);
+  if (!ctx) throw new Error('useSide deve ser usado dentro de SideProvider');
+  return ctx;
+}

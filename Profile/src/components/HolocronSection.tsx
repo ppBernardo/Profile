@@ -5,26 +5,39 @@ import Holocron from './Holocron';
 import InventoryModal from './InventoryModal';
 import Mascot, { type Pose } from './Mascot';
 import { useSkin } from '../context/SkinContext';
+import { useSide } from '../context/SideContext';
 import { useWhipIn } from '../hooks/useWhipIn';
 import { CRYSTALS_PER_PROJECT, PROJECTS } from '../data/profile';
 import { UNLOCKABLE, SKINS } from '../lib/sprites';
 import { prefersReducedMotion } from '../lib/scroll';
 
-function CrystalIcon({ size = 14 }: { size?: number }) {
+/** Cristal kyber: vermelho sangrado (Sith) ou azul (Jedi). */
+const CRYSTAL = {
+  crimson: { main: '#ff2a2a', light: '#ffb3b3', dark: '#9a1016' },
+  azure: { main: '#4aa8ff', light: '#cfe6ff', dark: '#1b4f8a' },
+};
+type Hue = keyof typeof CRYSTAL;
+
+function CrystalIcon({ size = 14, hue }: { size?: number; hue: Hue }) {
+  const c = CRYSTAL[hue];
   return (
-    <svg width={size} height={size} viewBox="0 0 16 16" aria-hidden style={{ filter: 'drop-shadow(0 0 4px #ff2a2a)' }}>
-      <polygon points="8,0 16,8 8,16 0,8" fill="#ff2a2a" />
-      <polygon points="8,2 13,8 8,8" fill="#ffb3b3" />
-      <polygon points="8,8 8,14 3,8" fill="#9a1016" />
+    <svg width={size} height={size} viewBox="0 0 16 16" aria-hidden style={{ filter: `drop-shadow(0 0 4px ${c.main})` }}>
+      <polygon points="8,0 16,8 8,16 0,8" fill={c.main} />
+      <polygon points="8,2 13,8 8,8" fill={c.light} />
+      <polygon points="8,8 8,14 3,8" fill={c.dark} />
     </svg>
   );
 }
 
-const SPAWN_SVG =
-  '<svg width="18" height="18" viewBox="0 0 16 16" style="filter:drop-shadow(0 0 5px #ff2a2a)"><polygon points="8,0 16,8 8,16 0,8" fill="#ff2a2a"/><polygon points="8,2 13,8 8,8" fill="#ffb3b3"/><polygon points="8,8 8,14 3,8" fill="#9a1016"/></svg>';
+const spawnSvg = (hue: Hue) => {
+  const c = CRYSTAL[hue];
+  return `<svg width="18" height="18" viewBox="0 0 16 16" style="filter:drop-shadow(0 0 5px ${c.main})"><polygon points="8,0 16,8 8,16 0,8" fill="${c.main}"/><polygon points="8,2 13,8 8,8" fill="${c.light}"/><polygon points="8,8 8,14 3,8" fill="${c.dark}"/></svg>`;
+};
 
 export default function HolocronSection() {
   const { collected, collect, crystals, totalCrystals, isUnlocked } = useSkin();
+  const { config } = useSide();
+  const hue: Hue = config.id === 'rebel' ? 'azure' : 'crimson';
   const wrapRef = useWhipIn<HTMLDivElement>();
   const stageRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLDivElement>(null);
@@ -81,7 +94,7 @@ export default function HolocronSection() {
         el.className = 'absolute';
         el.style.left = `${sx}px`;
         el.style.top = `${sy}px`;
-        el.innerHTML = `<div class="crystal-inner">${SPAWN_SVG}</div>`;
+        el.innerHTML = `<div class="crystal-inner">${spawnSvg(hue)}</div>`;
         fx.appendChild(el);
         const inner = el.firstElementChild as HTMLElement;
         const spread = (i - 1) * 36;
@@ -107,7 +120,7 @@ export default function HolocronSection() {
           .fromTo(inner, { y: 0 }, { y: -70, duration: 0.47, yoyo: true, repeat: 1, ease: 'power1.out' }, '<');
       }
     },
-    [collect]
+    [collect, hue]
   );
 
   const openActive = useCallback(() => {
@@ -174,13 +187,13 @@ export default function HolocronSection() {
           className={`pointer-events-none absolute bottom-0 top-0 hidden w-9 md:block ${side === 0 ? 'left-6 lg:left-12' : 'right-6 lg:right-12'}`}
           style={{
             background:
-              'repeating-linear-gradient(90deg, #171114 0 5px, #0b0809 5px 7px, #1d1518 7px 9px)',
-            boxShadow: 'inset 0 0 14px rgba(0,0,0,0.9)',
+              'repeating-linear-gradient(90deg, var(--raised) 0 5px, var(--void) 5px 7px, var(--surface) 7px 9px)',
+            boxShadow: 'inset 0 0 14px rgba(0,0,0,0.35)',
           }}
           aria-hidden
         >
-          <div className="absolute -left-2 -right-2 top-14 h-3 bg-[#2a2023]" />
-          <div className="absolute -left-2 -right-2 bottom-0 h-3 bg-[#2a2023]" />
+          <div className="absolute -left-2 -right-2 top-14 h-3 bg-sith-raised" />
+          <div className="absolute -left-2 -right-2 bottom-0 h-3 bg-sith-raised" />
         </div>
       ))}
 
@@ -200,7 +213,7 @@ export default function HolocronSection() {
 
           <div data-reveal className="flex items-center gap-3">
             <div ref={counterRef} className="pixel-chip flex items-center gap-2">
-              <CrystalIcon />
+              <CrystalIcon hue={hue} />
               <span>
                 {crystals}/{totalCrystals}
               </span>
@@ -216,7 +229,7 @@ export default function HolocronSection() {
           {/* Luz do chão */}
           <div
             className="pointer-events-none absolute bottom-[14%] left-1/2 h-32 w-[70%] -translate-x-1/2"
-            style={{ background: 'radial-gradient(ellipse at center, rgba(227,36,43,0.2), transparent 70%)' }}
+            style={{ background: 'radial-gradient(ellipse at center, rgb(var(--c-crimson) / 0.2), transparent 70%)' }}
             aria-hidden
           />
 
@@ -244,7 +257,7 @@ export default function HolocronSection() {
                   className="block"
                   aria-label={isActive ? `Abrir holocron ${p.numeral}: ${p.title}` : `Ir para ${p.title}`}
                 >
-                  <Holocron open={isActive && open} size={isActive ? 230 : 180} numeral={p.numeral} dim={!isActive} />
+                  <Holocron open={isActive && open} size={isActive ? 230 : 180} numeral={p.numeral} dim={!isActive} hue={hue} />
                 </button>
               </div>
             );
@@ -292,7 +305,7 @@ export default function HolocronSection() {
                 <X size={16} />
               </button>
               <div className="grid gap-5 sm:grid-cols-[200px_1fr] sm:gap-7">
-                <div className="flex aspect-[4/3] flex-col justify-between border border-sith-line bg-[#0a0809] p-4 sm:aspect-auto">
+                <div className="flex aspect-[4/3] flex-col justify-between border border-sith-line bg-sith-bg p-4 sm:aspect-auto">
                   <span className="font-mono text-[9px] uppercase leading-relaxed tracking-[0.26em] text-sith-faint">
                     holocron {project.numeral}
                     <br />

@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { prefersReducedMotion, scrollToId } from '../lib/scroll';
 import { drawHyperspace, makeStreaks, prepareCanvas } from '../lib/hyperspace';
+import { useSide } from '../context/SideContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,6 +20,10 @@ const HyperspaceContext = createContext<HyperspaceValue>({ jump: (id) => scrollT
 export function HyperspaceProvider({ children }: { children: ReactNode }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const busy = useRef(false);
+  const { config } = useSide();
+  const tint = config.hyperTint;
+  const flashRgb = config.hyperFlash;
+  const dimRgb = config.hyperDim;
 
   const jump = useCallback((id: string) => {
     const canvas = canvasRef.current;
@@ -37,7 +42,7 @@ export function HyperspaceProvider({ children }: { children: ReactNode }) {
 
     const streaks = makeStreaks(240, Math.max(w, h) * 0.6);
     const state = { p: 0 };
-    const draw = () => drawHyperspace(ctx, w, h, state.p, streaks);
+    const draw = () => drawHyperspace(ctx, w, h, state.p, streaks, { tint, flashRgb, dimRgb });
 
     canvas.style.opacity = '1';
     canvas.style.pointerEvents = 'auto';
@@ -57,7 +62,7 @@ export function HyperspaceProvider({ children }: { children: ReactNode }) {
         ScrollTrigger.update();
       })
       .to(state, { p: 0, duration: 0.62, ease: 'power3.out', onUpdate: draw });
-  }, []);
+  }, [tint, flashRgb, dimRgb]);
 
   return (
     <HyperspaceContext.Provider value={{ jump }}>

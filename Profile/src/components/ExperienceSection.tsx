@@ -118,7 +118,7 @@ export default function ExperienceSection() {
           className="h-px w-full"
           style={{
             background:
-              'repeating-linear-gradient(90deg, rgba(227,36,43,0.35) 0 10px, transparent 10px 22px)',
+              'repeating-linear-gradient(90deg, rgb(var(--c-crimson) / 0.35) 0 10px, transparent 10px 22px)',
           }}
         />
       </div>

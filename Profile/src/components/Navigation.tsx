@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { useHyperspace } from './Hyperspace';
+import { useSide } from '../context/SideContext';
 import { PROFILE } from '../data/profile';
+import { SIDES } from '../data/sides';
 
 export const NAV_LINKS = [
   { id: 'sobre', label: 'sobre' },
@@ -25,7 +27,7 @@ export function SaberIcon({ className = '' }: { className?: string }) {
       <rect x="0" y="2" width="5" height="4" fill="#c4c4cf" />
       <rect x="1" y="2" width="1" height="4" fill="#5f5f6b" />
       <rect x="3" y="2" width="1" height="4" fill="#5f5f6b" />
-      <rect x="5" y="2.5" width="17" height="3" fill="#ff2a2a" style={{ filter: 'drop-shadow(0 0 3px #ff2a2a)' }} />
+      <rect x="5" y="2.5" width="17" height="3" style={{ fill: 'var(--crimson)', filter: 'drop-shadow(0 0 3px var(--crimson))' }} />
       <rect x="5" y="3.4" width="16" height="1.2" fill="#ffe3e3" />
     </svg>
   );
@@ -33,6 +35,8 @@ export function SaberIcon({ className = '' }: { className?: string }) {
 
 export default function Navigation() {
   const { jump } = useHyperspace();
+  const { config, switchSide } = useSide();
+  const other = SIDES[config.id === 'sith' ? 'rebel' : 'sith'];
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const year = new Date().getFullYear();
@@ -92,6 +96,14 @@ export default function Navigation() {
           </nav>
 
           <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={switchSide}
+              className="hidden items-center gap-1.5 border border-sith-line px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.22em] text-sith-muted transition-colors hover:border-sith-crimson/60 hover:text-sith-ink md:inline-flex"
+              title={`Trocar para ${other.name}`}
+            >
+              <span className="text-sith-crimson">⇄</span> {other.name}
+            </button>
             <span className="hidden font-mono text-[10px] uppercase tracking-[0.32em] text-sith-faint md:block">
               portfólio / {year}
             </span>
@@ -130,6 +142,13 @@ export default function Navigation() {
             <span className="text-sith-crimson">.</span>
           </button>
         ))}
+        <button
+          type="button"
+          onClick={switchSide}
+          className="mt-4 inline-flex items-center gap-1.5 border border-sith-line px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-sith-muted"
+        >
+          <span className="text-sith-crimson">⇄</span> trocar para {other.name}
+        </button>
         <span className="mt-6 font-mono text-[10px] uppercase tracking-[0.32em] text-sith-faint">
           portfólio / {year}
         </span>

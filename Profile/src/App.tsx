@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { SideProvider, useSide } from './context/SideContext';
 import { SkinProvider } from './context/SkinContext';
 import { HyperspaceProvider } from './components/Hyperspace';
 import { setLenis } from './lib/scroll';
@@ -9,18 +10,19 @@ import Grain from './components/Grain';
 import LoadingScreen from './components/LoadingScreen';
 import Navigation from './components/Navigation';
 import HeroSection from './components/HeroSection';
-import MasterSection from './components/MasterSection';
 import AboutSection from './components/AboutSection';
 import CommitsSection from './components/CommitsSection';
 import ExperienceSection from './components/ExperienceSection';
 import FleetSection from './components/FleetSection';
 import HolocronSection from './components/HolocronSection';
+import TatooineEntry from './components/TatooineEntry';
 import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function App() {
+function Shell() {
+  const { side } = useSide();
   const [loading, setLoading] = useState(true);
   const [ready, setReady] = useState(false);
 
@@ -72,22 +74,33 @@ export default function App() {
     <SkinProvider>
       <HyperspaceProvider>
         {loading && <LoadingScreen onComplete={handleLoaded} />}
-        <div className="relative min-h-screen bg-sith-void text-sith-ink">
-          <Grain />
-          <Navigation />
-          <main>
-            <HeroSection ready={ready} />
-            <MasterSection />
-            <AboutSection />
-            <CommitsSection />
-            <ExperienceSection />
-            <FleetSection />
-            <HolocronSection />
-            <ContactSection />
-          </main>
-          <Footer />
-        </div>
+        {/* As seções só montam depois da escolha do lado: os modelos 3D e as falas dependem dela. */}
+        {side && (
+          <div className="relative min-h-screen bg-sith-void text-sith-ink">
+            <Grain />
+            <Navigation />
+            <main>
+              <HeroSection ready={ready} />
+              <AboutSection />
+              <CommitsSection />
+              <ExperienceSection />
+              <FleetSection />
+              <HolocronSection />
+              <TatooineEntry />
+              <ContactSection />
+            </main>
+            <Footer />
+          </div>
+        )}
       </HyperspaceProvider>
     </SkinProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <SideProvider>
+      <Shell />
+    </SideProvider>
   );
 }

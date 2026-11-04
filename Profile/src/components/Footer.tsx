@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import Mascot, { type Pose } from './Mascot';
 import { useWhipIn } from '../hooks/useWhipIn';
+import { useSide } from '../context/SideContext';
 import { PROFILE } from '../data/profile';
 
 export default function Footer() {
+  const { config } = useSide();
   const [pose, setPose] = useState<Pose>('idle');
   const [say, setSay] = useState<string | null>(null);
   const ref = useWhipIn<HTMLDivElement>({
@@ -23,7 +25,7 @@ export default function Footer() {
       <div className="pointer-events-none absolute inset-x-0 top-0 hairline" />
       <div
         className="pointer-events-none absolute left-1/2 top-1/2 h-[60vh] w-[80vw] -translate-x-1/2 -translate-y-1/2 opacity-40"
-        style={{ background: 'radial-gradient(ellipse at center, rgba(122,15,20,0.3), transparent 65%)' }}
+        style={{ background: 'radial-gradient(ellipse at center, rgb(var(--c-blood) / 0.3), transparent 65%)' }}
         aria-hidden
       />
 
@@ -68,7 +70,7 @@ export default function Footer() {
 
         <div data-reveal className="mt-16 flex flex-col items-center justify-between gap-3 border-t border-sith-line pt-6 font-mono text-[10px] uppercase tracking-[0.26em] text-sith-faint sm:flex-row">
           <span>© {year} {PROFILE.name}</span>
-          <span>o lado sombrio do código</span>
+          <span>{config.copy.footer}</span>
           <span>feito com react · gsap · pixels</span>
         </div>
       </div>

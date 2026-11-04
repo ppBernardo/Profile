@@ -2,76 +2,105 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import gsap from 'gsap';
 import { ArrowUpRight, Copy } from 'lucide-react';
 import Mascot, { type Pose } from './Mascot';
+import { TATOOINE_GROUND } from './TatooineEntry';
 import { useWhipIn } from '../hooks/useWhipIn';
+import { useSide } from '../context/SideContext';
 import { CONTACTS, type ContactChannel } from '../data/profile';
 import { prefersReducedMotion } from '../lib/scroll';
 
-function Temple({ variant, active, glyph }: { variant: ContactChannel['variant']; active: boolean; glyph: string }) {
-  const door = active ? '#ff3b43' : '#2a0a0d';
-  const doorStyle = { transition: 'fill 0.35s ease, filter 0.35s ease', filter: active ? 'drop-shadow(0 0 10px #ff2a2a)' : 'none' };
-  const trim = active ? 0.9 : 0.35;
-  const stone = '#1c1517';
-  const stone2 = '#231a1d';
-  const stone3 = '#2a1f22';
-  const edge = '#0d0a0b';
+const ADOBE = '#e6cb96';
+const ADOBE2 = '#d2b176';
+const ADOBE3 = '#b28c54';
+const DEEP = '#7d5c33';
+const EDGE = '#5a3f22';
+
+/** Casas de Tatooine: domo dos Lars, fazenda de umidade com vaporador, cantina e torre de Mos Espa. */
+function Homestead({ variant, active, glyph }: { variant: ContactChannel['variant']; active: boolean; glyph: string }) {
+  const door = active ? '#ffb14a' : '#2b1c12';
+  const doorStyle = { transition: 'fill 0.35s ease, filter 0.35s ease', filter: active ? 'drop-shadow(0 0 10px #ffb14a)' : 'none' };
+  const glyphColor = active ? '#e3242b' : '#6b4a26';
+  const win = { fill: door, opacity: active ? 0.9 : 0.55, style: doorStyle };
 
   return (
     <svg viewBox="0 0 160 150" className="block w-full" aria-hidden>
-      {variant === 'ziggurat' && (
+      <ellipse cx="80" cy="134" rx="72" ry="5" fill="rgba(70,45,20,0.22)" />
+
+      {variant === 'homestead' && (
         <>
-          <rect x="8" y="118" width="144" height="26" fill={stone} stroke={edge} />
-          <rect x="28" y="90" width="104" height="28" fill={stone2} stroke={edge} />
-          <rect x="48" y="62" width="64" height="28" fill={stone3} stroke={edge} />
-          <polygon points="62,62 98,62 80,24" fill={stone3} stroke={edge} />
-          <line x1="8" y1="118" x2="152" y2="118" stroke="#e3242b" strokeWidth="1.2" opacity={trim} />
-          <line x1="28" y1="90" x2="132" y2="90" stroke="#e3242b" strokeWidth="1.2" opacity={trim} />
-          <line x1="48" y1="62" x2="112" y2="62" stroke="#e3242b" strokeWidth="1.2" opacity={trim} />
-          <rect x="70" y="118" width="20" height="26" fill={door} style={doorStyle} />
-          <rect x="80" y="22" width="1.5" height="6" fill="#c9a44c" />
-          <text x="80" y="50" textAnchor="middle" fontFamily="JetBrains Mono, monospace" fontSize="11" fill="#c9a44c">
+          {/* Vaporador ao lado */}
+          <rect x="13" y="68" width="6" height="64" fill={ADOBE3} stroke={EDGE} />
+          {[74, 86, 98].map((y) => (
+            <rect key={y} x="10" y={y} width="12" height="3" fill={DEEP} />
+          ))}
+          <rect x="11" y="64" width="10" height="5" fill={DEEP} />
+          {/* Domo principal e anexo */}
+          <path d="M24 132 A56 46 0 0 1 136 132 Z" fill={ADOBE} stroke={EDGE} />
+          <path d="M42 132 A38 30 0 0 1 118 132" fill="none" stroke={ADOBE3} strokeWidth="1.2" opacity="0.6" />
+          <path d="M104 132 A26 22 0 0 1 156 132 Z" fill={ADOBE2} stroke={EDGE} />
+          <rect x="130" y="112" width="8" height="8" rx="4" {...win} />
+          {/* Entrada */}
+          <path d="M66 132 V117 A14 14 0 0 1 94 117 V132 Z" fill={door} style={doorStyle} />
+          <text x="80" y="104" textAnchor="middle" fontFamily="JetBrains Mono, monospace" fontSize="11" fill={glyphColor}>
             {glyph}
           </text>
         </>
       )}
+
+      {variant === 'vaporator' && (
+        <>
+          {/* Casa cúbica com teto em domo */}
+          <rect x="44" y="92" width="76" height="40" fill={ADOBE} stroke={EDGE} />
+          <path d="M44 92 A38 26 0 0 1 120 92 Z" fill={ADOBE2} stroke={EDGE} />
+          <rect x="56" y="104" width="10" height="10" rx="5" {...win} />
+          <rect x="98" y="104" width="10" height="10" rx="5" {...win} />
+          <path d="M73 132 V117 A9 9 0 0 1 91 117 V132 Z" fill={door} style={doorStyle} />
+          {/* Vaporador de umidade */}
+          <rect x="130" y="38" width="7" height="94" fill={ADOBE3} stroke={EDGE} />
+          {[46, 58, 70].map((y) => (
+            <rect key={y} x="126" y={y} width="15" height="3" fill={DEEP} />
+          ))}
+          <rect x="128" y="33" width="11" height="6" fill={DEEP} />
+          <rect x="120" y="122" width="10" height="3" fill={DEEP} />
+          <text x="82" y="84" textAnchor="middle" fontFamily="JetBrains Mono, monospace" fontSize="11" fill={glyphColor}>
+            {glyph}
+          </text>
+        </>
+      )}
+
+      {variant === 'cantina' && (
+        <>
+          {/* Corpo largo arredondado, domo central e antena */}
+          <rect x="14" y="96" width="132" height="36" rx="6" fill={ADOBE} stroke={EDGE} />
+          <rect x="22" y="90" width="34" height="7" rx="3" fill={ADOBE2} stroke={EDGE} />
+          <rect x="104" y="90" width="34" height="7" rx="3" fill={ADOBE2} stroke={EDGE} />
+          <path d="M56 96 A24 20 0 0 1 104 96 Z" fill={ADOBE2} stroke={EDGE} />
+          <line x1="134" y1="90" x2="134" y2="70" stroke={DEEP} strokeWidth="1.5" />
+          <circle cx="134" cy="68" r="3" fill={ADOBE3} stroke={EDGE} />
+          {/* Toldo e janelas */}
+          <rect x="60" y="107" width="40" height="5" fill="#8a2a2a" opacity="0.85" />
+          <rect x="28" y="106" width="12" height="12" rx="6" {...win} />
+          <rect x="120" y="106" width="12" height="12" rx="6" {...win} />
+          <path d="M70 132 V113 A10 10 0 0 1 90 113 V132 Z" fill={door} style={doorStyle} />
+          <text x="80" y="85" textAnchor="middle" fontFamily="JetBrains Mono, monospace" fontSize="11" fill={glyphColor}>
+            {glyph}
+          </text>
+        </>
+      )}
+
       {variant === 'tower' && (
         <>
-          <rect x="20" y="130" width="120" height="14" fill={stone} stroke={edge} />
-          <rect x="52" y="40" width="56" height="90" fill={stone2} stroke={edge} />
-          {[52, 66, 80, 94].map((x) => (
-            <rect key={x} x={x} y="32" width="8" height="10" fill={stone3} stroke={edge} />
-          ))}
-          <rect x="52" y="42" width="56" height="2" fill="#e3242b" opacity={trim} />
-          <rect x="77" y="58" width="6" height="34" fill={door} style={doorStyle} />
-          <rect x="70" y="104" width="20" height="26" fill={door} style={doorStyle} />
-          <text x="80" y="24" textAnchor="middle" fontFamily="JetBrains Mono, monospace" fontSize="11" fill="#c9a44c">
-            {glyph}
-          </text>
-        </>
-      )}
-      {variant === 'rotunda' && (
-        <>
-          <rect x="18" y="130" width="124" height="14" fill={stone} stroke={edge} />
-          <path d="M34 82 A46 46 0 0 1 126 82 Z" fill={stone3} stroke={edge} />
-          <rect x="30" y="80" width="100" height="6" fill={stone2} stroke={edge} />
-          {[36, 56, 96, 116].map((x) => (
-            <rect key={x} x={x} y="86" width="8" height="44" fill={stone2} stroke={edge} />
-          ))}
-          <rect x="30" y="86" width="100" height="1.5" fill="#e3242b" opacity={trim} />
-          <rect x="72" y="92" width="16" height="38" fill={door} style={doorStyle} />
-          <circle cx="80" cy="40" r="3" fill="#c9a44c" />
-          <text x="80" y="66" textAnchor="middle" fontFamily="JetBrains Mono, monospace" fontSize="11" fill="#c9a44c">
-            {glyph}
-          </text>
-        </>
-      )}
-      {variant === 'bunker' && (
-        <>
-          <polygon points="10,144 150,144 136,88 24,88" fill={stone} stroke={edge} />
-          <rect x="50" y="70" width="60" height="18" fill={stone2} stroke={edge} />
-          <rect x="24" y="88" width="112" height="1.5" fill="#e3242b" opacity={trim} />
-          <line x1="80" y1="70" x2="80" y2="48" stroke="#c9a44c" strokeWidth="1.5" />
-          <rect x="70" y="112" width="20" height="32" fill={door} style={doorStyle} />
-          <text x="80" y="44" textAnchor="middle" fontFamily="JetBrains Mono, monospace" fontSize="11" fill="#c9a44c">
+          {/* Torre de Mos Espa com bandeira */}
+          <rect x="46" y="40" width="68" height="92" fill={ADOBE} stroke={EDGE} />
+          <rect x="40" y="34" width="80" height="8" rx="4" fill={ADOBE2} stroke={EDGE} />
+          <rect x="46" y="86" width="68" height="4" fill={ADOBE3} />
+          <rect x="52" y="74" width="56" height="3" fill={DEEP} />
+          <rect x="58" y="52" width="12" height="14" rx="6" {...win} />
+          <rect x="90" y="52" width="12" height="14" rx="6" {...win} />
+          <rect x="74" y="98" width="12" height="12" rx="6" {...win} />
+          <path d="M70 132 V114 A10 10 0 0 1 90 114 V132 Z" fill={door} style={doorStyle} />
+          <line x1="80" y1="34" x2="80" y2="14" stroke={DEEP} strokeWidth="1.5" />
+          <polygon points="80,14 97,18 80,22" style={{ fill: 'var(--crimson)' }} opacity="0.85" />
+          <text x="80" y="82" textAnchor="middle" fontFamily="JetBrains Mono, monospace" fontSize="11" fill={glyphColor}>
             {glyph}
           </text>
         </>
@@ -82,8 +111,19 @@ function Temple({ variant, active, glyph }: { variant: ContactChannel['variant']
 
 const OFFSET_CLASSES = ['md:mt-0', 'md:mt-[70px]', 'md:mt-6', 'md:mt-[92px]'];
 
+/** Vaporadores ao fundo do assentamento. */
+const FAR_VAPORATORS = [
+  { left: '6%', h: 110, o: 0.35 },
+  { left: '18%', h: 70, o: 0.25 },
+  { left: '79%', h: 90, o: 0.3 },
+  { left: '92%', h: 130, o: 0.38 },
+];
+
 export default function ContactSection() {
+  const { config } = useSide();
+  const landing = config.copy.contact.landing;
   const wrapRef = useWhipIn<HTMLDivElement>();
+  const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const walkerRef = useRef<HTMLDivElement>(null);
   const doorRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -93,6 +133,7 @@ export default function ContactSection() {
   const [say, setSay] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const firstPlacement = useRef(true);
+  const greeted = useRef(false);
 
   const moveWalker = useCallback((toIndex: number, instant: boolean) => {
     const stage = stageRef.current;
@@ -134,6 +175,24 @@ export default function ContactSection() {
     return () => window.removeEventListener('resize', onResize);
   }, [active, moveWalker]);
 
+  // O oficial desembarca e reclama da areia (uma vez).
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting || greeted.current) return;
+        greeted.current = true;
+        setSay(landing);
+        window.setTimeout(() => setSay((s) => (s === landing ? null : s)), 2800);
+        obs.disconnect();
+      },
+      { threshold: 0.45 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [landing]);
+
   const copyEmail = async (value: string) => {
     try {
       await navigator.clipboard.writeText(value);
@@ -150,60 +209,54 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="contato" className="relative overflow-hidden bg-sith-void pt-28 sm:pt-36">
-      <div className="pointer-events-none absolute inset-x-0 top-0 hairline" />
-
-      {/* Mustafar */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            'linear-gradient(180deg, #050405 0%, #0b0608 38%, #2a0d0b 72%, #5a1a10 92%, #3a1009 100%)',
-        }}
-        aria-hidden
-      />
-      <svg className="pointer-events-none absolute inset-x-0 bottom-0 h-[52%] w-full" viewBox="0 0 1440 400" preserveAspectRatio="none" aria-hidden>
-        <polygon points="0,400 0,260 120,190 260,250 380,150 520,230 640,120 760,210 900,160 1020,240 1180,140 1300,220 1440,170 1440,400" fill="#120b0d" />
-        <polygon points="0,400 0,320 160,300 300,340 460,280 620,330 780,290 940,340 1120,300 1280,340 1440,300 1440,400" fill="#1a0f10" />
-        <polygon points="620,120 640,110 660,120" fill="#ff6a3c" opacity="0.8" />
-        <polygon points="1170,145 1180,136 1192,146" fill="#ff6a3c" opacity="0.7" />
-      </svg>
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-20 lava-flow opacity-90"
-        style={{
-          backgroundImage: 'linear-gradient(90deg, #ff4a1a, #ffb347, #ff2e00, #ff8a3c, #ff4a1a)',
-          clipPath:
-            'polygon(0 62%, 10% 46%, 22% 60%, 36% 40%, 50% 56%, 64% 36%, 78% 52%, 90% 40%, 100% 50%, 100% 100%, 0 100%)',
-          boxShadow: '0 -20px 60px rgba(255,90,60,0.35)',
-        }}
-        aria-hidden
-      />
-      <div className="pointer-events-none absolute inset-0" aria-hidden>
-        {Array.from({ length: 16 }).map((_, i) => (
-          <span
+    <section
+      ref={sectionRef}
+      id="contato"
+      className="relative overflow-hidden pt-24 sm:pt-32"
+      style={{ background: `linear-gradient(180deg, ${TATOOINE_GROUND} 0%, #c39654 32%, #ab7b3e 60%, #6f4a2c 82%, var(--void) 100%)` }}
+    >
+      {/* Ondulações da areia */}
+      <svg className="pointer-events-none absolute inset-x-0 top-0 h-full w-full opacity-[0.22]" viewBox="0 0 1440 900" preserveAspectRatio="none" aria-hidden>
+        {Array.from({ length: 14 }).map((_, i) => (
+          <path
             key={i}
-            className="ember-float"
-            style={{
-              left: `${4 + ((i * 61) % 92)}%`,
-              bottom: `${2 + ((i * 17) % 18)}%`,
-              ['--d' as string]: `${5 + (i % 4) * 1.6}s`,
-              ['--delay' as string]: `${(i * 0.7) % 5}s`,
-              ['--x' as string]: `${((i % 3) - 1) * 30}px`,
-            }}
+            d={`M-40 ${60 + i * 62} C 240 ${30 + i * 62}, 480 ${90 + i * 62}, 760 ${50 + i * 62} S 1240 ${80 + i * 62}, 1480 ${40 + i * 62}`}
+            fill="none"
+            stroke="#8a6436"
+            strokeWidth="1.4"
           />
+        ))}
+      </svg>
+
+      {/* Vaporadores ao longe */}
+      <div className="pointer-events-none absolute inset-x-0 top-10 hidden md:block" aria-hidden>
+        {FAR_VAPORATORS.map((v, i) => (
+          <div key={i} className="absolute" style={{ left: v.left, top: 0, opacity: v.o }}>
+            <div className="mx-auto w-[5px]" style={{ height: v.h, background: '#7d5c33' }} />
+            <div className="absolute left-1/2 top-2 h-[3px] w-[13px] -translate-x-1/2 bg-[#5a3f22]" />
+            <div className="absolute left-1/2 top-6 h-[3px] w-[13px] -translate-x-1/2 bg-[#5a3f22]" />
+            <div className="absolute left-1/2 top-10 h-[3px] w-[13px] -translate-x-1/2 bg-[#5a3f22]" />
+          </div>
         ))}
       </div>
 
-      <div ref={wrapRef} className="relative mx-auto max-w-6xl px-5 pb-24 sm:px-8 sm:pb-32">
+      {/* Calor subindo da areia */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-40"
+        style={{ background: 'linear-gradient(180deg, rgba(255,246,220,0.55), rgba(255,246,220,0))' }}
+        aria-hidden
+      />
+
+      <div ref={wrapRef} className="relative mx-auto max-w-6xl px-5 pb-28 sm:px-8 sm:pb-36">
         <div className="text-center">
-          <p data-reveal className="eyebrow">
-            setor de comunicações
+          <p data-reveal className="font-mono text-[10px] uppercase tracking-[0.32em] text-[#6a4a26]">
+            setor de comunicações · tatooine
           </p>
-          <h2 data-reveal className="mt-4 font-display text-5xl font-light tracking-tight text-sith-ink sm:text-6xl lg:text-7xl">
+          <h2 data-reveal className="mt-4 font-display text-5xl font-light tracking-tight text-[#2a1a10] sm:text-6xl lg:text-7xl">
             Contato<span className="text-sith-crimson">.</span>
           </h2>
-          <p data-reveal className="mt-4 text-sm text-sith-muted sm:text-base">
-            Escolha uma porta. O lado sombrio está recrutando.
+          <p data-reveal className="mt-4 text-sm text-[#4a3320] sm:text-base">
+            {config.copy.contact.pitch}
           </p>
         </div>
 
@@ -225,12 +278,12 @@ export default function ContactSection() {
                     aria-label={`${c.label}: ${c.value}`}
                   >
                     <div className="relative mx-auto w-full max-w-[200px] transition-transform duration-500 group-hover:-translate-y-1">
-                      <Temple variant={c.variant} active={isActive} glyph={c.glyph} />
+                      <Homestead variant={c.variant} active={isActive} glyph={c.glyph} />
                       <div
                         ref={(el) => {
                           doorRefs.current[i] = el;
                         }}
-                        className="pointer-events-none absolute bottom-[4%] left-1/2 h-px w-px"
+                        className="pointer-events-none absolute bottom-[12%] left-1/2 h-px w-px"
                       />
                     </div>
                   </button>
@@ -240,11 +293,11 @@ export default function ContactSection() {
                     className="relative mx-auto mt-3 max-w-[220px] origin-top transition-all duration-500"
                     style={{
                       transform: isActive ? 'scaleY(1)' : 'scaleY(0.96)',
-                      opacity: isActive ? 1 : 0.72,
+                      opacity: isActive ? 1 : 0.8,
                     }}
                   >
                     <div className="h-[6px] w-full bg-gradient-to-r from-[#8a6f2e] via-[#e6c467] to-[#8a6f2e]" />
-                    <div className="border-x border-[#3a2a1c] bg-[#14100f] px-3 py-3 text-center">
+                    <div className="border-x border-[#3a2a1c] bg-[#1a120c] px-3 py-3 text-center">
                       <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-sith-goldDim">{c.label}</p>
                       <p className="mt-1 break-all font-pixel text-[17px] leading-tight text-sith-ink sm:text-[19px]">{c.value}</p>
                       <div className="mt-2.5 flex justify-center">
@@ -271,7 +324,7 @@ export default function ContactSection() {
             })}
           </div>
 
-          {/* Mascote caminhando entre os templos (desktop) */}
+          {/* Mascote caminhando entre as casas (desktop) */}
           <div
             ref={walkerRef}
             className="pointer-events-none absolute left-0 top-0 z-20 hidden -translate-y-full md:block"

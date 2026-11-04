@@ -2,16 +2,12 @@ import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, use
 import { Canvas } from '@react-three/fiber';
 import gsap from 'gsap';
 import Mascot, { type Pose } from './Mascot';
-import TieFighter, {
-  CameraShake,
-  TIE_HIDDEN,
-  TIE_PATROL_FROM,
-  TIE_PATROL_TO_X,
-  type TieFlight,
-  type TieMotion,
-} from './TieFighter';
-import bust from '../../imgs/busto-sith.png';
+import Fighter, { CameraShake, TIE_HIDDEN, TIE_PATROL_FROM, TIE_PATROL_TO_X, type TieFlight, type TieMotion } from './TieFighter';
+import bustSith from '../../imgs/busto-sith.png';
+import bustRebel from '../../imgs/busto-rebel.png';
 import { PROFILE } from '../data/profile';
+import { useSide } from '../context/SideContext';
+import { useSkin } from '../context/SkinContext';
 import { prefersReducedMotion } from '../lib/scroll';
 
 const SLAB_W = 300;
@@ -95,13 +91,6 @@ function makeStars(count = 90, seed = 3) {
   }));
 }
 
-const SITTER_QUIPS = [
-  'o Império é mais forte.',
-  'role pra baixo. o mestre espera.',
-  'eu vigio pelo Imperador.',
-  'não pisca. ele vê tudo.',
-];
-
 interface Props {
   ready: boolean;
 }
@@ -137,6 +126,10 @@ export default function HeroSection({ ready }: Props) {
   const [sitterSay, setSitterSay] = useState<string | null>(null);
   const [inView, setInView] = useState(true);
   const quipIndex = useRef(0);
+  const { config } = useSide();
+  const { skin } = useSkin();
+  const copy = config.copy.hero;
+  const bust = config.id === 'rebel' ? bustRebel : bustSith;
 
   const shards = useMemo(() => makeShards(), []);
   const stars = useMemo(() => makeStars(), []);
@@ -264,7 +257,7 @@ export default function HeroSection({ ready }: Props) {
       });
       tl.to({}, { duration: 1.1 });
       tl.call(() => {
-        setWalkerSay('o Império mandou um presente.');
+        setWalkerSay(copy.gift);
         setWalkerFacing('left');
       });
 
@@ -280,7 +273,7 @@ export default function HeroSection({ ready }: Props) {
         'flight'
       );
       tl.to(flight.current, { t: 1, duration: 3.6, ease: 'power1.inOut' }, 'flight');
-      tl.call(() => setWalkerSay('abaixa! TIE Fighter!'), undefined, 'flight+=1.35');
+      tl.call(() => setWalkerSay(copy.incoming), undefined, 'flight+=1.35');
       tl.call(() => setWalkerPose('jump'), undefined, 'flight+=1.75');
 
       // Passagem rasante: só um tremor leve de câmera
@@ -297,7 +290,7 @@ export default function HeroSection({ ready }: Props) {
       tl.call(
         () => {
           setWalkerPose('idle');
-          setWalkerSay('carbonita imperial. do mestre.');
+          setWalkerSay(copy.carbonite);
         },
         undefined,
         'flight+=2.6'
@@ -391,7 +384,7 @@ export default function HeroSection({ ready }: Props) {
         undefined,
         'jump+=0.62'
       );
-      tl.call(() => setSitterSay('não subestime o lado sombrio.'), undefined, 'jump+=1.0');
+      tl.call(() => setSitterSay(copy.sitter), undefined, 'jump+=1.0');
       tl.to(hintRef.current, { opacity: 1, duration: 0.8 }, 'jump+=1.2');
       tl.to({}, { duration: 2.8 }, 'jump+=1.0');
       tl.call(() => setSitterSay(null));
@@ -405,7 +398,7 @@ export default function HeroSection({ ready }: Props) {
       patrolRef.current = null;
       tlRef.current = null;
     };
-  }, [ready]);
+  }, [ready, copy]);
 
   const skipIntro = useCallback(() => {
     const tl = tlRef.current;
@@ -414,11 +407,11 @@ export default function HeroSection({ ready }: Props) {
   }, []);
 
   const quip = useCallback(() => {
-    const line = SITTER_QUIPS[quipIndex.current % SITTER_QUIPS.length];
+    const line = copy.quips[quipIndex.current % copy.quips.length];
     quipIndex.current += 1;
     setSitterSay(line);
     window.setTimeout(() => setSitterSay((s) => (s === line ? null : s)), 2200);
-  }, []);
+  }, [copy]);
 
   return (
     <section
@@ -451,9 +444,9 @@ export default function HeroSection({ ready }: Props) {
         </div>
 
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden>
-          <span className="select-none whitespace-nowrap font-display text-[27vw] font-light leading-none tracking-[-0.03em] text-[#18121a] md:text-[19vw]">
+          <span className="select-none whitespace-nowrap font-display text-[27vw] font-light leading-none tracking-[-0.03em] text-sith-ink/[0.06] md:text-[19vw]">
             {PROFILE.wordmark}
-            <span className="text-[#2a1217]">.</span>
+            <span className="text-sith-crimson/20">.</span>
           </span>
         </div>
 
@@ -487,14 +480,14 @@ export default function HeroSection({ ready }: Props) {
             }}
             style={{ width: '100%', height: '100%', background: 'transparent' }}
           >
-            <fog attach="fog" args={['#050405', 12, 46]} />
+            <fog attach="fog" args={[config.scene.fog, 12, 46]} />
             <ambientLight intensity={0.3} />
-            <hemisphereLight color="#8a98c8" groundColor="#1a0a0c" intensity={0.5} />
+            <hemisphereLight color="#8a98c8" groundColor={config.scene.ground} intensity={0.5} />
             <directionalLight position={[4, 6, 5]} intensity={1.7} color="#ffffff" />
-            <directionalLight position={[-5, 2, -4]} intensity={1.2} color="#ff3b2a" />
+            <directionalLight position={[-5, 2, -4]} intensity={1.2} color={config.accent} />
             <CameraShake amp={shakeAmp} basePosition={CAMERA} />
             <Suspense fallback={null}>
-              <TieFighter motion={tie} flight={flight} />
+              <Fighter motion={tie} flight={flight} model={config.fighter} />
             </Suspense>
           </Canvas>
         )}
@@ -508,7 +501,7 @@ export default function HeroSection({ ready }: Props) {
           style={{
             bottom: 'calc(var(--floor) - 12vh)',
             background:
-              'radial-gradient(ellipse at center, rgba(227,36,43,0.22) 0%, rgba(122,15,20,0.08) 40%, transparent 70%)',
+              'radial-gradient(ellipse at center, rgb(var(--c-crimson) / 0.22) 0%, rgb(var(--c-blood) / 0.08) 40%, transparent 70%)',
           }}
           aria-hidden
         />
@@ -526,7 +519,7 @@ export default function HeroSection({ ready }: Props) {
               className="pointer-events-none absolute inset-[-40%]"
               style={{
                 background:
-                  'radial-gradient(circle at 50% 50%, rgba(255,120,120,0.9) 0%, rgba(227,36,43,0.45) 28%, transparent 62%)',
+                  `radial-gradient(circle at 50% 50%, ${skin.saberCore}e6 0%, ${skin.saber}73 28%, transparent 62%)`,
                 filter: 'blur(6px)',
               }}
               aria-hidden
@@ -535,14 +528,14 @@ export default function HeroSection({ ready }: Props) {
             {/* Busto Sith (revelado pelo sabre) */}
             <div
               ref={portraitRef}
-              className="absolute inset-0 overflow-hidden border border-[#3a2c2f] bg-[#0b090b]"
-              style={{ boxShadow: '0 0 0 1px rgba(201,164,76,0.12), 0 40px 90px -30px rgba(0,0,0,0.9), 0 0 80px rgba(227,36,43,0.2)' }}
+              className="absolute inset-0 overflow-hidden border border-sith-line bg-sith-surface"
+              style={{ boxShadow: '0 0 0 1px rgba(201,164,76,0.12), 0 40px 90px -30px rgba(0,0,0,0.9), 0 0 80px rgb(var(--c-crimson) / 0.2)' }}
             >
               <div
                 className="absolute inset-0"
                 style={{
                   background:
-                    'radial-gradient(ellipse 80% 55% at 50% 100%, rgba(227,36,43,0.28) 0%, rgba(122,15,20,0.1) 45%, transparent 75%), linear-gradient(180deg, #16111a 0%, #0f0c11 50%, #080607 100%)',
+                    'radial-gradient(ellipse 80% 55% at 50% 100%, rgb(var(--c-crimson) / 0.28) 0%, rgb(var(--c-blood) / 0.1) 45%, transparent 75%), linear-gradient(180deg, var(--panel-a) 0%, var(--panel-b) 100%)',
                 }}
               />
               <img
@@ -562,7 +555,7 @@ export default function HeroSection({ ready }: Props) {
               <div className="absolute inset-x-3 top-3 flex items-start justify-between">
                 <div>
                   <p className="font-display text-base font-medium tracking-wide text-sith-ink">B. PEREIRA</p>
-                  <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-sith-crimson/80">lado sombrio</p>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-sith-crimson/80">{copy.badge}</p>
                 </div>
                 <div className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-sith-muted">
                   <span className="blink-dot inline-block h-1.5 w-1.5 rounded-full bg-sith-crimson" />
@@ -609,16 +602,16 @@ export default function HeroSection({ ready }: Props) {
               ref={slashRef}
               viewBox="0 0 100 100"
               className="pointer-events-none absolute right-[-18%] z-30 h-[46%] w-[70%] -translate-y-1/2 opacity-0"
-              style={{ filter: 'drop-shadow(0 0 8px #ff2a2a)', transformOrigin: '90% 50%' }}
+              style={{ filter: `drop-shadow(0 0 8px ${skin.saber})`, transformOrigin: '90% 50%' }}
               aria-hidden
             >
-              <path d="M 92 10 A 70 70 0 0 1 10 70" fill="none" stroke="#ff3b3b" strokeWidth="6" strokeLinecap="round" opacity="0.95" />
+              <path d="M 92 10 A 70 70 0 0 1 10 70" fill="none" stroke={skin.saber} strokeWidth="6" strokeLinecap="round" opacity="0.95" />
               <path d="M 92 10 A 70 70 0 0 1 10 70" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
             </svg>
             <div
               ref={cutRef}
               className="pointer-events-none absolute inset-x-[-6%] z-30 h-[3px] -translate-y-1/2 opacity-0"
-              style={{ background: 'linear-gradient(90deg, transparent, #ff6b6b 20%, #fff 50%, #ff6b6b 80%, transparent)', boxShadow: '0 0 14px #ff2a2a', transformOrigin: '100% 50%' }}
+              style={{ background: `linear-gradient(90deg, transparent, ${skin.saber} 20%, #fff 50%, ${skin.saber} 80%, transparent)`, boxShadow: `0 0 14px ${skin.saber}`, transformOrigin: '100% 50%' }}
               aria-hidden
             />
             <div ref={chipsRef} className="pointer-events-none absolute right-[8%] z-30" aria-hidden>
@@ -626,7 +619,7 @@ export default function HeroSection({ ready }: Props) {
                 <span
                   key={i}
                   className="absolute opacity-0"
-                  style={{ width: 3 + (i % 3), height: 3 + ((i + 1) % 3), background: i % 3 === 0 ? '#ffd0c0' : '#6a6270', boxShadow: i % 3 === 0 ? '0 0 6px #ff5a3c' : 'none' }}
+                  style={{ width: 3 + (i % 3), height: 3 + ((i + 1) % 3), background: i % 3 === 0 ? skin.saberCore : '#6a6270', boxShadow: i % 3 === 0 ? `0 0 6px ${skin.saber}` : 'none' }}
                 />
               ))}
             </div>
@@ -664,7 +657,7 @@ export default function HeroSection({ ready }: Props) {
         className="absolute left-6 top-[13%] z-[3] sm:left-10 md:left-[7vw] md:top-1/2 md:-translate-y-1/2 lg:left-[9vw]"
       >
         <p className="font-display text-[clamp(28px,7vw,34px)] font-light italic leading-[1.05] tracking-tight text-sith-ink md:text-[clamp(34px,3.6vw,58px)]">
-          {PROFILE.tagline.map((line) => (
+          {config.copy.tagline.map((line) => (
             <span key={line} data-line className="block">
               {line}
             </span>
@@ -682,11 +675,11 @@ export default function HeroSection({ ready }: Props) {
       >
         <span>scroll</span>
         <svg width="12" height="18" viewBox="0 0 6 9" shapeRendering="crispEdges" className="animate-bounce" aria-hidden>
-          <rect x="2" y="0" width="2" height="5" fill="#e3242b" />
-          <rect x="0" y="4" width="2" height="2" fill="#e3242b" />
-          <rect x="4" y="4" width="2" height="2" fill="#e3242b" />
-          <rect x="1" y="6" width="4" height="2" fill="#e3242b" />
-          <rect x="2" y="8" width="2" height="1" fill="#e3242b" />
+          <rect x="2" y="0" width="2" height="5" style={{ fill: 'var(--crimson)' }} />
+          <rect x="0" y="4" width="2" height="2" style={{ fill: 'var(--crimson)' }} />
+          <rect x="4" y="4" width="2" height="2" style={{ fill: 'var(--crimson)' }} />
+          <rect x="1" y="6" width="4" height="2" style={{ fill: 'var(--crimson)' }} />
+          <rect x="2" y="8" width="2" height="1" style={{ fill: 'var(--crimson)' }} />
         </svg>
       </div>
 

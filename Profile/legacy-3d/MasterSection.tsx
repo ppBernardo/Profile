@@ -5,17 +5,18 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Mascot from './Mascot';
 import VaderHelmet, { HELMET_URL } from './VaderHelmet';
+import { useSide } from '../context/SideContext';
 import { prefersReducedMotion } from '../lib/scroll';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const LINES = ['Todo aprendiz', 'tem um mestre.'];
-
 /**
  * Interlúdio: o capacete de Darth Vader emerge da escuridão conforme o scroll,
- * acompanha o cursor e "respira" em luz vermelha. O aprendiz comenta de longe.
+ * acompanha o cursor e "respira" em luz vermelha. Para o Sith é o mestre; para a Resistência, o inimigo.
  */
 export default function MasterSection() {
+  const { config } = useSide();
+  const master = config.copy.master;
   const sectionRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const progress = useRef(0);
@@ -73,7 +74,7 @@ export default function MasterSection() {
             progress.current = self.progress;
             if (self.progress > 0.62 && !spoke.current) {
               spoke.current = true;
-              setSay('...meu mestre. não encara muito.');
+              setSay(master.say);
               window.setTimeout(() => setSay(null), 3400);
             }
           },
@@ -102,7 +103,7 @@ export default function MasterSection() {
     }, section);
 
     return () => ctx.revert();
-  }, []);
+  }, [master.say]);
 
   const onPointerMove = (e: React.PointerEvent) => {
     pointer.current = {
@@ -170,10 +171,10 @@ export default function MasterSection() {
       <div ref={textRef} className="pointer-events-none absolute inset-0">
         <div className="absolute left-6 top-[13%] sm:left-10 md:left-[7vw] md:top-auto md:bottom-[16%] lg:left-[9vw]">
           <p data-eyebrow className="eyebrow">
-            o mestre
+            {master.eyebrow}
           </p>
           <h2 className="mt-3 font-display text-[clamp(34px,8vw,44px)] font-light leading-[1] tracking-tight text-sith-ink md:text-[clamp(44px,4.6vw,76px)]">
-            {LINES.map((l) => (
+            {master.lines.map((l) => (
               <span key={l} data-line className="block">
                 {l}
               </span>

@@ -2,8 +2,7 @@ import { useEffect, useMemo, useRef, type MutableRefObject } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Center, Trail, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
-
-export const TIE_URL = '/3d_t.i.e_fighter_-_star_wars_model.glb';
+import type { FighterModel } from '../data/sides';
 
 /** Pose livre (patrulha ao fundo / escondido). */
 export interface TieMotion {
@@ -14,7 +13,7 @@ export interface TieMotion {
   yaw: number;
   pitch: number;
   roll: number;
-  /** 0..1 — intensidade dos motores iônicos. */
+  /** 0..1 — intensidade dos motores. */
   glow: number;
 }
 
@@ -48,13 +47,16 @@ export const FLIGHT_PATH = new THREE.CatmullRomCurve3(
 interface Props {
   motion: MutableRefObject<TieMotion>;
   flight: MutableRefObject<TieFlight>;
+  /** Caça do lado escolhido: TIE Fighter (Império) ou X-wing (Resistência). */
+  model: FighterModel;
 }
 
 const _target = new THREE.Vector3();
 const _tangent = new THREE.Vector3();
 
-export default function TieFighter({ motion, flight }: Props) {
-  const { scene } = useGLTF(TIE_URL);
+/** Caça da intro: voo rasante pela spline e patrulha ao fundo. O modelo vem do lado da Força escolhido. */
+export default function Fighter({ motion, flight, model }: Props) {
+  const { scene } = useGLTF(model.url);
   const rig = useRef<THREE.Group>(null);
   const body = useRef<THREE.Group>(null);
   const engine = useRef<THREE.PointLight>(null);
@@ -62,6 +64,7 @@ export default function TieFighter({ motion, flight }: Props) {
   const trailGroup = useRef<THREE.Group>(null);
   const lastJump = useRef(-10);
   const prevPos = useRef(new THREE.Vector3(60, 0, -40));
+  const trailColor = useMemo(() => new THREE.Color(model.trail), [model.trail]);
 
   // Dimensão em espaço local (clone solto: não herda a escala do grupo).
   const base = useMemo(() => {
@@ -138,7 +141,7 @@ export default function TieFighter({ motion, flight }: Props) {
   return (
     <group ref={rig} position={[60, 0, -40]}>
       <group ref={body}>
-        <group rotation={[0, 0, Math.PI]}>
+        <group rotation={model.fix}>
           <Center>
             <primitive object={scene} />
           </Center>
@@ -148,13 +151,13 @@ export default function TieFighter({ motion, flight }: Props) {
       {/* Luz principal acoplada (unidades de mundo) */}
       <pointLight color="#ffffff" intensity={7} distance={22} decay={1.5} position={[3.5, 3, 4.5]} />
 
-      {/* Motores iônicos + rastro */}
-      <pointLight ref={engine} color="#ff5a3c" intensity={6} distance={7} decay={2} position={[0, 0, -1]} />
+      {/* Motores + rastro */}
+      <pointLight ref={engine} color={model.engine} intensity={6} distance={7} decay={2} position={[0, 0, -1]} />
       <group ref={trailGroup} visible={false}>
-        <Trail width={0.9} length={6} decay={1.2} color={new THREE.Color('#ff3b2a')} attenuation={(w) => w * w}>
+        <Trail width={0.9} length={6} decay={1.2} color={trailColor} attenuation={(w) => w * w}>
           <mesh ref={engineGlow} position={[0, 0, -1]}>
             <sphereGeometry args={[0.22, 14, 14]} />
-            <meshBasicMaterial color="#ff7a5c" transparent opacity={0.8} depthWrite={false} />
+            <meshBasicMaterial color={model.engine} transparent opacity={0.8} depthWrite={false} />
           </mesh>
         </Trail>
       </group>
