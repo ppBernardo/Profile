@@ -1,18 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { useHyperspace } from './Hyperspace';
+import LangSwitch from './LangSwitch';
 import { useSide } from '../context/SideContext';
+import { useLang } from '../i18n/LangContext';
 import { PROFILE } from '../data/profile';
-import { SIDES } from '../data/sides';
 
-export const NAV_LINKS = [
-  { id: 'sobre', label: 'sobre' },
-  { id: 'commits', label: 'commits' },
-  { id: 'campanhas', label: 'campanhas' },
-  { id: 'frota', label: 'frota' },
-  { id: 'holocrons', label: 'holocrons' },
-  { id: 'contato', label: 'contato' },
-];
+export const NAV_IDS = ['sobre', 'commits', 'campanhas', 'frota', 'holocrons', 'contato'] as const;
 
 export function SaberIcon({ className = '' }: { className?: string }) {
   return (
@@ -35,8 +29,9 @@ export function SaberIcon({ className = '' }: { className?: string }) {
 
 export default function Navigation() {
   const { jump } = useHyperspace();
-  const { config, switchSide } = useSide();
-  const other = SIDES[config.id === 'sith' ? 'rebel' : 'sith'];
+  const { config, switchSide, nameOf } = useSide();
+  const { t } = useLang();
+  const otherName = nameOf(config.id === 'sith' ? 'rebel' : 'sith');
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const year = new Date().getFullYear();
@@ -72,7 +67,7 @@ export default function Navigation() {
             type="button"
             onClick={() => go('inicio')}
             className="group flex items-center gap-2.5"
-            aria-label="Voltar ao início"
+            aria-label={t('nav.home')}
           >
             <SaberIcon className="transition-transform duration-300 group-hover:-rotate-12" />
             <span className="font-display text-[22px] font-medium tracking-tight text-sith-ink">
@@ -81,37 +76,38 @@ export default function Navigation() {
             </span>
           </button>
 
-          <nav className="hidden items-center gap-7 md:flex" aria-label="Seções">
-            {NAV_LINKS.map((l) => (
+          <nav className="hidden items-center gap-7 md:flex" aria-label={t('nav.sections')}>
+            {NAV_IDS.map((id) => (
               <button
-                key={l.id}
+                key={id}
                 type="button"
-                onClick={() => go(l.id)}
+                onClick={() => go(id)}
                 className="group relative font-mono text-[11px] uppercase tracking-[0.22em] text-sith-muted transition-colors hover:text-sith-ink"
               >
-                {l.label}
+                {t(`nav.${id}`)}
                 <span className="absolute -bottom-1 left-0 h-px w-0 bg-sith-crimson transition-all duration-300 group-hover:w-full" />
               </button>
             ))}
           </nav>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 md:gap-4">
+            <LangSwitch className="hidden md:inline-flex" />
             <button
               type="button"
               onClick={switchSide}
               className="hidden items-center gap-1.5 border border-sith-line px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.22em] text-sith-muted transition-colors hover:border-sith-crimson/60 hover:text-sith-ink md:inline-flex"
-              title={`Trocar para ${other.name}`}
+              title={t('nav.switchTo', { side: otherName })}
             >
-              <span className="text-sith-crimson">⇄</span> {other.name}
+              <span className="text-sith-crimson">⇄</span> {otherName}
             </button>
-            <span className="hidden font-mono text-[10px] uppercase tracking-[0.32em] text-sith-faint md:block">
-              portfólio / {year}
+            <span className="hidden font-mono text-[10px] uppercase tracking-[0.32em] text-sith-faint lg:block">
+              {t('nav.portfolio')} / {year}
             </span>
             <button
               type="button"
               className="p-1.5 text-sith-muted hover:text-sith-ink md:hidden"
               onClick={() => setOpen((v) => !v)}
-              aria-label={open ? 'Fechar menu' : 'Abrir menu'}
+              aria-label={open ? t('nav.closeMenu') : t('nav.openMenu')}
               aria-expanded={open}
             >
               {open ? <X size={20} /> : <Menu size={20} />}
@@ -126,11 +122,11 @@ export default function Navigation() {
         }`}
         aria-hidden={!open}
       >
-        {NAV_LINKS.map((l, i) => (
+        {NAV_IDS.map((id, i) => (
           <button
-            key={l.id}
+            key={id}
             type="button"
-            onClick={() => go(l.id)}
+            onClick={() => go(id)}
             className="font-display text-4xl font-light text-sith-ink transition-all duration-300 hover:text-sith-crimson"
             style={{
               transform: open ? 'translateY(0)' : 'translateY(14px)',
@@ -138,19 +134,20 @@ export default function Navigation() {
               transitionDelay: `${i * 50}ms`,
             }}
           >
-            {l.label}
+            {t(`nav.${id}`)}
             <span className="text-sith-crimson">.</span>
           </button>
         ))}
+        <LangSwitch size="md" className="mt-2" />
         <button
           type="button"
           onClick={switchSide}
-          className="mt-4 inline-flex items-center gap-1.5 border border-sith-line px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-sith-muted"
+          className="inline-flex items-center gap-1.5 border border-sith-line px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-sith-muted"
         >
-          <span className="text-sith-crimson">⇄</span> trocar para {other.name}
+          <span className="text-sith-crimson">⇄</span> {t('nav.switchTo', { side: otherName })}
         </button>
-        <span className="mt-6 font-mono text-[10px] uppercase tracking-[0.32em] text-sith-faint">
-          portfólio / {year}
+        <span className="mt-4 font-mono text-[10px] uppercase tracking-[0.32em] text-sith-faint">
+          {t('nav.portfolio')} / {year}
         </span>
       </div>
     </>

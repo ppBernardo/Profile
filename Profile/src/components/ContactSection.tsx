@@ -7,6 +7,7 @@ import PodWreck from './PodWreck';
 import { TATOOINE_GROUND } from './TatooineEntry';
 import { useWhipIn } from '../hooks/useWhipIn';
 import { useSide } from '../context/SideContext';
+import { useLang } from '../i18n/LangContext';
 import { CONTACTS, type ContactChannel } from '../data/profile';
 import { prefersReducedMotion } from '../lib/scroll';
 
@@ -130,6 +131,9 @@ const FAR_VAPORATORS = [
 
 export default function ContactSection() {
   const { config } = useSide();
+  const { t } = useLang();
+  const tRef = useRef(t);
+  tRef.current = t;
   const landing = config.copy.contact.landing;
   const wrapRef = useWhipIn<HTMLDivElement>();
   const sectionRef = useRef<HTMLElement>(null);
@@ -213,8 +217,9 @@ export default function ContactSection() {
       ([entry]) => {
         if (!entry?.isIntersecting || kidGreeted.current) return;
         kidGreeted.current = true;
-        setKidSay('eu construí. eu conserto.');
-        window.setTimeout(() => setKidSay((s) => (s === 'eu construí. eu conserto.' ? null : s)), 3000);
+        const line = tRef.current('contact.kid');
+        setKidSay(line);
+        window.setTimeout(() => setKidSay((s) => (s === line ? null : s)), 3000);
         obs.disconnect();
       },
       { threshold: 0.6 }
@@ -227,13 +232,13 @@ export default function ContactSection() {
     try {
       await navigator.clipboard.writeText(value);
       setCopied(true);
-      setSay('copiado.');
+      setSay(t('contact.copiedQuip'));
       window.setTimeout(() => {
         setCopied(false);
         setSay(null);
       }, 1800);
     } catch {
-      setSay('não deu. copia na mão.');
+      setSay(t('contact.copyFail'));
       window.setTimeout(() => setSay(null), 2200);
     }
   };
@@ -293,10 +298,10 @@ export default function ContactSection() {
       <div ref={wrapRef} className="relative mx-auto max-w-6xl px-5 pb-28 sm:px-8 sm:pb-36">
         <div className="text-center">
           <p data-reveal className="font-mono text-[10px] uppercase tracking-[0.32em] text-[#6a4a26]">
-            setor de comunicações · tatooine
+            {t('contact.eyebrow')}
           </p>
           <h2 data-reveal className="mt-4 font-display text-5xl font-light tracking-tight text-[#2a1a10] sm:text-6xl lg:text-7xl">
-            Contato<span className="text-sith-crimson">.</span>
+            {t('contact.title')}<span className="text-sith-crimson">.</span>
           </h2>
           <p data-reveal className="mt-4 text-sm text-[#4a3320] sm:text-base">
             {config.copy.contact.pitch}
@@ -346,7 +351,7 @@ export default function ContactSection() {
                       <div className="mt-2.5 flex justify-center">
                         {c.copy ? (
                           <button type="button" className="pixel-btn inline-flex items-center gap-1.5 !px-3 !py-1.5 !text-[16px]" onClick={() => copyEmail(c.value)}>
-                            <Copy size={12} /> {copied && isActive ? 'copiado' : 'copiar'}
+                            <Copy size={12} /> {copied && isActive ? t('contact.copied') : t('contact.copy')}
                           </button>
                         ) : (
                           <a
@@ -355,7 +360,7 @@ export default function ContactSection() {
                             rel="noopener noreferrer"
                             className="pixel-btn inline-flex items-center gap-1.5 !px-3 !py-1.5 !text-[16px]"
                           >
-                            abrir <ArrowUpRight size={12} />
+                            {t('contact.open')} <ArrowUpRight size={12} />
                           </a>
                         )}
                       </div>

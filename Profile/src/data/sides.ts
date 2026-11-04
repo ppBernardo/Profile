@@ -39,9 +39,20 @@ export interface CapitalModel {
   bolt: string;
 }
 
-export interface FleetSystemSide {
-  region: string;
-  anchor: [number, number, number];
+export type FleetSystemId = 'ponte' | 'armas' | 'hangar' | 'escudos';
+
+/** Falas e títulos de um lado (há uma versão por idioma; a portuguesa fica aqui). */
+export interface SideCopy {
+  loading: string;
+  tracking: string;
+  tagline: string[];
+  hero: { gift: string; incoming: string; carbonite: string; sitter: string; badge: string; quips: string[] };
+  fleet: { title: [string, string]; arrived: string; systems: Record<FleetSystemId, string> };
+  contact: { pitch: string; landing: string };
+  footer: string;
+  /** Convite para trocar de lado, no rodapé: a linha acima e a frase do botão. */
+  switchKicker: string;
+  switchCta: string;
 }
 
 export interface SideConfig {
@@ -62,18 +73,9 @@ export interface SideConfig {
   capital: CapitalModel;
   /** Escoltas de capital (duas Star Destroyers) só no Império. */
   escorts: boolean;
-  copy: {
-    loading: string;
-    tracking: string;
-    tagline: string[];
-    hero: { gift: string; incoming: string; carbonite: string; sitter: string; badge: string; quips: string[] };
-    fleet: { title: [string, string]; arrived: string; systems: Record<'ponte' | 'armas' | 'hangar' | 'escudos', FleetSystemSide> };
-    contact: { pitch: string; landing: string };
-    footer: string;
-    /** Convite para trocar de lado, no rodapé: a linha acima e a frase do botão. */
-    switchKicker: string;
-    switchCta: string;
-  };
+  /** Pontos dos sistemas no casco da capitânia (coordenadas normalizadas do modelo). */
+  anchors: Record<FleetSystemId, [number, number, number]>;
+  copy: SideCopy;
 }
 
 const TIE: FighterModel = {
@@ -152,6 +154,7 @@ export const SIDES: Record<SideId, SideConfig> = {
     fighter: TIE,
     capital: DESTROYER,
     escorts: true,
+    anchors: { ponte: [0, 0.11, -0.3], armas: [-0.08, 0.035, -0.06], hangar: [0, -0.07, 0.12], escudos: [0, -0.01, 0.46] },
     copy: {
       loading: 'carregando o lado sombrio',
       tracking: 'rastreando o TIE Fighter',
@@ -167,12 +170,7 @@ export const SIDES: Record<SideId, SideConfig> = {
       fleet: {
         title: ['A frota do', 'Império.'],
         arrived: 'a frota do mestre.',
-        systems: {
-          ponte: { region: 'Ponte de comando', anchor: [0, 0.11, -0.3] },
-          armas: { region: 'Armas · turbolasers', anchor: [-0.08, 0.035, -0.06] },
-          hangar: { region: 'Hangar e comunicações', anchor: [0, -0.07, 0.12] },
-          escudos: { region: 'Escudos defletores', anchor: [0, -0.01, 0.46] },
-        },
+        systems: { ponte: 'Ponte de comando', armas: 'Armas · turbolasers', hangar: 'Hangar e comunicações', escudos: 'Escudos defletores' },
       },
       contact: { pitch: 'Pousamos onde tudo começou. Escolha uma casa. O lado sombrio está recrutando.', landing: 'tatooine. odeio areia.' },
       footer: 'o lado sombrio do código',
@@ -197,6 +195,7 @@ export const SIDES: Record<SideId, SideConfig> = {
     fighter: XWING,
     capital: FALCON,
     escorts: false,
+    anchors: { ponte: [-0.2, 0.07, 0.2], armas: [0, 0.12, 0], hangar: [0.14, 0.04, 0.4], escudos: [0.16, 0.1, -0.18] },
     copy: {
       loading: 'carregando a Resistência',
       tracking: 'rastreando o X-wing',
@@ -212,12 +211,7 @@ export const SIDES: Record<SideId, SideConfig> = {
       fleet: {
         title: ['A frota da', 'Resistência.'],
         arrived: 'a frota da aliança.',
-        systems: {
-          ponte: { region: 'Cabine de comando', anchor: [-0.2, 0.07, 0.2] },
-          armas: { region: 'Canhões quad-laser', anchor: [0, 0.12, 0] },
-          hangar: { region: 'Porões de carga e comunicações', anchor: [0.14, 0.04, 0.4] },
-          escudos: { region: 'Escudos defletores', anchor: [0.16, 0.1, -0.18] },
-        },
+        systems: { ponte: 'Cabine de comando', armas: 'Canhões quad-laser', hangar: 'Porões de carga e comunicações', escudos: 'Escudos defletores' },
       },
       contact: { pitch: 'Pousamos onde tudo começou. Escolha uma casa. A Resistência está recrutando.', landing: 'tatooine. de volta pra casa.' },
       footer: 'o lado da luz do código',

@@ -8,7 +8,9 @@ import Mascot, { type Pose } from './Mascot';
 import CapitalShip, { fleetShips, type ArriveKey, type FleetMotion } from './StarDestroyer';
 import FighterWing from './TieWing';
 import { useSide } from '../context/SideContext';
-import { fleetSystems, SKILLS } from '../data/profile';
+import { useLang } from '../i18n/LangContext';
+import { fleetSystems } from '../i18n/data';
+import { SKILLS } from '../data/profile';
 import { prefersReducedMotion } from '../lib/scroll';
 import { drawHyperspace, makeStreaks, prepareCanvas } from '../lib/hyperspace';
 
@@ -102,9 +104,15 @@ export default function FleetSection() {
   const [pose, setPose] = useState<Pose>('idle');
 
   const { config } = useSide();
+  const { t, lang } = useLang();
   const ships = useMemo(() => fleetShips(config.id), [config.id]);
-  const systems = useMemo(() => fleetSystems(config.id), [config.id]);
+  const systems = useMemo(() => fleetSystems(config.id, lang), [config.id, lang]);
   const system = systems[active];
+  // A cena de chegada lê lado e idioma por ref: trocar o idioma no meio não reinicia a frota.
+  const cfgRef = useRef(config);
+  cfgRef.current = config;
+  const tRef = useRef(t);
+  tRef.current = t;
 
   // Layout estreito: a nave fica menor e centralizada acima do painel.
   useEffect(() => {
@@ -216,8 +224,8 @@ export default function FleetSection() {
     const origin = compact ? { x: w * 0.5, y: h * 0.42 } : { x: w * 0.4, y: h * 0.47 };
     const streaks = makeStreaks(220, Math.max(w, h) * 0.6);
     const fx = { s: 0 };
-    const tint = config.hyperTint;
-    const flashRgb = config.hyperFlash;
+    const tint = cfgRef.current.hyperTint;
+    const flashRgb = cfgRef.current.hyperFlash;
     const draw = () => {
       if (fx.s < 0.002) ctx.clearRect(0, 0, w, h);
       else drawHyperspace(ctx, w, h, fx.s, streaks, { origin, dim: false, maxLen: 520, tint, flashRgb });
@@ -270,16 +278,16 @@ export default function FleetSection() {
     // Império: capitânia → duas escoltas → ala de TIEs. Resistência: Falcon → ala de X-wings.
     const escorts = ships.length > 1;
     const wingAt = escorts ? 5.15 : 3.2;
-    tl.call(() => speak('rastro de salto detectado.', 2000), [], 0)
+    tl.call(() => speak(tRef.current('fleet.jumpTrace'), 2000), [], 0)
       .to(fx, { s: 1, duration: 1.05, ease: 'power3.in', onUpdate: draw }, 0.3)
       .to(arrive, { flag: 1, duration: 1.9, ease: 'expo.out' }, 1.35)
       .to(fx, { s: 0, duration: 0.75, ease: 'power3.out', onUpdate: draw }, 1.35)
       .call(() => setPose('salute'), [], 1.9)
       .call(() => setHud(true), [], 2.3)
-      .call(() => speak(config.copy.fleet.arrived, 2600), [], escorts ? 4.4 : 3.4)
+      .call(() => speak(cfgRef.current.copy.fleet.arrived, 2600), [], escorts ? 4.4 : 3.4)
       .call(() => setPose('idle'), [], escorts ? 4.6 : 3.6)
       .to(arrive, { ties: 1, duration: 1.6, ease: 'expo.out' }, wingAt)
-      .call(() => speak('toca num sistema.', 3000), [], wingAt + 2.2);
+      .call(() => speak(tRef.current('fleet.tap'), 3000), [], wingAt + 2.2);
     shake(1.4, 1);
     if (escorts) {
       tl.to(arrive, { two: 1, duration: 1.5, ease: 'expo.out' }, 3.1).to(arrive, { three: 1, duration: 1.5, ease: 'expo.out' }, 4.1);
@@ -297,7 +305,7 @@ export default function FleetSection() {
       canvas.style.opacity = '0';
       if (stars) stars.style.opacity = '1';
     };
-  }, [entered, ready, speak, ships, config]);
+  }, [entered, ready, speak, ships]);
 
   // Painel de telemetria entra com o HUD.
   useEffect(() => {
@@ -344,7 +352,7 @@ export default function FleetSection() {
     }
     const status = statusRef.current;
     if (status) {
-      const txt = `> varredura ${sys.code} concluída · ${sys.region.toLowerCase()} online`;
+      const txt = t('fleet.scan', { code: sys.code, region: sys.region.toLowerCase() });
       const o = { n: 0 };
       status.textContent = '';
       panelTweens.current.push(
@@ -363,7 +371,7 @@ export default function FleetSection() {
     // Armas: a frota inteira entra em modo de batalha — alerta vermelho e o oficial avisa.
     if (alertRef.current) gsap.to(alertRef.current, { opacity: active === 1 ? 1 : 0, duration: 0.5, overwrite: true });
     if (active === 1) {
-      speak('frota em modo de batalha.', 2400);
+      speak(t('fleet.battle'), 2400);
       setPose('salute');
       window.setTimeout(() => setPose('idle'), 1800);
     }
@@ -374,7 +382,7 @@ export default function FleetSection() {
     } else {
       gsap.to(motion.current, { tieBoost: 0, duration: 0.6, overwrite: 'auto' });
     }
-  }, [active, hud, speak, systems]);
+  }, [active, hud, speak, systems, t]);
 
   // Linha de travamento: liga o marcador ativo ao painel (desktop), seguindo a nave a cada quadro.
   useEffect(() => {
@@ -431,7 +439,7 @@ export default function FleetSection() {
       id="frota"
       className="relative h-[100svh] overflow-hidden bg-sith-void"
       onPointerMove={onPointerMove}
-      aria-label="A frota do Império — competências"
+      aria-label={t('fleet.aria')}
     >
       {/* Espaço profundo */}
       <div
@@ -541,18 +549,17 @@ export default function FleetSection() {
 
       {/* Cabeçalho */}
       <div className="pointer-events-none absolute left-6 top-24 z-20 sm:left-10 md:left-[7vw] lg:left-[9vw]">
-        <p className="eyebrow">competências · ponte de comando</p>
+        <p className="eyebrow">{t('fleet.eyebrow')}</p>
         <h2 className="mt-3 font-display text-[clamp(36px,8vw,48px)] font-light leading-[0.95] tracking-tight text-sith-ink md:text-[clamp(44px,4.6vw,72px)]">
           {config.copy.fleet.title[0]}
           <br />
           <span className="italic text-sith-crimson text-glow-crimson">{config.copy.fleet.title[1]}</span>
         </h2>
         <p className="mt-4 max-w-xs text-sm text-sith-muted">
-          Cada sistema da capitânia é uma área que eu domino.{' '}
-          <span className="hidden md:inline">Toque nos marcadores do casco para inspecionar.</span>
+          {t('fleet.sub')} <span className="hidden md:inline">{t('fleet.hint')}</span>
         </p>
         {near && !ready && (
-          <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.3em] text-sith-faint">sincronizando com a frota…</p>
+          <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.3em] text-sith-faint">{t('fleet.syncing')}</p>
         )}
       </div>
 
@@ -563,7 +570,7 @@ export default function FleetSection() {
         style={{ borderLeft: `3px solid ${system.color}`, background: 'rgb(var(--c-surface) / 0.82)', backdropFilter: 'blur(14px)', boxShadow: '0 30px 60px -30px rgba(0,0,0,0.6), inset 0 1px 0 rgb(var(--c-line) / 0.05)' }}
         role="region"
         aria-live="polite"
-        aria-label="Telemetria do sistema selecionado"
+        aria-label={t('fleet.panelAria')}
       >
         {/* Oficial de ponte (mobile): apoiado no painel */}
         <div className="pointer-events-none absolute -top-14 right-3 md:hidden">
@@ -593,7 +600,7 @@ export default function FleetSection() {
             style={{ background: `linear-gradient(90deg, transparent, ${system.color}, transparent)`, boxShadow: `0 0 14px ${system.color}` }}
             aria-hidden
           />
-          <p className="font-mono text-[8px] uppercase tracking-[0.42em] text-sith-faint">{'>'} telemetria ativa</p>
+          <p className="font-mono text-[8px] uppercase tracking-[0.42em] text-sith-faint">{t('fleet.telemetry')}</p>
           <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.28em]" style={{ color: system.color }}>
             {system.code} — {system.region}
           </p>
@@ -601,7 +608,7 @@ export default function FleetSection() {
           <p className="mt-2 text-[12px] leading-relaxed text-sith-muted md:text-[13px]">{system.desc}</p>
 
           <div className="mt-4 flex items-baseline gap-3">
-            <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-sith-faint">carga</span>
+            <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-sith-faint">{t('fleet.load')}</span>
             <div className="h-[5px] min-w-0 flex-1 bg-sith-ink/10">
               <div className="fleet-bar h-full" style={{ width: `${system.level}%`, background: system.color, boxShadow: `0 0 12px ${system.color}88` }} />
             </div>
@@ -627,7 +634,7 @@ export default function FleetSection() {
           </ul>
 
           <p className="mt-4 hidden font-mono text-[9px] uppercase tracking-[0.22em] text-sith-faint md:block">
-            arsenal · {SKILLS.arsenal.slice(0, 6).join(' · ')}
+            {t('fleet.arsenal')} · {SKILLS.arsenal.slice(0, 6).join(' · ')}
           </p>
         </div>
       </div>

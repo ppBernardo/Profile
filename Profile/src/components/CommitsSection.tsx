@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Mascot, { type Pose } from './Mascot';
 import { useWhipIn } from '../hooks/useWhipIn';
+import { useLang } from '../i18n/LangContext';
 import { PROFILE } from '../data/profile';
 import { prefersReducedMotion } from '../lib/scroll';
 
@@ -56,9 +57,9 @@ function toGrid(days: Day[]): (Day | null)[] {
   return cells;
 }
 
-const fmt = new Intl.NumberFormat('pt-BR');
-
 export default function CommitsSection() {
+  const { t, locale } = useLang();
+  const fmt = useMemo(() => new Intl.NumberFormat(locale), [locale]);
   const [days, setDays] = useState<Day[] | null>(null);
   const [total, setTotal] = useState<number | null>(null);
   const [offline, setOffline] = useState(false);
@@ -131,13 +132,13 @@ export default function CommitsSection() {
       once: true,
       onEnter: () => {
         setPlayed(true);
-        setBossSay('bora, pessoal.');
+        setBossSay(t('commits.boss'));
         setWorkersPose('hammer');
         const counter = { v: 0 };
         const tl = gsap.timeline({
           onComplete: () => {
             setWorkersPose('idle');
-            setBossSay(`${fmt.format(total)} comandos até aqui.`);
+            setBossSay(t('commits.total', { n: fmt.format(total) }));
             window.setTimeout(() => setBossSay(null), 3200);
           },
         });
@@ -164,7 +165,7 @@ export default function CommitsSection() {
     });
 
     return () => st.kill();
-  }, [days, total, played]);
+  }, [days, total, played, fmt, t]);
 
   return (
     <section id="commits" className="relative overflow-hidden bg-sith-void py-28 sm:py-36">
@@ -173,13 +174,13 @@ export default function CommitsSection() {
       <div ref={wrapRef} className="relative mx-auto max-w-6xl px-5 sm:px-8">
         <div className="text-center">
           <p data-reveal className="eyebrow">
-            {YEAR} no github
+            {t('commits.eyebrow', { year: YEAR })}
           </p>
           <h2 data-reveal className="mt-4 font-display text-5xl font-light tracking-tight text-sith-ink sm:text-6xl lg:text-7xl">
-            Comando a comando<span className="text-sith-crimson">.</span>
+            {t('commits.title')}<span className="text-sith-crimson">.</span>
           </h2>
           <p data-reveal className="mt-4 text-sm text-sith-muted sm:text-base">
-            Cada luz é um dia de commits em {YEAR}.
+            {t('commits.sub', { year: YEAR })}
           </p>
         </div>
 
@@ -233,19 +234,19 @@ export default function CommitsSection() {
                       className="cell"
                       data-level={d ? d.level : 0}
                       style={d ? undefined : { opacity: 0.25 }}
-                      title={d ? `${d.date}: ${d.count} commit${d.count === 1 ? '' : 's'}` : undefined}
+                      title={d ? t('commits.day', { date: d.date, n: d.count }) : undefined}
                     />
                   ))}
                 </div>
               ) : (
                 <div className="flex h-[112px] items-center justify-center font-mono text-[10px] uppercase tracking-[0.3em] text-sith-faint">
-                  sincronizando com o império…
+                  {t('commits.syncing')}
                 </div>
               )}
             </div>
 
             <div className="mt-3 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.26em] text-sith-faint">
-              <span>{narrow ? 'últimas 26 semanas' : `jan — dez ${YEAR}`}</span>
+              <span>{narrow ? t('commits.last26') : t('commits.range', { year: YEAR })}</span>
               <span className="flex items-center gap-2">
                 {[0, 1, 2, 3, 4].map((l) => (
                   <span key={l} className="cell !w-2.5" data-level={l} />
@@ -260,8 +261,8 @@ export default function CommitsSection() {
             <span ref={numberRef}>0</span>
           </p>
           <p className="mt-2 eyebrow">
-            contribuições em {YEAR}
-            {offline && ' · sincronização offline'}
+            {t('commits.contribs', { year: YEAR })}
+            {offline && t('commits.offline')}
           </p>
         </div>
       </div>

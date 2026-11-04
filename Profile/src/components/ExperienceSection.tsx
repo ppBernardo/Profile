@@ -3,12 +3,13 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Calendar, MapPin } from 'lucide-react';
 import Mascot, { type Pose } from './Mascot';
-import { EXPERIENCES } from '../data/profile';
+import { useLang } from '../i18n/LangContext';
 import { prefersReducedMotion } from '../lib/scroll';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function ExperienceSection() {
+  const { t, experiences } = useLang();
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const walkerRef = useRef<HTMLDivElement>(null);
@@ -136,18 +137,17 @@ export default function ExperienceSection() {
           className="flex flex-col gap-6 px-5 sm:px-8 md:flex-row md:items-stretch md:gap-8 md:pl-[6vw] md:pr-[8vw]"
         >
           <div className="campaign-header flex shrink-0 flex-col justify-center md:w-[34vw] md:pr-6">
-            <p className="eyebrow">registro de missões</p>
+            <p className="eyebrow">{t('exp.eyebrow')}</p>
             <h2 className="mt-4 font-display text-5xl font-light leading-[0.95] tracking-tight text-sith-ink sm:text-6xl lg:text-7xl">
-              Campanhas<span className="text-sith-crimson">.</span>
+              {t('exp.title')}<span className="text-sith-crimson">.</span>
             </h2>
             <p className="mt-6 max-w-sm text-sm leading-relaxed text-sith-muted sm:text-base">
-              Cada empresa foi um campo de batalha diferente. Cada entrega, uma habilidade
-              forjada. <span className="hidden md:inline">Role para avançar na linha do tempo.</span>
+              {t('exp.sub')} <span className="hidden md:inline">{t('exp.hint')}</span>
             </p>
             <div className="mt-8 h-px w-32 bg-gradient-to-r from-sith-crimson to-transparent" />
           </div>
 
-          {EXPERIENCES.map((exp, i) => (
+          {experiences.map((exp, i) => (
             <article
               key={exp.company}
               className="campaign-card panel group relative flex shrink-0 flex-col p-6 sm:p-7 md:w-[440px] lg:w-[470px]"
@@ -157,10 +157,10 @@ export default function ExperienceSection() {
                 {exp.current ? (
                   <span className="flex items-center gap-1.5 text-sith-crimson">
                     <span className="blink-dot inline-block h-1.5 w-1.5 rounded-full bg-sith-crimson" />
-                    em curso
+                    {t('exp.current')}
                   </span>
                 ) : (
-                  `missão ${String(EXPERIENCES.length - i).padStart(2, '0')}`
+                  t('exp.mission', { n: String(experiences.length - i).padStart(2, '0') })
                 )}
               </span>
 
@@ -217,9 +217,9 @@ export default function ExperienceSection() {
               +
             </div>
             <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.3em] text-sith-faint">
-              próxima campanha
+              {t('exp.next')}
             </p>
-            <p className="mt-1 font-display text-xl italic text-sith-muted">em aberto.</p>
+            <p className="mt-1 font-display text-xl italic text-sith-muted">{t('exp.open')}</p>
           </div>
         </div>
       </div>

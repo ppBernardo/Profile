@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { LangProvider } from './i18n/LangContext';
 import { SideProvider, useSide } from './context/SideContext';
 import { SkinProvider } from './context/SkinContext';
 import { HyperspaceProvider } from './components/Hyperspace';
@@ -99,8 +100,10 @@ function Shell() {
 
 export default function App() {
   return (
-    <SideProvider>
-      <Shell />
-    </SideProvider>
+    <LangProvider>
+      <SideProvider>
+        <Shell />
+      </SideProvider>
+    </LangProvider>
   );
 }

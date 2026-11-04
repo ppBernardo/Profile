@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import PixelSprite from './PixelSprite';
 import Mascot from './Mascot';
 import { useSkin } from '../context/SkinContext';
+import { useLang } from '../i18n/LangContext';
 import { SKINS, type SkinId } from '../lib/sprites';
 
 interface Props {
@@ -12,33 +13,35 @@ interface Props {
 
 export default function InventoryModal({ open, onClose }: Props) {
   const { skin, skinId, setSkinId, crystals, totalCrystals, isUnlocked, unlockables } = useSkin();
+  const { t } = useLang();
   const [say, setSay] = useState<string | null>(null);
+  const skinName = (id: SkinId) => t(`skin.${id}`);
 
   useEffect(() => {
     if (!open) return;
-    setSay('minha ficha.');
+    setSay(t('inv.quip'));
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+  }, [open, onClose, t]);
 
   if (!open) return null;
 
   const pick = (id: SkinId) => {
     if (!isUnlocked(id) || id === skinId) return;
     setSkinId(id);
-    setSay(`${SKINS[id].name.toLowerCase()}. agora sim.`);
+    setSay(t('inv.picked', { name: skinName(id).toLowerCase() }));
   };
 
   return (
-    <div className="fixed inset-0 z-[90] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Inventário">
+    <div className="fixed inset-0 z-[90] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label={t('inv.title')}>
       <button
         type="button"
         className="absolute inset-0 bg-sith-void/80 backdrop-blur-sm"
         onClick={onClose}
-        aria-label="Fechar inventário"
+        aria-label={t('inv.close')}
       />
       <div
         className="relative w-full max-w-[460px] border-2 border-sith-goldDim bg-[#120d0f] p-6 shadow-[0_0_0_1px_#2a1f12,0_40px_80px_-20px_rgba(0,0,0,0.9)] sm:p-8"
@@ -47,23 +50,22 @@ export default function InventoryModal({ open, onClose }: Props) {
           type="button"
           onClick={onClose}
           className="absolute right-3 top-3 p-1.5 text-sith-muted hover:text-sith-ink"
-          aria-label="Fechar"
+          aria-label={t('holo.close')}
         >
           <X size={16} />
         </button>
 
         <div className="flex items-start justify-between gap-5">
           <div className="min-w-0 flex-1">
-            <p className="font-display text-3xl font-medium tracking-wide text-sith-ink">Inventário</p>
-            <p className="mt-1 font-mono text-[10px] tracking-[0.14em] text-sith-faint">
-              troca o que estiver liberado.
-            </p>
-            <p className="eyebrow mt-6">personagem</p>
+            <p className="font-display text-3xl font-medium tracking-wide text-sith-ink">{t('inv.title')}</p>
+            <p className="mt-1 font-mono text-[10px] tracking-[0.14em] text-sith-faint">{t('inv.sub')}</p>
+            <p className="eyebrow mt-6">{t('inv.character')}</p>
             <p className="mt-1 font-display text-2xl uppercase tracking-[0.08em] text-sith-ink">
-              {skin.name}
+              {skinName(skin.id)}
             </p>
             <p className="mt-1 font-pixel text-lg text-sith-muted">
-              {crystals} de {totalCrystals} cristais{crystals >= totalCrystals ? '. todos.' : '.'}
+              {t('inv.crystals', { n: crystals, total: totalCrystals })}
+              {crystals >= totalCrystals ? t('inv.all') : '.'}
             </p>
           </div>
           <div className="shrink-0 pr-4 pt-14">
@@ -71,7 +73,7 @@ export default function InventoryModal({ open, onClose }: Props) {
           </div>
         </div>
 
-        <p className="eyebrow mt-7">patente</p>
+        <p className="eyebrow mt-7">{t('inv.rank')}</p>
         <div className="mt-3 grid grid-cols-3 gap-3">
           {unlockables.map(({ id, threshold }) => {
             const s = SKINS[id];
@@ -94,19 +96,17 @@ export default function InventoryModal({ open, onClose }: Props) {
               >
                 <PixelSprite frame="idle" skin={s} scale={3} />
                 <span className="font-display text-base uppercase tracking-[0.1em] text-sith-ink">
-                  {s.name.split(' ')[0]}
+                  {skinName(id).split(' ')[0]}
                 </span>
                 <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-sith-faint">
-                  {active ? 'em uso' : unlocked ? 'liberado' : `${threshold} cristais`}
+                  {active ? t('inv.inUse') : unlocked ? t('inv.unlocked') : t('inv.cost', { n: threshold })}
                 </span>
               </button>
             );
           })}
         </div>
 
-        <p className="mt-5 font-mono text-[10px] leading-relaxed tracking-[0.1em] text-sith-faint">
-          Abra holocrons na seção de projetos para coletar cristais kyber e liberar patentes.
-        </p>
+        <p className="mt-5 font-mono text-[10px] leading-relaxed tracking-[0.1em] text-sith-faint">{t('inv.hint')}</p>
       </div>
     </div>
   );

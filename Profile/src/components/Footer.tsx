@@ -2,16 +2,18 @@ import { useState } from 'react';
 import Mascot, { type Pose } from './Mascot';
 import { useWhipIn } from '../hooks/useWhipIn';
 import { useSide } from '../context/SideContext';
+import { useLang } from '../i18n/LangContext';
 import { PROFILE } from '../data/profile';
 
 export default function Footer() {
   const { config, switchSide } = useSide();
+  const { t, profile } = useLang();
   const [pose, setPose] = useState<Pose>('idle');
   const [say, setSay] = useState<string | null>(null);
   const ref = useWhipIn<HTMLDivElement>({
     start: 'top 85%',
     onEnter: () => {
-      setSay('ponto final.');
+      setSay(t('footer.quip'));
       window.setTimeout(() => {
         setSay(null);
         setPose('sleep');
@@ -44,15 +46,15 @@ export default function Footer() {
         </div>
 
         <p data-reveal className="mt-4 font-display text-2xl font-light italic text-sith-ink/90 sm:text-3xl">
-          {PROFILE.role}.
+          {profile.role}.
         </p>
         <p data-reveal className="mx-auto mt-3 max-w-md text-sm text-sith-muted">
-          {PROFILE.pitch}
+          {profile.pitch}
         </p>
 
         <div data-reveal className="mt-8 flex flex-col items-center gap-3">
           <span className="eyebrow">{config.copy.switchKicker}</span>
-          <button type="button" onClick={switchSide} className="pixel-btn is-gold" title="Trocar de lado na Força">
+          <button type="button" onClick={switchSide} className="pixel-btn is-gold" title={t('footer.switchTitle')}>
             {config.copy.switchCta}
           </button>
           <div className="mt-2 flex flex-wrap items-center justify-center gap-3">
@@ -71,7 +73,7 @@ export default function Footer() {
         <div data-reveal className="mt-16 flex flex-col items-center justify-between gap-3 border-t border-sith-line pt-6 font-mono text-[10px] uppercase tracking-[0.26em] text-sith-faint sm:flex-row">
           <span>© {year} {PROFILE.name}</span>
           <span>{config.copy.footer}</span>
-          <span>feito com react · gsap · pixels</span>
+          <span>{t('footer.made')}</span>
         </div>
       </div>
     </footer>

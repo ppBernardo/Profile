@@ -1,5 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { SIDES, type SideConfig, type SideId } from '../data/sides';
+import { useLang } from '../i18n/LangContext';
+import { sideCopy, sideName } from '../i18n/sideCopy';
 
 const KEY = 'force-side-v1';
 const SKIP_KEY = 'force-side-skip';
@@ -27,17 +29,20 @@ export function consumeAutoSide(): SideId | null {
 interface SideValue {
   /** Lado escolhido nesta visita (null até a tela de carregamento perguntar). */
   side: SideId | null;
-  /** Configuração em vigor (do lado escolhido, do lembrado, ou Sith por padrão). */
+  /** Configuração em vigor (do lado escolhido, do lembrado, ou Sith por padrão), com as falas no idioma atual. */
   config: SideConfig;
   remembered: SideId | null;
   choose: (s: SideId) => void;
   /** Troca o lado e recarrega a página já no outro tema. */
   switchSide: () => void;
+  /** Nome de um lado no idioma atual. */
+  nameOf: (s: SideId) => string;
 }
 
 const SideContext = createContext<SideValue | null>(null);
 
 export function SideProvider({ children }: { children: ReactNode }) {
+  const { lang } = useLang();
   const [side, setSide] = useState<SideId | null>(null);
   const [remembered] = useState<SideId | null>(readStored);
   const effective: SideId = side ?? remembered ?? 'sith';
@@ -70,8 +75,15 @@ export function SideProvider({ children }: { children: ReactNode }) {
   }, [effective]);
 
   const value = useMemo<SideValue>(
-    () => ({ side, config: SIDES[effective], remembered, choose, switchSide }),
-    [side, effective, remembered, choose, switchSide]
+    () => ({
+      side,
+      config: { ...SIDES[effective], name: sideName(effective, lang), copy: sideCopy(effective, lang) },
+      remembered,
+      choose,
+      switchSide,
+      nameOf: (s: SideId) => sideName(s, lang),
+    }),
+    [side, effective, remembered, choose, switchSide, lang]
   );
 
   return <SideContext.Provider value={value}>{children}</SideContext.Provider>;

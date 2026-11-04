@@ -7,8 +7,8 @@ import Mascot, { type Pose } from './Mascot';
 import { useSkin } from '../context/SkinContext';
 import { useSide } from '../context/SideContext';
 import { useWhipIn } from '../hooks/useWhipIn';
-import { CRYSTALS_PER_PROJECT, PROJECTS } from '../data/profile';
-import { SKINS } from '../lib/sprites';
+import { useLang } from '../i18n/LangContext';
+import { CRYSTALS_PER_PROJECT } from '../data/profile';
 import { prefersReducedMotion } from '../lib/scroll';
 
 /** Cristal kyber: vermelho sangrado (Sith) ou azul (Jedi). */
@@ -37,6 +37,7 @@ const spawnSvg = (hue: Hue) => {
 export default function HolocronSection() {
   const { collected, collect, crystals, totalCrystals, isUnlocked, unlockables } = useSkin();
   const { config } = useSide();
+  const { t, projects } = useLang();
   const hue: Hue = config.id === 'rebel' ? 'azure' : 'crimson';
   const wrapRef = useWhipIn<HTMLDivElement>();
   const stageRef = useRef<HTMLDivElement>(null);
@@ -53,8 +54,8 @@ export default function HolocronSection() {
   const busy = useRef(false);
   const unlockedBefore = useRef<Set<string>>(new Set(unlockables.filter((u) => isUnlocked(u.id)).map((u) => u.id)));
 
-  const project = PROJECTS[index];
-  const n = PROJECTS.length;
+  const project = projects[index];
+  const n = projects.length;
 
   const sayFor = useCallback((text: string, ms = 2600) => {
     setSay(text);
@@ -66,10 +67,10 @@ export default function HolocronSection() {
     for (const u of unlockables) {
       if (isUnlocked(u.id) && !unlockedBefore.current.has(u.id)) {
         unlockedBefore.current.add(u.id);
-        if (u.threshold > 0) sayFor(`${SKINS[u.id].name.toLowerCase()} liberado. abre o inventário.`, 3600);
+        if (u.threshold > 0) sayFor(t('holo.unlocked', { name: t(`skin.${u.id}`).toLowerCase() }), 3600);
       }
     }
-  }, [crystals, isUnlocked, sayFor, unlockables]);
+  }, [crystals, isUnlocked, sayFor, unlockables, t]);
 
   const spawnCrystals = useCallback(
     (projectId: string) => {
@@ -134,13 +135,13 @@ export default function HolocronSection() {
         setPose('idle');
         if (!collected.has(project.id)) {
           window.setTimeout(() => spawnCrystals(project.id), 350);
-          sayFor('cristais!');
+          sayFor(t('holo.crystals'));
         }
         busy.current = false;
       },
       reduced ? 0 : 320
     );
-  }, [open, project.id, collected, spawnCrystals, sayFor]);
+  }, [open, project.id, collected, spawnCrystals, sayFor, t]);
 
   const close = useCallback(() => setOpen(false), []);
 
@@ -201,13 +202,13 @@ export default function HolocronSection() {
         <div className="flex flex-col items-center gap-6 text-center sm:flex-row sm:items-end sm:justify-between sm:text-left">
           <div>
             <p data-reveal className="eyebrow">
-              holocrons recuperados
+              {t('holo.eyebrow')}
             </p>
             <h2 data-reveal className="mt-4 font-display text-5xl font-light tracking-tight text-sith-ink sm:text-6xl lg:text-7xl">
-              Projetos<span className="text-sith-crimson">.</span>
+              {t('holo.title')}<span className="text-sith-crimson">.</span>
             </h2>
             <p data-reveal className="mt-4 max-w-md text-sm text-sith-muted sm:text-base">
-              Cada holocron guarda uma entrega. Abra, colete os cristais e suba de patente.
+              {t('holo.sub')}
             </p>
           </div>
 
@@ -219,7 +220,7 @@ export default function HolocronSection() {
               </span>
             </div>
             <button type="button" className="pixel-btn is-gold" onClick={() => setInventory(true)}>
-              inventário
+              {t('holo.inventory')}
             </button>
           </div>
         </div>
@@ -233,7 +234,7 @@ export default function HolocronSection() {
             aria-hidden
           />
 
-          {PROJECTS.map((p, i) => {
+          {projects.map((p, i) => {
             let off = (((i - index) % n) + n) % n;
             if (off > n / 2) off -= n;
             const isActive = off === 0;
@@ -255,7 +256,7 @@ export default function HolocronSection() {
                   type="button"
                   onClick={() => (isActive ? (open ? close() : openActive()) : go(off > 0 ? 1 : -1))}
                   className="block"
-                  aria-label={isActive ? `Abrir holocron ${p.numeral}: ${p.title}` : `Ir para ${p.title}`}
+                  aria-label={isActive ? t('holo.openAria', { n: p.numeral, title: p.title }) : t('holo.goAria', { title: p.title })}
                 >
                   <Holocron open={isActive && open} size={isActive ? 230 : 180} numeral={p.numeral} dim={!isActive} hue={hue} />
                 </button>
@@ -270,21 +271,21 @@ export default function HolocronSection() {
 
           {/* Navegação */}
           <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-5">
-            <button type="button" onClick={() => go(-1)} className="p-2 text-sith-muted transition-colors hover:text-sith-ink" aria-label="Holocron anterior">
+            <button type="button" onClick={() => go(-1)} className="p-2 text-sith-muted transition-colors hover:text-sith-ink" aria-label={t('holo.prev')}>
               <ArrowLeft size={18} />
             </button>
             <div className="text-center">
-              <p className="eyebrow">holocron {project.numeral}</p>
+              <p className="eyebrow">{t('holo.holocron', { n: project.numeral })}</p>
               <p className="font-display text-2xl text-sith-ink sm:text-3xl">{project.title}</p>
             </div>
-            <button type="button" onClick={() => go(1)} className="p-2 text-sith-muted transition-colors hover:text-sith-ink" aria-label="Próximo holocron">
+            <button type="button" onClick={() => go(1)} className="p-2 text-sith-muted transition-colors hover:text-sith-ink" aria-label={t('holo.next')}>
               <ArrowRight size={18} />
             </button>
           </div>
 
           {!open && (
             <div className="pointer-events-none absolute left-1/2 top-[6%] -translate-x-1/2 font-mono text-[10px] uppercase tracking-[0.3em] text-sith-faint sm:top-[10%]">
-              toque no holocron para abrir
+              {t('holo.tapHint')}
             </div>
           )}
 
@@ -300,14 +301,14 @@ export default function HolocronSection() {
                 type="button"
                 onClick={close}
                 className="absolute right-3 top-3 p-1 text-sith-muted hover:text-sith-ink"
-                aria-label="Fechar"
+                aria-label={t('holo.close')}
               >
                 <X size={16} />
               </button>
               <div className="grid gap-5 sm:grid-cols-[200px_1fr] sm:gap-7">
                 <div className="flex aspect-[4/3] flex-col justify-between border border-sith-line bg-sith-bg p-4 sm:aspect-auto">
                   <span className="font-mono text-[9px] uppercase leading-relaxed tracking-[0.26em] text-sith-faint">
-                    holocron {project.numeral}
+                    {t('holo.holocron', { n: project.numeral })}
                     <br />
                     {project.kind}
                   </span>
@@ -327,10 +328,10 @@ export default function HolocronSection() {
                     ))}
                   </div>
                   <div className="mt-5 flex items-center justify-between gap-3 border-t border-sith-line pt-4">
-                    <span className="font-mono text-[9px] uppercase tracking-[0.26em] text-sith-faint">{project.stack.length} módulos</span>
+                    <span className="font-mono text-[9px] uppercase tracking-[0.26em] text-sith-faint">{t('holo.modules', { n: project.stack.length })}</span>
                     {project.privateRepo ? (
                       <span className="inline-flex items-center gap-1.5 border border-sith-crimson/40 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-sith-crimson">
-                        <Lock size={11} /> repositório privado
+                        <Lock size={11} /> {t('holo.private')}
                       </span>
                     ) : (
                       <a
@@ -339,7 +340,7 @@ export default function HolocronSection() {
                         rel="noopener noreferrer"
                         className="pixel-btn is-primary inline-flex items-center gap-1.5 !py-2"
                       >
-                        abrir canal <ArrowUpRight size={14} />
+                        {t('holo.open')} <ArrowUpRight size={14} />
                       </a>
                     )}
                   </div>

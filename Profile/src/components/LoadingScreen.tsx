@@ -2,10 +2,13 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useGLTF, useProgress } from '@react-three/drei';
 import Mascot from './Mascot';
+import LangSwitch from './LangSwitch';
 import bustSith from '../../imgs/busto-sith.png';
 import bustRebel from '../../imgs/busto-rebel.png';
 import { prefersReducedMotion } from '../lib/scroll';
 import { consumeAutoSide, useSide } from '../context/SideContext';
+import { useLang } from '../i18n/LangContext';
+import { sideCopy } from '../i18n/sideCopy';
 import { SIDES, type SideId } from '../data/sides';
 
 interface Props {
@@ -61,23 +64,25 @@ function preloadModel(url: string, onProgress: (pct: number) => void) {
 }
 
 const ORDER: SideId[] = ['sith', 'rebel'];
-const KICKER: Record<SideId, string> = { sith: 'lado negro da força', rebel: 'lado da luz' };
 const PORTRAIT: Record<SideId, string> = { sith: bustSith, rebel: bustRebel };
 
 /**
- * Tela de carregamento: prepara fontes e retrato, pergunta de que lado da Força você está
+ * Tela de carregamento: prepara as fontes, pergunta de que lado da Força você está
  * e só então rastreia o caça daquele lado (TIE Fighter ou X-wing).
  */
 export default function LoadingScreen({ onComplete }: Props) {
-  const { choose, remembered } = useSide();
+  const { choose, remembered, nameOf } = useSide();
+  const { t, lang } = useLang();
   const rootRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
   const pctRef = useRef<HTMLSpanElement>(null);
   const done = useRef(false);
   const prog = useRef({ v: 0 });
   const [phase, setPhase] = useState<Phase>('boot');
-  const [label, setLabel] = useState('preparando o salto');
+  const [picked, setPicked] = useState<SideId | null>(null);
   const [hover, setHover] = useState<SideId | null>(null);
+
+  const label = picked ? sideCopy(picked, lang).tracking : t('loading.preparing');
 
   const render = useCallback(() => {
     if (barRef.current) barRef.current.style.width = `${prog.current.v}%`;
@@ -89,8 +94,8 @@ export default function LoadingScreen({ onComplete }: Props) {
       if (done.current) return;
       const cfg = SIDES[s];
       choose(s);
+      setPicked(s);
       setPhase('tracking');
-      setLabel(cfg.copy.tracking);
       Promise.all([
         preloadImage(PORTRAIT[s]),
         preloadModel(cfg.fighter.url, (p) => {
@@ -144,21 +149,24 @@ export default function LoadingScreen({ onComplete }: Props) {
     <div
       ref={rootRef}
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-sith-void px-5"
-      aria-label="Carregando"
+      aria-label={t('loading.aria')}
     >
       {phase === 'choose' ? (
         <div className="w-full max-w-3xl text-center">
-          <p className="eyebrow">antes de embarcar</p>
+          <div className="mb-6 flex justify-center">
+            <LangSwitch size="md" />
+          </div>
+          <p className="eyebrow">{t('loading.before')}</p>
           <h2 className="mt-3 font-display text-4xl font-light tracking-tight text-sith-ink sm:text-5xl">
-            Escolha o seu lado<span className="text-sith-crimson">.</span>
+            {t('loading.choose')}
+            <span className="text-sith-crimson">.</span>
           </h2>
-          <p className="mx-auto mt-3 max-w-md text-sm text-sith-muted">
-            Cada lado muda as naves, as cores e quem narra a história. Dá para trocar depois, no menu.
-          </p>
+          <p className="mx-auto mt-3 max-w-md text-sm text-sith-muted">{t('loading.sub')}</p>
 
           <div className="mt-9 grid gap-4 sm:grid-cols-2">
             {ORDER.map((id) => {
               const s = SIDES[id];
+              const name = nameOf(id);
               const remember = remembered === id && !hover;
               return (
                 <button
@@ -171,14 +179,14 @@ export default function LoadingScreen({ onComplete }: Props) {
                   onFocus={() => setHover(id)}
                   onBlur={() => setHover(null)}
                   onClick={() => pick(id)}
-                  aria-label={`Entrar pelo ${s.name}`}
+                  aria-label={t('loading.enter', { side: name })}
                 >
                   <div className="flex items-end justify-between gap-4">
                     <div className="min-w-0">
                       <p className="font-mono text-[9px] uppercase tracking-[0.3em]" style={{ color: s.accent }}>
-                        {KICKER[id]}
+                        {t(id === 'sith' ? 'loading.kickerSith' : 'loading.kickerRebel')}
                       </p>
-                      <p className="mt-2 font-display text-3xl font-medium tracking-tight text-sith-ink">{s.name}</p>
+                      <p className="mt-2 font-display text-3xl font-medium tracking-tight text-sith-ink">{name}</p>
                       <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.2em] text-sith-faint">{s.tag}</p>
                     </div>
                     <div className="shrink-0 pb-1">
@@ -186,7 +194,7 @@ export default function LoadingScreen({ onComplete }: Props) {
                     </div>
                   </div>
                   <p className="mt-4 h-3 font-mono text-[9px] uppercase tracking-[0.25em] text-sith-faint">
-                    {remembered === id ? 'última escolha' : ''}
+                    {remembered === id ? t('loading.last') : ''}
                   </p>
                 </button>
               );

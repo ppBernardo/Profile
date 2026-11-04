@@ -8,6 +8,7 @@ import bustRebel from '../../imgs/busto-rebel.png';
 import { PROFILE } from '../data/profile';
 import { useSide } from '../context/SideContext';
 import { useSkin } from '../context/SkinContext';
+import { useLang } from '../i18n/LangContext';
 import { prefersReducedMotion } from '../lib/scroll';
 
 const SLAB_W = 300;
@@ -130,6 +131,12 @@ export default function HeroSection({ ready }: Props) {
   const { skin } = useSkin();
   const copy = config.copy.hero;
   const bust = config.id === 'rebel' ? bustRebel : bustSith;
+  const { t, profile } = useLang();
+  // A linha do tempo da intro lê as falas por ref: trocar o idioma no meio não reinicia a cena.
+  const copyRef = useRef(copy);
+  copyRef.current = copy;
+  const tRef = useRef(t);
+  tRef.current = t;
 
   const shards = useMemo(() => makeShards(), []);
   const stars = useMemo(() => makeStars(), []);
@@ -253,11 +260,11 @@ export default function HeroSection({ ready }: Props) {
       tl.to(walker, { left: standX, duration: 1.5, ease: 'none' });
       tl.call(() => {
         setWalkerPose('idle');
-        setWalkerSay('senti sua presença.');
+        setWalkerSay(tRef.current('hero.presence'));
       });
       tl.to({}, { duration: 1.1 });
       tl.call(() => {
-        setWalkerSay(copy.gift);
+        setWalkerSay(copyRef.current.gift);
         setWalkerFacing('left');
       });
 
@@ -273,7 +280,7 @@ export default function HeroSection({ ready }: Props) {
         'flight'
       );
       tl.to(flight.current, { t: 1, duration: 3.6, ease: 'power1.inOut' }, 'flight');
-      tl.call(() => setWalkerSay(copy.incoming), undefined, 'flight+=1.35');
+      tl.call(() => setWalkerSay(copyRef.current.incoming), undefined, 'flight+=1.35');
       tl.call(() => setWalkerPose('jump'), undefined, 'flight+=1.75');
 
       // Passagem rasante: só um tremor leve de câmera
@@ -290,7 +297,7 @@ export default function HeroSection({ ready }: Props) {
       tl.call(
         () => {
           setWalkerPose('idle');
-          setWalkerSay(copy.carbonite);
+          setWalkerSay(copyRef.current.carbonite);
         },
         undefined,
         'flight+=2.6'
@@ -325,7 +332,7 @@ export default function HeroSection({ ready }: Props) {
       tl.add('carve', 'flight+=3.9');
       tl.call(
         () => {
-          setWalkerSay('o sabre esculpe o que a Força escolhe.');
+          setWalkerSay(tRef.current('hero.carve'));
           setWalkerFacing('left');
           setWalkerSaber(true);
         },
@@ -384,7 +391,7 @@ export default function HeroSection({ ready }: Props) {
         undefined,
         'jump+=0.62'
       );
-      tl.call(() => setSitterSay(copy.sitter), undefined, 'jump+=1.0');
+      tl.call(() => setSitterSay(copyRef.current.sitter), undefined, 'jump+=1.0');
       tl.to(hintRef.current, { opacity: 1, duration: 0.8 }, 'jump+=1.2');
       tl.to({}, { duration: 2.8 }, 'jump+=1.0');
       tl.call(() => setSitterSay(null));
@@ -398,7 +405,7 @@ export default function HeroSection({ ready }: Props) {
       patrolRef.current = null;
       tlRef.current = null;
     };
-  }, [ready, copy]);
+  }, [ready]);
 
   const skipIntro = useCallback(() => {
     const tl = tlRef.current;
@@ -420,7 +427,7 @@ export default function HeroSection({ ready }: Props) {
       className="relative h-[100svh] min-h-[640px] overflow-hidden bg-sith-void"
     >
       <h1 className="sr-only">
-        {PROFILE.name} — {PROFILE.role}
+        {PROFILE.name} — {profile.role}
       </h1>
 
       {/* Fundo: estrelas, marca d'água e brasas */}
@@ -559,7 +566,7 @@ export default function HeroSection({ ready }: Props) {
                 </div>
                 <div className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-sith-muted">
                   <span className="blink-dot inline-block h-1.5 w-1.5 rounded-full bg-sith-crimson" />
-                  online
+                  {t('hero.online')}
                 </div>
               </div>
             </div>
@@ -637,7 +644,7 @@ export default function HeroSection({ ready }: Props) {
                 type="button"
                 onClick={quip}
                 className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-full cursor-pointer"
-                aria-label="Falar com o aprendiz"
+                aria-label={t('hero.talk')}
               >
                 <Mascot pose="idle" facing="right" scale={4} say={sitterSay} />
               </button>
@@ -664,7 +671,7 @@ export default function HeroSection({ ready }: Props) {
           ))}
         </p>
         <p data-line className="mt-4 font-mono text-[10px] uppercase tracking-[0.3em] text-sith-faint md:mt-6">
-          {PROFILE.name} — {PROFILE.role}
+          {PROFILE.name} — {profile.role}
         </p>
       </div>
 
@@ -673,7 +680,7 @@ export default function HeroSection({ ready }: Props) {
         ref={hintRef}
         className="absolute bottom-6 left-1/2 z-[4] flex -translate-x-1/2 flex-col items-center gap-2 font-mono text-[9px] uppercase tracking-[0.3em] text-sith-faint"
       >
-        <span>scroll</span>
+        <span>{t('hero.scroll')}</span>
         <svg width="12" height="18" viewBox="0 0 6 9" shapeRendering="crispEdges" className="animate-bounce" aria-hidden>
           <rect x="2" y="0" width="2" height="5" style={{ fill: 'var(--crimson)' }} />
           <rect x="0" y="4" width="2" height="2" style={{ fill: 'var(--crimson)' }} />
@@ -689,7 +696,7 @@ export default function HeroSection({ ready }: Props) {
         onClick={skipIntro}
         className="absolute bottom-6 right-5 z-[4] font-mono text-[10px] uppercase tracking-[0.28em] text-sith-faint transition-colors hover:text-sith-ink sm:right-8"
       >
-        pular intro →
+        {t('hero.skip')}
       </button>
 
       <style>{`

@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import Mascot from './Mascot';
 import { useWhipIn } from '../hooks/useWhipIn';
-import { DOSSIER, PROFILE } from '../data/profile';
+import { useLang } from '../i18n/LangContext';
+import { PROFILE } from '../data/profile';
 
 export default function AboutSection() {
+  const { t, profile, dossier } = useLang();
   const [say, setSay] = useState<string | null>(null);
   const ref = useWhipIn<HTMLDivElement>({
     onEnter: () => {
-      setSay('ele é dos bons.');
+      setSay(t('about.quip'));
       window.setTimeout(() => setSay(null), 2600);
     },
   });
@@ -17,27 +19,27 @@ export default function AboutSection() {
       <div className="pointer-events-none absolute inset-x-0 top-0 hairline" />
       <div
         className="pointer-events-none absolute -left-40 top-1/3 h-[60vh] w-[60vh] rounded-full opacity-40"
-        style={{ background: 'radial-gradient(circle, rgba(122,15,20,0.35), transparent 65%)' }}
+        style={{ background: 'radial-gradient(circle, rgb(var(--c-blood) / 0.35), transparent 65%)' }}
         aria-hidden
       />
 
       <div ref={ref} className="relative mx-auto grid max-w-6xl gap-14 px-6 sm:px-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-20">
         <div>
           <p data-reveal className="eyebrow">
-            // sobre
+            {t('about.eyebrow')}
           </p>
           <h2 data-reveal className="mt-5 font-display text-5xl font-light leading-[0.95] tracking-tight text-sith-ink sm:text-6xl lg:text-7xl">
-            Forjado em
+            {t('about.title1')}
             <br />
-            <span className="italic text-sith-crimson text-glow-crimson">código.</span>
+            <span className="italic text-sith-crimson text-glow-crimson">{t('about.title2')}</span>
           </h2>
 
           <p data-reveal className="mt-10 max-w-xl font-display text-2xl font-light italic leading-snug text-sith-ink/90 sm:text-[28px]">
-            “{PROFILE.quote}”
+            “{profile.quote}”
           </p>
 
           <div className="mt-8 max-w-xl space-y-5 text-[15px] leading-relaxed text-sith-muted sm:text-base">
-            {PROFILE.bio.map((p) => (
+            {profile.bio.map((p) => (
               <p key={p} data-reveal>
                 {p}
               </p>
@@ -45,12 +47,12 @@ export default function AboutSection() {
           </div>
 
           <div data-reveal className="mt-9 flex flex-wrap gap-2">
-            {PROFILE.tags.map((t) => (
+            {PROFILE.tags.map((tag) => (
               <span
-                key={t}
+                key={tag}
                 className="border border-sith-line px-3 py-1.5 font-mono text-[11px] tracking-[0.12em] text-sith-muted transition-colors hover:border-sith-crimson/50 hover:text-sith-ink"
               >
-                {t}
+                {tag}
               </span>
             ))}
           </div>
@@ -67,19 +69,19 @@ export default function AboutSection() {
             <div className="rivet bottom-2 left-2" />
             <div className="rivet bottom-2 right-2" />
 
-            <p className="eyebrow">ficha do aprendiz</p>
+            <p className="eyebrow">{t('about.dossier')}</p>
             <p className="mt-2 font-display text-3xl font-medium tracking-tight text-sith-ink">
               {PROFILE.fullName}
             </p>
             <p className="mt-1 font-mono text-[10px] tracking-[0.12em] text-sith-crimson/80">
-              {PROFILE.role}
+              {profile.role}
             </p>
             <p className="mt-1 font-mono text-[10px] leading-relaxed tracking-[0.08em] text-sith-faint">
               {PROFILE.headline}
             </p>
 
             <dl className="mt-7 divide-y divide-sith-line border-y border-sith-line">
-              {DOSSIER.map((row) => (
+              {dossier.map((row) => (
                 <div key={row.k} className="grid grid-cols-[96px_1fr] gap-4 py-3.5 sm:grid-cols-[124px_1fr]">
                   <dt className="font-mono text-[10px] uppercase leading-relaxed tracking-[0.2em] text-sith-faint">{row.k}</dt>
                   <dd>
@@ -93,9 +95,9 @@ export default function AboutSection() {
             <div className="mt-6 flex items-center justify-between">
               <span className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-sith-muted">
                 <span className="blink-dot inline-block h-1.5 w-1.5 rounded-full bg-sith-crimson" />
-                disponível para projetos
+                {t('about.available')}
               </span>
-              <span className="pixel-chip">status: ativo</span>
+              <span className="pixel-chip">{t('about.status')}</span>
             </div>
           </div>
         </div>

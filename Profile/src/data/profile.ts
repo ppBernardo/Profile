@@ -1,5 +1,3 @@
-import { SIDES, type SideId } from './sides';
-
 export const PROFILE = {
   firstName: 'Bernardo',
   name: 'Bernardo Pereira',
@@ -327,20 +325,7 @@ export interface FleetSystem {
   techs: Skill[];
 }
 
-/** Sistemas da capitânia do lado escolhido: nomes e pontos no casco mudam com o modelo. */
-export function fleetSystems(side: SideId): FleetSystem[] {
-  const s = SIDES[side];
-  return FLEET_SYSTEMS.map((f) => {
-    const o = s.copy.fleet.systems[f.id as keyof typeof s.copy.fleet.systems];
-    return {
-      ...f,
-      region: o?.region ?? f.region,
-      anchor: o?.anchor ?? f.anchor,
-      color: f.id === 'ponte' ? s.accent : f.color,
-    };
-  });
-}
-
+/** Base em português; `fleetSystems(side, lang)` em i18n/data.ts aplica lado e idioma. */
 export const FLEET_SYSTEMS: FleetSystem[] = [
   {
     id: 'ponte',

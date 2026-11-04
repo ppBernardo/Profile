@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import PodRacer, { type PodVariant } from './PodRacer';
+import { useLang } from '../i18n/LangContext';
 import { prefersReducedMotion } from '../lib/scroll';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -34,6 +35,9 @@ const DUNES = [
  * (calor, estrias, tremor) e pouso entre as dunas sob os dois sóis. Tudo guiado pelo scroll.
  */
 export default function TatooineEntry() {
+  const { t } = useLang();
+  const tRef = useRef(t);
+  tRef.current = t;
   const sectionRef = useRef<HTMLElement>(null);
   const shakeRef = useRef<HTMLDivElement>(null);
   const starsRef = useRef<HTMLDivElement>(null);
@@ -93,7 +97,7 @@ export default function TatooineEntry() {
       if (velRef.current) velRef.current.textContent = `${lerp(7.8, 0.1, smooth(0.3, 0.97, p)).toFixed(1)} km/s`;
       if (tempRef.current) tempRef.current.textContent = `${Math.round(40 + heat * 1610)} °C`;
       if (phaseRef.current) {
-        phaseRef.current.textContent = p < 0.3 ? 'aproximação orbital' : p < 0.64 ? 'reentrada atmosférica' : 'pouso em tatooine';
+        phaseRef.current.textContent = tRef.current(p < 0.3 ? 'tat.phase1' : p < 0.64 ? 'tat.phase2' : 'tat.phase3');
       }
       if (barRef.current) gsap.set(barRef.current, { scaleX: p });
       if (hudRef.current) gsap.set(hudRef.current, { opacity: 1 - smooth(0.86, 0.97, p) });
@@ -143,7 +147,7 @@ export default function TatooineEntry() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative h-[100svh] overflow-hidden bg-sith-void" aria-label="Entrada na atmosfera de Tatooine">
+    <section ref={sectionRef} className="relative h-[100svh] overflow-hidden bg-sith-void" aria-label={t('tat.aria')}>
       <div ref={shakeRef} className="absolute inset-[-12px] will-change-transform">
         {/* Espaço */}
         <div ref={starsRef} className="pointer-events-none absolute inset-0" aria-hidden>
@@ -270,20 +274,20 @@ export default function TatooineEntry() {
         ))}
         <div className="absolute left-8 top-28 font-mono text-[10px] uppercase tracking-[0.28em] text-sith-ink/80 sm:left-10">
           <p className="text-sith-crimson">
-            {'>'} <span ref={phaseRef}>aproximação orbital</span>
+            {'>'} <span ref={phaseRef}>{t('tat.phase1')}</span>
           </p>
           <p className="mt-3">
-            altitude <span ref={altRef} className="text-sith-ink">420 km</span>
+            {t('tat.alt')} <span ref={altRef} className="text-sith-ink">420 km</span>
           </p>
           <p className="mt-1">
-            velocidade <span ref={velRef} className="text-sith-ink">7.8 km/s</span>
+            {t('tat.vel')} <span ref={velRef} className="text-sith-ink">7.8 km/s</span>
           </p>
           <p className="mt-1">
-            casco <span ref={tempRef} className="text-sith-ink">40 °C</span>
+            {t('tat.hull')} <span ref={tempRef} className="text-sith-ink">40 °C</span>
           </p>
         </div>
         <div className="absolute bottom-12 left-8 right-8 sm:left-10 sm:right-10">
-          <p className="mb-2 font-mono text-[9px] uppercase tracking-[0.3em] text-sith-ink/60">trajetória de descida · setor de comunicações</p>
+          <p className="mb-2 font-mono text-[9px] uppercase tracking-[0.3em] text-sith-ink/60">{t('tat.trajectory')}</p>
           <div className="h-px w-full bg-sith-ink/15">
             <div ref={barRef} className="h-full origin-left bg-sith-crimson" style={{ transform: 'scaleX(0)' }} />
           </div>
@@ -292,11 +296,11 @@ export default function TatooineEntry() {
 
       {/* Chegada */}
       <div ref={titleRef} className="pointer-events-none absolute bottom-[12%] left-6 z-10 opacity-0 sm:left-10 md:left-[7vw] lg:left-[9vw]">
-        <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-[#6a4a26]">pouso concluído · orla do mar de dunas</p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-[#6a4a26]">{t('tat.landed')}</p>
         <h2 className="mt-3 font-display text-[clamp(40px,8vw,56px)] font-light leading-[0.95] tracking-tight text-[#2a1a10] md:text-[clamp(48px,5vw,80px)]">
           Tatooine<span className="text-sith-crimson">.</span>
         </h2>
-        <p className="mt-3 max-w-xs text-sm text-[#4a3320]">Onde tudo começou. O setor de comunicações fica logo adiante.</p>
+        <p className="mt-3 max-w-xs text-sm text-[#4a3320]">{t('tat.sub')}</p>
       </div>
     </section>
   );
