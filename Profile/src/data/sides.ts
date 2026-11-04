@@ -70,6 +70,9 @@ export interface SideConfig {
     fleet: { title: [string, string]; arrived: string; systems: Record<'ponte' | 'armas' | 'hangar' | 'escudos', FleetSystemSide> };
     contact: { pitch: string; landing: string };
     footer: string;
+    /** Convite para trocar de lado, no rodapé: a linha acima e a frase do botão. */
+    switchKicker: string;
+    switchCta: string;
   };
 }
 
@@ -145,7 +148,7 @@ export const SIDES: Record<SideId, SideConfig> = {
       ground: '#1a0a0c',
       space: 'radial-gradient(ellipse 80% 60% at 70% 110%, rgba(122,15,20,0.25), transparent 60%), linear-gradient(180deg, #040305 0%, #07060a 60%, #0b0709 100%)',
     },
-    skin: 'aprendiz',
+    skin: 'anakin',
     fighter: TIE,
     capital: DESTROYER,
     escorts: true,
@@ -173,6 +176,8 @@ export const SIDES: Record<SideId, SideConfig> = {
       },
       contact: { pitch: 'Pousamos onde tudo começou. Escolha uma casa. O lado sombrio está recrutando.', landing: 'tatooine. odeio areia.' },
       footer: 'o lado sombrio do código',
+      switchKicker: 'um chamado do outro lado',
+      switchCta: 'Ainda há luz em você',
     },
   },
   rebel: {
@@ -216,6 +221,8 @@ export const SIDES: Record<SideId, SideConfig> = {
       },
       contact: { pitch: 'Pousamos onde tudo começou. Escolha uma casa. A Resistência está recrutando.', landing: 'tatooine. de volta pra casa.' },
       footer: 'o lado da luz do código',
+      switchKicker: 'uma oferta do Imperador',
+      switchCta: 'Junte-se ao lado sombrio',
     },
   },
 };

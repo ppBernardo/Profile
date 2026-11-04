@@ -8,7 +8,7 @@ import { useSkin } from '../context/SkinContext';
 import { useSide } from '../context/SideContext';
 import { useWhipIn } from '../hooks/useWhipIn';
 import { CRYSTALS_PER_PROJECT, PROJECTS } from '../data/profile';
-import { UNLOCKABLE, SKINS } from '../lib/sprites';
+import { SKINS } from '../lib/sprites';
 import { prefersReducedMotion } from '../lib/scroll';
 
 /** Cristal kyber: vermelho sangrado (Sith) ou azul (Jedi). */
@@ -35,7 +35,7 @@ const spawnSvg = (hue: Hue) => {
 };
 
 export default function HolocronSection() {
-  const { collected, collect, crystals, totalCrystals, isUnlocked } = useSkin();
+  const { collected, collect, crystals, totalCrystals, isUnlocked, unlockables } = useSkin();
   const { config } = useSide();
   const hue: Hue = config.id === 'rebel' ? 'azure' : 'crimson';
   const wrapRef = useWhipIn<HTMLDivElement>();
@@ -51,7 +51,7 @@ export default function HolocronSection() {
   const [pose, setPose] = useState<Pose>('idle');
   const [say, setSay] = useState<string | null>(null);
   const busy = useRef(false);
-  const unlockedBefore = useRef<Set<string>>(new Set(UNLOCKABLE.filter((u) => isUnlocked(u.id)).map((u) => u.id)));
+  const unlockedBefore = useRef<Set<string>>(new Set(unlockables.filter((u) => isUnlocked(u.id)).map((u) => u.id)));
 
   const project = PROJECTS[index];
   const n = PROJECTS.length;
@@ -63,13 +63,13 @@ export default function HolocronSection() {
 
   // Avisa quando uma patente nova ficou disponível.
   useEffect(() => {
-    for (const u of UNLOCKABLE) {
+    for (const u of unlockables) {
       if (isUnlocked(u.id) && !unlockedBefore.current.has(u.id)) {
         unlockedBefore.current.add(u.id);
         if (u.threshold > 0) sayFor(`${SKINS[u.id].name.toLowerCase()} liberado. abre o inventário.`, 3600);
       }
     }
-  }, [crystals, isUnlocked, sayFor]);
+  }, [crystals, isUnlocked, sayFor, unlockables]);
 
   const spawnCrystals = useCallback(
     (projectId: string) => {

@@ -1,5 +1,5 @@
 /**
- * Sprites pixel-art: o aprendiz (encapuzado), Darth Vader e Obi-Wan.
+ * Sprites pixel-art: o aprendiz (encapuzado), Darth Vader, Obi-Wan, Anakin, Han Solo e Yoda.
  * Cada frame é uma grade 12×16; cada caractere mapeia para uma cor da skin.
  *
  *  K outline   H hood   h hood light   s skin   d skin shadow
@@ -14,7 +14,7 @@ export const SPRITE_H = 16;
 
 export type FrameName = 'idle' | 'walk1' | 'walk2' | 'jump' | 'swing' | 'pull' | 'sleep' | 'salute' | 'kneel';
 export type SpriteFrame = readonly string[];
-export type SpriteKind = 'hooded' | 'vader' | 'vaderCracked' | 'jedi';
+export type SpriteKind = 'hooded' | 'vader' | 'vaderCracked' | 'jedi' | 'hair' | 'vest' | 'yoda';
 
 export interface SaberAnchor {
   x: number;
@@ -225,11 +225,148 @@ const JEDI: FrameSet = {
   kneel: [...HEAD_JEDI, ...BODY_JEDI_IDLE, ...LEGS_JEDI_KNEEL],
 };
 
+/* ─── Cabelo sem capuz (Anakin, Han Solo) ───────────────────────────── */
+
+const HEAD_HAIR = [
+  '...KKKKKK...',
+  '..KAAAAAAK..',
+  '.KAAAAAAAAK.',
+  '.KAassssaAK.',
+  '.KAssssssAK.',
+  '.KAsessesAK.',
+  '.KssssssssK.',
+  '..KdssssdK..',
+] as const;
+
+const HEAD_HAIR_SLEEP = [
+  '...KKKKKK...',
+  '..KAAAAAAK..',
+  '.KAAAAAAAAK.',
+  '.KAassssaAK.',
+  '.KAssssssAK.',
+  '.KAs-ss-sAK.',
+  '.KssssssssK.',
+  '..KdssssdK..',
+] as const;
+
+/** Anakin: cabelo + túnica escura (mesmo corpo do encapuzado). */
+const HAIR: FrameSet = {
+  idle: [...HEAD_HAIR, ...BODY_IDLE, ...LEGS_IDLE],
+  walk1: [...HEAD_HAIR, ...BODY_IDLE, ...LEGS_WALK1],
+  walk2: [...HEAD_HAIR, ...BODY_IDLE, ...LEGS_WALK2],
+  jump: [...HEAD_HAIR, ...BODY_IDLE, ...LEGS_JUMP],
+  swing: [...HEAD_HAIR, ...BODY_SWING, ...LEGS_IDLE],
+  pull: [...HEAD_HAIR, ...BODY_PULL, ...LEGS_WALK1],
+  sleep: [...HEAD_HAIR_SLEEP, ...BODY_IDLE, ...LEGS_IDLE],
+  salute: [...HEAD_HAIR, ...BODY_SWING, ...LEGS_IDLE],
+  kneel: [...HEAD_HAIR, ...BODY_IDLE, ...LEGS_JUMP],
+};
+
+/* ─── Han Solo (camisa, colete, calça com listra) ───────────────────── */
+
+const BODY_VEST_IDLE = [
+  '..KttttttK..',
+  '.KTtttttttK.',
+  '.KTttttttTK.',
+  '.KTbbgbbTTG.',
+  '.KqqqqqqqqK.',
+  '.KqqqqqqqqK.',
+] as const;
+
+const BODY_VEST_SWING = [
+  '..KttttttKG.',
+  '.KTtttttttK.',
+  '.KTttttttTK.',
+  '.KTbbgbbTTK.',
+  '.KqqqqqqqqK.',
+  '.KqqqqqqqqK.',
+] as const;
+
+const BODY_VEST_PULL = [
+  '..KttttttK..',
+  '.KTtttttttK.',
+  'GKTttttttTK.',
+  'GKTbbgbbTTK.',
+  '.KqqqqqqqqK.',
+  '.KqqqqqqqqK.',
+] as const;
+
+const VEST: FrameSet = {
+  idle: [...HEAD_HAIR, ...BODY_VEST_IDLE, ...LEGS_JEDI_IDLE],
+  walk1: [...HEAD_HAIR, ...BODY_VEST_IDLE, ...LEGS_JEDI_WALK1],
+  walk2: [...HEAD_HAIR, ...BODY_VEST_IDLE, ...LEGS_JEDI_WALK2],
+  jump: [...HEAD_HAIR, ...BODY_VEST_IDLE, ...LEGS_JEDI_KNEEL],
+  swing: [...HEAD_HAIR, ...BODY_VEST_SWING, ...LEGS_JEDI_IDLE],
+  pull: [...HEAD_HAIR, ...BODY_VEST_PULL, ...LEGS_JEDI_WALK1],
+  sleep: [...HEAD_HAIR_SLEEP, ...BODY_VEST_IDLE, ...LEGS_JEDI_IDLE],
+  salute: [...HEAD_HAIR, ...BODY_VEST_SWING, ...LEGS_JEDI_IDLE],
+  kneel: [...HEAD_HAIR, ...BODY_VEST_IDLE, ...LEGS_JEDI_KNEEL],
+};
+
+/* ─── Yoda (baixinho, orelhas grandes, túnica marrom) ──────────────── */
+
+const HEAD_YODA = [
+  '............',
+  '............',
+  '............',
+  '............',
+  '...KKKKKK...',
+  '..KssssssK..',
+  'KssssssssssK',
+  'KsssessesssK',
+  '.KKssssssKK.',
+  '..KddssddK..',
+] as const;
+
+const HEAD_YODA_SLEEP = [
+  '............',
+  '............',
+  '............',
+  '............',
+  '...KKKKKK...',
+  '..KssssssK..',
+  'KssssssssssK',
+  'Ksss-ss-sssK',
+  '.KKssssssKK.',
+  '..KddssddK..',
+] as const;
+
+const BODY_YODA_IDLE = ['..KRRRRRRK..', '.KRrRRRRRRK.', '.KRbbgbbRRG.', '.KRRRRRRRRK.'] as const;
+const BODY_YODA_SWING = ['..KRRRRRRKG.', '.KRrRRRRRRK.', '.KRbbgbbRRK.', '.KRRRRRRRRK.'] as const;
+const BODY_YODA_PULL = ['..KRRRRRRK..', 'GKRrRRRRRRK.', 'GKRbbgbbRRK.', '.KRRRRRRRRK.'] as const;
+
+const YODA: FrameSet = {
+  idle: [...HEAD_YODA, ...BODY_YODA_IDLE, ...LEGS_IDLE],
+  walk1: [...HEAD_YODA, ...BODY_YODA_IDLE, ...LEGS_WALK1],
+  walk2: [...HEAD_YODA, ...BODY_YODA_IDLE, ...LEGS_WALK2],
+  jump: [...HEAD_YODA, ...BODY_YODA_IDLE, ...LEGS_JUMP],
+  swing: [...HEAD_YODA, ...BODY_YODA_SWING, ...LEGS_IDLE],
+  pull: [...HEAD_YODA, ...BODY_YODA_PULL, ...LEGS_WALK1],
+  sleep: [...HEAD_YODA_SLEEP, ...BODY_YODA_IDLE, ...LEGS_IDLE],
+  salute: [...HEAD_YODA, ...BODY_YODA_SWING, ...LEGS_IDLE],
+  kneel: [...HEAD_YODA, ...BODY_YODA_IDLE, ...LEGS_JUMP],
+};
+
+const YODA_ANCHORS: AnchorSet = {
+  idle: { x: 11, y: 12.5, angle: 0 },
+  walk1: { x: 11, y: 12.5, angle: 0 },
+  walk2: { x: 11, y: 12.5, angle: 0 },
+  jump: { x: 11, y: 12.5, angle: -20 },
+  swing: { x: 11, y: 10.5, angle: -52 },
+  pull: null,
+  sleep: null,
+  salute: { x: 11, y: 10.5, angle: -90 },
+  kneel: { x: 11, y: 12.5, angle: 0 },
+};
+
 export const FRAME_SETS: Record<SpriteKind, FrameSet> = {
   hooded: HOODED,
   vader: vaderSet(HEAD_VADER),
   vaderCracked: vaderSet(HEAD_VADER_CRACKED),
   jedi: JEDI,
+  hair: HAIR,
+  vest: VEST,
+  yoda: YODA,
 };
 
 export const ANCHOR_SETS: Record<SpriteKind, AnchorSet> = {
@@ -237,6 +374,9 @@ export const ANCHOR_SETS: Record<SpriteKind, AnchorSet> = {
   vader: VADER_ANCHORS,
   vaderCracked: VADER_ANCHORS,
   jedi: HOODED_ANCHORS,
+  hair: HOODED_ANCHORS,
+  vest: HOODED_ANCHORS,
+  yoda: YODA_ANCHORS,
 };
 
 /** Compatibilidade: frames e âncoras do aprendiz. */
@@ -245,7 +385,7 @@ export const SABER_ANCHOR = HOODED_ANCHORS;
 
 /* ─── Skins ───────────────────────────────────────────────────────── */
 
-export type SkinId = 'aprendiz' | 'lorde' | 'imperador' | 'sombra' | 'vader' | 'vaderCracked' | 'jedi';
+export type SkinId = 'aprendiz' | 'lorde' | 'imperador' | 'sombra' | 'vader' | 'vaderCracked' | 'jedi' | 'anakin' | 'anakinKid' | 'han' | 'yoda';
 
 export interface Skin {
   id: SkinId;
@@ -348,18 +488,18 @@ export const SKINS: Record<SkinId, Skin> = {
     id: 'imperador',
     name: 'Imperador',
     sprite: 'hooded',
-    outline: '#100b18',
-    hood: '#4a3a6e',
-    hoodLight: '#62508c',
-    skin: '#bfb4cf',
-    skinShadow: '#978aae',
-    eye: '#f5d36b',
-    eyeClosed: '#6f6391',
-    robe: '#2d2347',
-    robeLight: '#3d3160',
-    belt: '#4a3b1f',
-    buckle: '#e6c467',
-    glove: '#171126',
+    outline: '#0d0b10',
+    hood: '#1b1720',
+    hoodLight: '#2a2430',
+    skin: '#d9d2d6',
+    skinShadow: '#aaa0a8',
+    eye: '#f2c238',
+    eyeClosed: '#6a6070',
+    robe: '#15121a',
+    robeLight: '#221d28',
+    belt: '#2a2230',
+    buckle: '#6a6070',
+    glove: '#0f0d12',
     hiltLight: '#e2d7b0',
     hiltDark: '#8a7a4a',
     saber: '#ff2a2a',
@@ -417,13 +557,130 @@ export const SKINS: Record<SkinId, Skin> = {
       q: '#4a3426',
     },
   },
+  anakin: {
+    id: 'anakin',
+    name: 'Anakin',
+    sprite: 'hair',
+    outline: '#120e16',
+    hood: '#1a171c',
+    hoodLight: '#2a252d',
+    skin: '#e7d3c0',
+    skinShadow: '#c4ab8c',
+    eye: '#f2c238',
+    eyeClosed: '#7a6a5a',
+    robe: '#1a171c',
+    robeLight: '#2a252d',
+    belt: '#3a2a1e',
+    buckle: '#8a7a5a',
+    glove: '#0f0d10',
+    hiltLight: '#c4c4cf',
+    hiltDark: '#5f5f6b',
+    saber: '#4aa8ff',
+    saberCore: '#eaf5ff',
+    extra: {
+      A: '#6b4a2a',
+      a: '#4e3419',
+    },
+  },
+  anakinKid: {
+    id: 'anakinKid',
+    name: 'Ani',
+    sprite: 'hair',
+    outline: '#2a1f16',
+    hood: '#cdb58d',
+    hoodLight: '#dcc8a6',
+    skin: '#ead8c3',
+    skinShadow: '#c9b092',
+    eye: '#3f5f8f',
+    eyeClosed: '#8a7a6a',
+    robe: '#cdb58d',
+    robeLight: '#dcc8a6',
+    belt: '#5a3f26',
+    buckle: '#8a6a3a',
+    glove: '#ead8c3',
+    hiltLight: '#9a9aa4',
+    hiltDark: '#4a4a52',
+    saber: '#ffd36a',
+    saberCore: '#ffffff',
+    extra: {
+      A: '#c9a35a',
+      a: '#a3803f',
+    },
+  },
+  han: {
+    id: 'han',
+    name: 'Han Solo',
+    sprite: 'vest',
+    outline: '#15110e',
+    hood: '#1d1a1e',
+    hoodLight: '#2b2a2e',
+    skin: '#e4cfb6',
+    skinShadow: '#c4ab8c',
+    eye: '#3a2a1a',
+    eyeClosed: '#8a7a6a',
+    robe: '#1d1a1e',
+    robeLight: '#2b2a2e',
+    belt: '#3a2a1e',
+    buckle: '#8a8a94',
+    glove: '#e4cfb6',
+    hiltLight: '#8a8a94',
+    hiltDark: '#3a3a40',
+    saber: '#ff4a3c',
+    saberCore: '#ffd6cc',
+    extra: {
+      A: '#5a3a22',
+      a: '#3f2816',
+      T: '#1d1a1e',
+      t: '#ece7dc',
+      q: '#2f3f6a',
+    },
+  },
+  yoda: {
+    id: 'yoda',
+    name: 'Yoda',
+    sprite: 'yoda',
+    outline: '#1a2412',
+    hood: '#8a6a3a',
+    hoodLight: '#a98350',
+    skin: '#8fbf4a',
+    skinShadow: '#6f9a37',
+    eye: '#2b2a1a',
+    eyeClosed: '#5a7a30',
+    robe: '#8a6a3a',
+    robeLight: '#a98350',
+    belt: '#5a3f26',
+    buckle: '#c9a44c',
+    glove: '#8fbf4a',
+    hiltLight: '#c4c4cf',
+    hiltDark: '#5f5f6b',
+    saber: '#6dff6a',
+    saberCore: '#eaffe6',
+  },
 };
 
-export const UNLOCKABLE: { id: SkinId; threshold: number }[] = [
-  { id: 'aprendiz', threshold: 0 },
-  { id: 'lorde', threshold: 6 },
-  { id: 'imperador', threshold: 12 },
-];
+export type ForceSide = 'sith' | 'rebel';
+
+export interface UnlockRule {
+  id: SkinId;
+  threshold: number;
+}
+
+/** Patentes por lado da Força: cada lado tem seu próprio trio liberado por cristais. */
+export const UNLOCKABLE_BY_SIDE: Record<ForceSide, UnlockRule[]> = {
+  sith: [
+    { id: 'anakin', threshold: 0 },
+    { id: 'vader', threshold: 6 },
+    { id: 'imperador', threshold: 12 },
+  ],
+  rebel: [
+    { id: 'jedi', threshold: 0 },
+    { id: 'han', threshold: 6 },
+    { id: 'yoda', threshold: 12 },
+  ],
+};
+
+/** Compatibilidade: a lista do lado sombrio. */
+export const UNLOCKABLE = UNLOCKABLE_BY_SIDE.sith;
 
 export function paletteOf(skin: Skin): Record<string, string> {
   return {

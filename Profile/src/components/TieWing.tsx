@@ -52,6 +52,7 @@ interface Props {
 export default function FighterWing({ motion, model, flagship }: Props) {
   const { scene } = useGLTF(model.url);
   const wing = useRef<THREE.Group>(null);
+  const bodiesRoot = useRef<THREE.Group>(null);
   const ties = useRef<(THREE.Group | null)[]>([]);
   const bodies = useRef<(THREE.Group | null)[]>([]);
   const engines = useRef<(THREE.PointLight | null)[]>([]);
@@ -82,12 +83,18 @@ export default function FighterWing({ motion, model, flagship }: Props) {
     if (!g) return;
     const { arrive, compact, tieBoost, active } = motion.current;
     const a = arrive.ties;
-    g.visible = a > 0.001;
+    // Só os caças somem antes da chegada; o grupo e as luzes ficam na cena (shaders compilados uma vez).
+    const shown = a > 0.001;
+    if (bodiesRoot.current) bodiesRoot.current.visible = shown;
     const t = state.clock.elapsedTime;
     const { damp } = THREE.MathUtils;
     const wb = (battle.current = damp(battle.current, active === 1 ? 1 : 0, 3, delta));
 
-    if (g.visible) {
+    if (!shown) {
+      engines.current.forEach((l) => {
+        if (l) l.intensity = 0;
+      });
+    } else {
       const flag = compact ? flagship.compact : flagship.desktop;
 
       // Elipse de patrulha sob a proa da capitânia, abaixo do casco e fora do cabeçalho e do painel.
@@ -177,7 +184,8 @@ export default function FighterWing({ motion, model, flagship }: Props) {
 
   return (
     <>
-      <group ref={wing} visible={false}>
+      <group ref={wing}>
+        <group ref={bodiesRoot} visible={false}>
         {clones.map((obj, i) => (
           <group
             key={i}
@@ -209,6 +217,7 @@ export default function FighterWing({ motion, model, flagship }: Props) {
             />
           </group>
         ))}
+        </group>
       </group>
 
       {/* Lasers dos caças (espaço de mundo) */}

@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import PodRacer, { type PodVariant } from './PodRacer';
 import { prefersReducedMotion } from '../lib/scroll';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -14,6 +15,13 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 /** Cor do chão no fim do pouso — a seção de contato começa exatamente com ela. */
 export const TATOOINE_GROUND = '#c9a260';
+
+/** Corrida de pods durante o pouso: cada um cruza a tela num trecho do scroll, do longe para o perto. */
+const PODS: { variant: PodVariant; start: number; end: number; top: string; width: number; z: number }[] = [
+  { variant: 'gasgano', start: 0.7, end: 0.86, top: '56%', width: 110, z: 1 },
+  { variant: 'sebulba', start: 0.76, end: 0.93, top: '62%', width: 170, z: 2 },
+  { variant: 'anakin', start: 0.84, end: 1, top: '69%', width: 260, z: 3 },
+];
 
 const DUNES = [
   { color: '#ead3a0', d: 'M0 96 C 180 46, 360 126, 540 76 S 900 36, 1080 86 S 1320 66, 1440 56 L1440 200 L0 200 Z', start: 0.56 },
@@ -37,6 +45,7 @@ export default function TatooineEntry() {
   const hazeRef = useRef<HTMLDivElement>(null);
   const groundRef = useRef<HTMLDivElement>(null);
   const duneRefs = useRef<(SVGSVGElement | null)[]>([]);
+  const podRefs = useRef<(HTMLDivElement | null)[]>([]);
   const hudRef = useRef<HTMLDivElement>(null);
   const altRef = useRef<HTMLSpanElement>(null);
   const velRef = useRef<HTMLSpanElement>(null);
@@ -73,6 +82,12 @@ export default function TatooineEntry() {
       });
       if (groundRef.current) gsap.set(groundRef.current, { yPercent: lerp(100, 0, smooth(0.74, 1, p)) });
       if (hazeRef.current) gsap.set(hazeRef.current, { opacity: smooth(0.76, 1, p) * 0.7 });
+      podRefs.current.forEach((el, k) => {
+        if (!el) return;
+        const pod = PODS[k];
+        const u = clamp01((p - pod.start) / (pod.end - pod.start));
+        gsap.set(el, { x: `${lerp(112, -40, u)}vw`, opacity: u > 0 && u < 1 ? 1 : 0 });
+      });
 
       if (altRef.current) altRef.current.textContent = `${Math.round(lerp(420, 0, smooth(0.04, 0.97, p)))} km`;
       if (velRef.current) velRef.current.textContent = `${lerp(7.8, 0.1, smooth(0.3, 0.97, p)).toFixed(1)} km/s`;
@@ -181,6 +196,21 @@ export default function TatooineEntry() {
           </svg>
         ))}
         <div ref={groundRef} className="pointer-events-none absolute inset-x-0 bottom-0 h-[30%]" style={{ background: TATOOINE_GROUND }} aria-hidden />
+
+        {/* Corrida de pods rasgando as dunas */}
+        {PODS.map((pod, k) => (
+          <div
+            key={pod.variant}
+            ref={(el) => {
+              podRefs.current[k] = el;
+            }}
+            className="pointer-events-none absolute left-0 opacity-0"
+            style={{ top: pod.top, zIndex: pod.z, transform: 'translateX(112vw)' }}
+            aria-hidden
+          >
+            <PodRacer variant={pod.variant} width={pod.width} />
+          </div>
+        ))}
 
         {/* Névoa de calor no horizonte */}
         <div

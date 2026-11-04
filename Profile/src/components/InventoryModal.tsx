@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 import PixelSprite from './PixelSprite';
 import Mascot from './Mascot';
 import { useSkin } from '../context/SkinContext';
-import { SKINS, UNLOCKABLE } from '../lib/sprites';
+import { SKINS, type SkinId } from '../lib/sprites';
 
 interface Props {
   open: boolean;
@@ -11,7 +11,7 @@ interface Props {
 }
 
 export default function InventoryModal({ open, onClose }: Props) {
-  const { skin, skinId, setSkinId, crystals, totalCrystals, isUnlocked } = useSkin();
+  const { skin, skinId, setSkinId, crystals, totalCrystals, isUnlocked, unlockables } = useSkin();
   const [say, setSay] = useState<string | null>(null);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function InventoryModal({ open, onClose }: Props) {
 
   if (!open) return null;
 
-  const pick = (id: (typeof UNLOCKABLE)[number]['id']) => {
+  const pick = (id: SkinId) => {
     if (!isUnlocked(id) || id === skinId) return;
     setSkinId(id);
     setSay(`${SKINS[id].name.toLowerCase()}. agora sim.`);
@@ -73,7 +73,7 @@ export default function InventoryModal({ open, onClose }: Props) {
 
         <p className="eyebrow mt-7">patente</p>
         <div className="mt-3 grid grid-cols-3 gap-3">
-          {UNLOCKABLE.map(({ id, threshold }) => {
+          {unlockables.map(({ id, threshold }) => {
             const s = SKINS[id];
             const unlocked = isUnlocked(id);
             const active = id === skinId;

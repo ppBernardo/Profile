@@ -5,7 +5,7 @@ import { useSide } from '../context/SideContext';
 import { PROFILE } from '../data/profile';
 
 export default function Footer() {
-  const { config } = useSide();
+  const { config, switchSide } = useSide();
   const [pose, setPose] = useState<Pose>('idle');
   const [say, setSay] = useState<string | null>(null);
   const ref = useWhipIn<HTMLDivElement>({
@@ -51,10 +51,10 @@ export default function Footer() {
         </p>
 
         <div data-reveal className="mt-8 flex flex-col items-center gap-3">
-          <span className="eyebrow">portfólio novo no ar</span>
-          <a href={PROFILE.site} target="_blank" rel="noopener noreferrer" className="pixel-btn is-gold">
-            {PROFILE.siteLabel}
-          </a>
+          <span className="eyebrow">{config.copy.switchKicker}</span>
+          <button type="button" onClick={switchSide} className="pixel-btn is-gold" title="Trocar de lado na Força">
+            {config.copy.switchCta}
+          </button>
           <div className="mt-2 flex flex-wrap items-center justify-center gap-3">
             <a href={PROFILE.github} target="_blank" rel="noopener noreferrer" className="pixel-btn">
               github

@@ -63,6 +63,9 @@ export function SideProvider({ children }: { children: ReactNode }) {
     } catch {
       /* storage indisponível */
     }
+    // Recarrega no topo: sem restaurar a posição do scroll, a página volta à intro do outro lado.
+    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
     window.location.reload();
   }, [effective]);
 

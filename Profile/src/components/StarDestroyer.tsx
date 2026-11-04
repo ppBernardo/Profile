@@ -137,7 +137,6 @@ function makeFlashTexture() {
 interface Props {
   spec: ShipSpec;
   motion: MutableRefObject<FleetMotion>;
-  onReady?: () => void;
   /** Marcadores HTML (drei <Html>) posicionados em coordenadas da nave normalizada. */
   children?: ReactNode;
   /** Pontos quentes iluminados quando o sistema correspondente está ativo (só a capitânia). */
@@ -155,10 +154,11 @@ export const smooth = (a: number, b: number, t: number) => {
  * com a proa em +Z. A capitânia ainda reage ao sistema selecionado: reenquadra, acende o ponto quente,
  * dispara as armas e, nos escudos, ergue a bolha.
  */
-export default function CapitalShip({ spec, motion, onReady, children, hotspots = [] }: Props) {
+export default function CapitalShip({ spec, motion, children, hotspots = [] }: Props) {
   const { model } = spec;
   const { scene } = useGLTF(model.url);
   const rig = useRef<THREE.Group>(null);
+  const modelRef = useRef<THREE.Group>(null);
   const bridgeRef = useRef<THREE.PointLight>(null);
   const engineRef = useRef<THREE.PointLight>(null);
   const shieldRef = useRef<THREE.Mesh>(null);
@@ -206,16 +206,17 @@ export default function CapitalShip({ spec, motion, onReady, children, hotspots 
       mat.envMapIntensity = 1.2;
       mat.needsUpdate = true;
     });
-    onReady?.();
-  }, [scene, onReady, isFlag]);
+  }, [scene, isFlag]);
 
   useFrame((state, delta) => {
     const g = rig.current;
     if (!g) return;
     const { arrive, orbit, pointer, compact, active } = motion.current;
     const a = arrive[spec.key];
-    g.visible = a > 0.001;
-    if (!g.visible) return;
+    // Só o modelo some antes da chegada: o grupo e as luzes ficam na cena para o renderer
+    // compilar os shaders uma vez só (a contagem de luzes faz parte do programa).
+    const shown = a > 0.001;
+    if (modelRef.current) modelRef.current.visible = shown;
 
     const t = state.clock.elapsedTime;
     const s = sm.current;
@@ -321,9 +322,9 @@ export default function CapitalShip({ spec, motion, onReady, children, hotspots 
 
     if (!isFlag) return;
 
-    // Luzes: ponte/cabine, motores e pontos quentes por sistema.
-    if (bridgeRef.current) bridgeRef.current.intensity = 0.9 + Math.sin(t * 1.9) * 0.3;
-    if (engineRef.current) engineRef.current.intensity = (0.84 + Math.sin(t * 2.5) * 0.16) * 2.4;
+    // Luzes: ponte/cabine, motores e pontos quentes por sistema (apagadas até a nave chegar).
+    if (bridgeRef.current) bridgeRef.current.intensity = shown ? 0.9 + Math.sin(t * 1.9) * 0.3 : 0;
+    if (engineRef.current) engineRef.current.intensity = shown ? (0.84 + Math.sin(t * 2.5) * 0.16) * 2.4 : 0;
     hotRefs.current.forEach((l, i) => {
       if (!l) return;
       const target = active === i ? 2.6 + Math.sin(t * 5 + i) * 0.6 : 0;
@@ -348,9 +349,9 @@ export default function CapitalShip({ spec, motion, onReady, children, hotspots 
   });
 
   return (
-    <group ref={rig} visible={false}>
-      {/* Modelo normalizado (maior dimensão 1), proa em +Z */}
-      <group scale={base}>
+    <group ref={rig}>
+      {/* Modelo normalizado (maior dimensão 1), proa em +Z — escondido até sair do hiperespaço */}
+      <group ref={modelRef} scale={base} visible={false}>
         <Center>
           <primitive object={object} />
         </Center>

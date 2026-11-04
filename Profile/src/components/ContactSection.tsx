@@ -2,6 +2,8 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import gsap from 'gsap';
 import { ArrowUpRight, Copy } from 'lucide-react';
 import Mascot, { type Pose } from './Mascot';
+import PodRacer, { type PodVariant } from './PodRacer';
+import PodWreck from './PodWreck';
 import { TATOOINE_GROUND } from './TatooineEntry';
 import { useWhipIn } from '../hooks/useWhipIn';
 import { useSide } from '../context/SideContext';
@@ -111,6 +113,13 @@ function Homestead({ variant, active, glyph }: { variant: ContactChannel['varian
 
 const OFFSET_CLASSES = ['md:mt-0', 'md:mt-[70px]', 'md:mt-6', 'md:mt-[92px]'];
 
+/** Pods que não param de passar pela pista atrás do assentamento. */
+const PASSING_PODS: { variant: PodVariant; d: string; delay: string; top: string; width: number; z: number }[] = [
+  { variant: 'gasgano', d: '13s', delay: '-4s', top: '2%', width: 90, z: 1 },
+  { variant: 'sebulba', d: '9.5s', delay: '-1s', top: '14%', width: 140, z: 2 },
+  { variant: 'anakin', d: '7s', delay: '-6s', top: '26%', width: 200, z: 3 },
+];
+
 /** Vaporadores ao fundo do assentamento. */
 const FAR_VAPORATORS = [
   { left: '6%', h: 110, o: 0.35 },
@@ -132,8 +141,11 @@ export default function ContactSection() {
   const [facing, setFacing] = useState<'left' | 'right'>('left');
   const [say, setSay] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [kidSay, setKidSay] = useState<string | null>(null);
+  const wreckRef = useRef<HTMLDivElement>(null);
   const firstPlacement = useRef(true);
   const greeted = useRef(false);
+  const kidGreeted = useRef(false);
 
   const moveWalker = useCallback((toIndex: number, instant: boolean) => {
     const stage = stageRef.current;
@@ -193,6 +205,24 @@ export default function ContactSection() {
     return () => obs.disconnect();
   }, [landing]);
 
+  // O pequeno Anakin comenta quando o pátio aparece (uma vez).
+  useEffect(() => {
+    const el = wreckRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting || kidGreeted.current) return;
+        kidGreeted.current = true;
+        setKidSay('eu construí. eu conserto.');
+        window.setTimeout(() => setKidSay((s) => (s === 'eu construí. eu conserto.' ? null : s)), 3000);
+        obs.disconnect();
+      },
+      { threshold: 0.6 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
   const copyEmail = async (value: string) => {
     try {
       await navigator.clipboard.writeText(value);
@@ -246,6 +276,19 @@ export default function ContactSection() {
         style={{ background: 'linear-gradient(180deg, rgba(255,246,220,0.55), rgba(255,246,220,0))' }}
         aria-hidden
       />
+
+      {/* Pista da corrida de pods: passam atrás do título, sem parar */}
+      <div className="pointer-events-none absolute inset-x-0 top-6 h-56 overflow-hidden sm:top-8" aria-hidden>
+        {PASSING_PODS.map((pod) => (
+          <div
+            key={pod.variant}
+            className="pod-pass absolute left-0"
+            style={{ top: pod.top, zIndex: pod.z, ['--d' as string]: pod.d, ['--delay' as string]: pod.delay }}
+          >
+            <PodRacer variant={pod.variant} width={pod.width} />
+          </div>
+        ))}
+      </div>
 
       <div ref={wrapRef} className="relative mx-auto max-w-6xl px-5 pb-28 sm:px-8 sm:pb-36">
         <div className="text-center">
@@ -322,6 +365,14 @@ export default function ContactSection() {
                 </div>
               );
             })}
+          </div>
+
+          {/* Pátio ao lado das casas: o pod que não sobreviveu à Boonta Eve e o menino que o construiu */}
+          <div ref={wreckRef} className="mt-10 flex items-end gap-1 sm:mt-14 sm:gap-2">
+            <PodWreck width={230} className="w-[190px] sm:w-[260px]" style={{ height: 'auto', aspectRatio: '16 / 7' }} />
+            <div className="relative -ml-3 mb-1 sm:-ml-4">
+              <Mascot pose="hammer" facing="left" scale={2.6} skinId="anakinKid" saberOn={false} say={kidSay} bob={false} />
+            </div>
           </div>
 
           {/* Mascote caminhando entre as casas (desktop) */}

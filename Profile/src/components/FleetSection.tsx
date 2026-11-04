@@ -1,6 +1,7 @@
 import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import { Html, useGLTF } from '@react-three/drei';
+import * as THREE from 'three';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Mascot, { type Pose } from './Mascot';
@@ -24,6 +25,50 @@ const BURST_ORIGIN: Record<Exclude<ArriveKey, 'flag'>, { desktop: [number, numbe
 };
 
 const freshArrive = (): Record<ArriveKey, number> => ({ flag: 0, two: 0, three: 0, ties: 0 });
+
+/**
+ * Compila os shaders e sobe as texturas de tudo que está na cena antes da chegada,
+ * para a nave não travar a página no primeiro quadro em que aparece.
+ */
+function Precompile({ onDone }: { onDone: () => void }) {
+  const { gl, scene, camera } = useThree();
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      // Tudo visível só durante a compilação: o renderer precisa enxergar luzes e materiais.
+      const hidden: THREE.Object3D[] = [];
+      scene.traverse((o) => {
+        if (!o.visible) {
+          hidden.push(o);
+          o.visible = true;
+        }
+      });
+      try {
+        await gl.compileAsync(scene, camera);
+      } catch {
+        gl.compile(scene, camera);
+      }
+      hidden.forEach((o) => {
+        o.visible = false;
+      });
+      scene.traverse((o) => {
+        const m = (o as THREE.Mesh).material;
+        const mats = Array.isArray(m) ? m : m ? [m] : [];
+        for (const mat of mats) {
+          for (const v of Object.values(mat)) {
+            if (v && (v as THREE.Texture).isTexture) gl.initTexture(v as THREE.Texture);
+          }
+        }
+      });
+      if (!cancelled) onDone();
+    };
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [gl, scene, camera, onDone]);
+  return null;
+}
 
 /**
  * A frota do Império: a capitânia sai do hiperespaço (mesmo salto da navegação), freia de frente
@@ -430,7 +475,6 @@ export default function FleetSection() {
               <CapitalShip
                 spec={ships[0]}
                 motion={motion}
-                onReady={handleReady}
                 hotspots={systems.map((s) => ({ position: s.anchor, color: s.color }))}
               >
                 {systems.map((s, i) => (
@@ -449,6 +493,7 @@ export default function FleetSection() {
                   </Html>
                 ))}
               </CapitalShip>
+              <Precompile onDone={handleReady} />
             </Suspense>
           </Canvas>
         )}
