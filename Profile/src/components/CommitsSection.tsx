@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Mascot, { type Pose } from './Mascot';
 import { useWhipIn } from '../hooks/useWhipIn';
 import { useLang } from '../i18n/LangContext';
+import { useSide } from '../context/SideContext';
 import { PROFILE } from '../data/profile';
 import { prefersReducedMotion } from '../lib/scroll';
 
@@ -59,6 +60,8 @@ function toGrid(days: Day[]): (Day | null)[] {
 
 export default function CommitsSection() {
   const { t, locale } = useLang();
+  const { side } = useSide();
+  const crew = side === 'rebel' ? (['ewok', 'ewokChief', 'ewok'] as const) : (['stormtrooper', 'stormtrooper', 'stormtrooper'] as const);
   const fmt = useMemo(() => new Intl.NumberFormat(locale), [locale]);
   const [days, setDays] = useState<Day[] | null>(null);
   const [total, setTotal] = useState<number | null>(null);
@@ -190,7 +193,7 @@ export default function CommitsSection() {
           <div className="pointer-events-none absolute inset-x-0 -top-[58px] hidden md:block" aria-hidden>
             {[14, 44, 74].map((x, i) => (
               <div key={x} className="absolute bottom-0" style={{ left: `${x}%` }}>
-                <Mascot pose={workersPose} facing="right" scale={3.5} bob={false} skinId={i === 1 ? 'lorde' : undefined} />
+                <Mascot pose={workersPose} facing="right" scale={3.5} bob={false} saberOn={false} skinId={crew[i]} />
                 {workersPose === 'hammer' && (
                   <>
                     <span className="spark" style={{ left: 44, top: 30, ['--sx' as string]: '10px', ['--sy' as string]: '-16px' }} />

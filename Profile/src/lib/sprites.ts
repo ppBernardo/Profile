@@ -14,7 +14,7 @@ export const SPRITE_H = 16;
 
 export type FrameName = 'idle' | 'walk1' | 'walk2' | 'jump' | 'swing' | 'pull' | 'sleep' | 'salute' | 'kneel';
 export type SpriteFrame = readonly string[];
-export type SpriteKind = 'hooded' | 'vader' | 'vaderCracked' | 'jedi' | 'hair' | 'vest' | 'yoda';
+export type SpriteKind = 'hooded' | 'vader' | 'vaderCracked' | 'jedi' | 'hair' | 'vest' | 'yoda' | 'trooper' | 'ewok';
 
 export interface SaberAnchor {
   x: number;
@@ -359,6 +359,71 @@ const YODA_ANCHORS: AnchorSet = {
   kneel: { x: 11, y: 12.5, angle: 0 },
 };
 
+/* ─── Stormtrooper (capacete branco, lentes pretas, armadura branca) ─── */
+
+const HEAD_TROOPER = [
+  '...KKKKKK...',
+  '..KVVVVVVK..',
+  '.KVvVVVVVVK.',
+  '.KVVVVVVVVK.',
+  '.KEEEVVEEEK.',
+  '.KVEEVVEEVK.',
+  '.KVVmVVmVVK.',
+  '..KVmmmmVK..',
+] as const;
+
+const TROOPER: FrameSet = {
+  idle: [...HEAD_TROOPER, ...BODY_IDLE, ...LEGS_IDLE],
+  walk1: [...HEAD_TROOPER, ...BODY_IDLE, ...LEGS_WALK1],
+  walk2: [...HEAD_TROOPER, ...BODY_IDLE, ...LEGS_WALK2],
+  jump: [...HEAD_TROOPER, ...BODY_IDLE, ...LEGS_JUMP],
+  swing: [...HEAD_TROOPER, ...BODY_SWING, ...LEGS_IDLE],
+  pull: [...HEAD_TROOPER, ...BODY_PULL, ...LEGS_WALK1],
+  sleep: [...HEAD_TROOPER, ...BODY_IDLE, ...LEGS_IDLE],
+  salute: [...HEAD_TROOPER, ...BODY_SWING, ...LEGS_IDLE],
+  kneel: [...HEAD_TROOPER, ...BODY_IDLE, ...LEGS_JUMP],
+};
+
+/* ─── Ewok (baixinho, peludo, capuz com orelhas) ─── */
+
+const HEAD_EWOK = [
+  '............',
+  '............',
+  '............',
+  '............',
+  '..KK....KK..',
+  '.KHHKKKKHHK.',
+  '.KHhHHHHHHK.',
+  '.KHssssssHK.',
+  '.KHseddesHK.',
+  '..KsddddsK..',
+] as const;
+
+const HEAD_EWOK_SLEEP = [
+  '............',
+  '............',
+  '............',
+  '............',
+  '..KK....KK..',
+  '.KHHKKKKHHK.',
+  '.KHhHHHHHHK.',
+  '.KHssssssHK.',
+  '.KHs-dd-sHK.',
+  '..KsddddsK..',
+] as const;
+
+const EWOK: FrameSet = {
+  idle: [...HEAD_EWOK, ...BODY_YODA_IDLE, ...LEGS_IDLE],
+  walk1: [...HEAD_EWOK, ...BODY_YODA_IDLE, ...LEGS_WALK1],
+  walk2: [...HEAD_EWOK, ...BODY_YODA_IDLE, ...LEGS_WALK2],
+  jump: [...HEAD_EWOK, ...BODY_YODA_IDLE, ...LEGS_JUMP],
+  swing: [...HEAD_EWOK, ...BODY_YODA_SWING, ...LEGS_IDLE],
+  pull: [...HEAD_EWOK, ...BODY_YODA_PULL, ...LEGS_WALK1],
+  sleep: [...HEAD_EWOK_SLEEP, ...BODY_YODA_IDLE, ...LEGS_IDLE],
+  salute: [...HEAD_EWOK, ...BODY_YODA_SWING, ...LEGS_IDLE],
+  kneel: [...HEAD_EWOK, ...BODY_YODA_IDLE, ...LEGS_JUMP],
+};
+
 export const FRAME_SETS: Record<SpriteKind, FrameSet> = {
   hooded: HOODED,
   vader: vaderSet(HEAD_VADER),
@@ -367,6 +432,8 @@ export const FRAME_SETS: Record<SpriteKind, FrameSet> = {
   hair: HAIR,
   vest: VEST,
   yoda: YODA,
+  trooper: TROOPER,
+  ewok: EWOK,
 };
 
 export const ANCHOR_SETS: Record<SpriteKind, AnchorSet> = {
@@ -377,6 +444,8 @@ export const ANCHOR_SETS: Record<SpriteKind, AnchorSet> = {
   hair: HOODED_ANCHORS,
   vest: HOODED_ANCHORS,
   yoda: YODA_ANCHORS,
+  trooper: HOODED_ANCHORS,
+  ewok: YODA_ANCHORS,
 };
 
 /** Compatibilidade: frames e âncoras do aprendiz. */
@@ -385,7 +454,7 @@ export const SABER_ANCHOR = HOODED_ANCHORS;
 
 /* ─── Skins ───────────────────────────────────────────────────────── */
 
-export type SkinId = 'aprendiz' | 'lorde' | 'imperador' | 'sombra' | 'vader' | 'vaderCracked' | 'jedi' | 'anakin' | 'anakinKid' | 'han' | 'yoda';
+export type SkinId = 'aprendiz' | 'lorde' | 'imperador' | 'sombra' | 'vader' | 'vaderCracked' | 'jedi' | 'anakin' | 'anakinKid' | 'han' | 'yoda' | 'stormtrooper' | 'ewok' | 'ewokChief';
 
 export interface Skin {
   id: SkinId;
@@ -655,6 +724,75 @@ export const SKINS: Record<SkinId, Skin> = {
     hiltDark: '#5f5f6b',
     saber: '#6dff6a',
     saberCore: '#eaffe6',
+  },
+  stormtrooper: {
+    id: 'stormtrooper',
+    name: 'Stormtrooper',
+    sprite: 'trooper',
+    outline: '#16161b',
+    hood: '#e9e9ee',
+    hoodLight: '#ffffff',
+    skin: '#e9e9ee',
+    skinShadow: '#b9b9c2',
+    eye: '#0c0c10',
+    eyeClosed: '#0c0c10',
+    robe: '#e9e9ee',
+    robeLight: '#ffffff',
+    belt: '#c4c4cc',
+    buckle: '#3a3a42',
+    glove: '#18181d',
+    hiltLight: '#c4c4cf',
+    hiltDark: '#5f5f6b',
+    saber: '#ff2a2a',
+    saberCore: '#ffe3e3',
+    extra: {
+      V: '#e9e9ee',
+      v: '#ffffff',
+      E: '#0c0c10',
+      m: '#7a7a86',
+    },
+  },
+  ewok: {
+    id: 'ewok',
+    name: 'Ewok',
+    sprite: 'ewok',
+    outline: '#1e140c',
+    hood: '#c4692a',
+    hoodLight: '#de8a46',
+    skin: '#7a5232',
+    skinShadow: '#a8805a',
+    eye: '#0e0906',
+    eyeClosed: '#4a3220',
+    robe: '#6b4527',
+    robeLight: '#87593a',
+    belt: '#4a3020',
+    buckle: '#b08a52',
+    glove: '#5a3a22',
+    hiltLight: '#c4c4cf',
+    hiltDark: '#5f5f6b',
+    saber: '#4aa8ff',
+    saberCore: '#eaf5ff',
+  },
+  ewokChief: {
+    id: 'ewokChief',
+    name: 'Chefe Ewok',
+    sprite: 'ewok',
+    outline: '#1e140c',
+    hood: '#6f6a5e',
+    hoodLight: '#8f897a',
+    skin: '#5e4a3a',
+    skinShadow: '#8a7360',
+    eye: '#0e0906',
+    eyeClosed: '#3a2a1e',
+    robe: '#4f3a2a',
+    robeLight: '#6a5040',
+    belt: '#3a2a1e',
+    buckle: '#d9c38a',
+    glove: '#3f2e22',
+    hiltLight: '#c4c4cf',
+    hiltDark: '#5f5f6b',
+    saber: '#4aa8ff',
+    saberCore: '#eaf5ff',
   },
 };
 
