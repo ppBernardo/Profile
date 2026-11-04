@@ -100,27 +100,50 @@ export default function TatooineEntry() {
       if (titleRef.current) gsap.set(titleRef.current, { opacity: smooth(0.8, 0.95, p), y: lerp(24, 0, smooth(0.8, 0.95, p)) });
     };
 
+    const mm = gsap.matchMedia();
     const ctx = gsap.context(() => {
       if (reduced) {
         apply(1);
         return;
       }
       apply(0);
-      ScrollTrigger.create({
-        trigger: section,
-        start: 'top top',
-        end: '+=180%',
-        pin: true,
-        scrub: 0.8,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => apply(self.progress),
+      // Desktop: a descida é guiada pelo scroll, com a seção fixa.
+      mm.add('(min-width: 768px)', () => {
+        apply(0);
+        ScrollTrigger.create({
+          trigger: section,
+          start: 'top top',
+          end: '+=180%',
+          pin: true,
+          scrub: 0.8,
+          invalidateOnRefresh: true,
+          onUpdate: (self) => apply(self.progress),
+        });
+      });
+      // Celular: sem pin — a descida toca sozinha, como uma cena, quando a seção entra na tela.
+      mm.add('(max-width: 767px)', () => {
+        apply(0);
+        const state = { p: 0 };
+        const tween = gsap.to(state, { p: 1, duration: 5.5, ease: 'power1.inOut', paused: true, onUpdate: () => apply(state.p) });
+        ScrollTrigger.create({
+          trigger: section,
+          start: 'top 60%',
+          once: true,
+          onEnter: () => tween.play(),
+        });
+        return () => {
+          tween.kill();
+        };
       });
     }, section);
-    return () => ctx.revert();
+    return () => {
+      mm.revert();
+      ctx.revert();
+    };
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative h-screen overflow-hidden bg-sith-void" aria-label="Entrada na atmosfera de Tatooine">
+    <section ref={sectionRef} className="relative h-[100svh] overflow-hidden bg-sith-void" aria-label="Entrada na atmosfera de Tatooine">
       <div ref={shakeRef} className="absolute inset-[-12px] will-change-transform">
         {/* Espaço */}
         <div ref={starsRef} className="pointer-events-none absolute inset-0" aria-hidden>

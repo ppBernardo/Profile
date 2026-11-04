@@ -32,12 +32,12 @@ function Shell() {
   }, []);
 
   useEffect(() => {
+    // Roda do mouse suavizada; no toque o scroll é nativo (o Lenis "segurando" o dedo deixa o celular pesado).
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
-      syncTouch: true,
-      touchMultiplier: 1,
+      syncTouch: false,
     });
     setLenis(lenis);
     lenis.on('scroll', ScrollTrigger.update);

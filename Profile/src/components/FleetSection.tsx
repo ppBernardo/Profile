@@ -141,22 +141,29 @@ export default function FleetSection() {
     };
   }, [ships, config.fighter.url]);
 
-  // Pin curto: o scroll dentro da seção só orbita a nave de leve; a chegada é uma cena com tempo próprio.
+  // Pin curto só no desktop: o scroll dentro da seção orbita a nave de leve. No celular a seção
+  // rola normalmente (pin por toque fica travado) e a chegada, que tem tempo próprio, toca ao entrar.
   useLayoutEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
     const reduced = prefersReducedMotion();
+    const mm = gsap.matchMedia();
     const ctx = gsap.context(() => {
-      ScrollTrigger.create({
-        trigger: section,
-        start: 'top top',
-        end: '+=100%',
-        pin: true,
-        scrub: 0.8,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => {
-          motion.current.orbit = reduced ? 0 : self.progress;
-        },
+      mm.add('(min-width: 768px)', () => {
+        ScrollTrigger.create({
+          trigger: section,
+          start: 'top top',
+          end: '+=100%',
+          pin: true,
+          scrub: 0.8,
+          invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            motion.current.orbit = reduced ? 0 : self.progress;
+          },
+        });
+        return () => {
+          motion.current.orbit = 0;
+        };
       });
       ScrollTrigger.create({
         trigger: section,
@@ -165,7 +172,10 @@ export default function FleetSection() {
         onEnter: () => setEntered(true),
       });
     }, section);
-    return () => ctx.revert();
+    return () => {
+      mm.revert();
+      ctx.revert();
+    };
   }, []);
 
   const speak = useCallback((text: string, ms: number) => {
@@ -419,7 +429,7 @@ export default function FleetSection() {
     <section
       ref={sectionRef}
       id="frota"
-      className="relative h-screen overflow-hidden bg-sith-void"
+      className="relative h-[100svh] overflow-hidden bg-sith-void"
       onPointerMove={onPointerMove}
       aria-label="A frota do Império — competências"
     >
