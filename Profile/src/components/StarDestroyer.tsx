@@ -66,26 +66,28 @@ export function fleetShips(side: SideId): ShipSpec[] {
     model: cap,
   };
   if (!s.escorts) return [flag];
+  // Escoltas em cunha com a capitânia: mesmo rumo, uma a estibordo e outra a bombordo,
+  // mais atrás e mais altas, sem invadir o cabeçalho (esquerda) nem o painel (direita).
   return [
     flag,
     {
       key: 'two',
-      entryYaw: 0.35,
-      entryDist: 44,
-      bank: 0.2,
+      entryYaw: 0.2,
+      entryDist: 48,
+      bank: 0.22,
       react: 0.35,
-      desktop: { x: 2.4, y: 2.6, z: -22, yaw: 0.9, len: cap.len.desktop },
-      compact: { x: 4.3, y: 5.6, z: -26, yaw: 0.8, len: cap.len.compact },
+      desktop: { x: 3.3, y: 1.8, z: -17, yaw: 0.46, len: cap.len.desktop },
+      compact: { x: 2.8, y: 0.9, z: -16, yaw: 0.6, len: cap.len.compact },
       model: cap,
     },
     {
       key: 'three',
-      entryYaw: -0.1,
-      entryDist: 44,
-      bank: 0.16,
+      entryYaw: 0.05,
+      entryDist: 52,
+      bank: 0.18,
       react: 0.2,
-      desktop: { x: -6, y: 5.5, z: -40, yaw: 0.5, len: cap.len.desktop },
-      compact: { x: 3.5, y: 8.9, z: -42, yaw: 0.55, len: cap.len.compact },
+      desktop: { x: -4.4, y: 4.3, z: -31, yaw: 0.5, len: cap.len.desktop },
+      compact: { x: -2.6, y: 1.3, z: -19, yaw: 0.6, len: cap.len.compact },
       model: cap,
     },
   ];
@@ -192,7 +194,6 @@ export default function CapitalShip({ spec, motion, children, hotspots = [] }: P
     return 1 / maxDim;
   }, [scene]);
 
-  const fwd = useMemo(() => new THREE.Vector3(Math.sin(spec.entryYaw), 0, Math.cos(spec.entryYaw)), [spec.entryYaw]);
 
   useEffect(() => {
     if (!isFlag) return;
@@ -220,7 +221,7 @@ export default function CapitalShip({ spec, motion, children, hotspots = [] }: P
 
     const t = state.clock.elapsedTime;
     const s = sm.current;
-    const { damp, lerp } = THREE.MathUtils;
+    const { damp } = THREE.MathUtils;
     s.px = damp(s.px, pointer.x, 4, delta);
     s.py = damp(s.py, pointer.y, 4, delta);
     s.orbit = damp(s.orbit, orbit, 5, delta);
@@ -245,15 +246,17 @@ export default function CapitalShip({ spec, motion, children, hotspots = [] }: P
     const sz = pose.z + s.dz;
     const yawEnd = pose.yaw + s.yaw + s.orbit * 0.14 * r + s.px * 0.05 * r + Math.sin(t * 0.2 + phase) * 0.012;
 
-    // Chegada: surge esticada pelo salto, freia e inclina na curva até a pose final.
-    const turn = smooth(0.3, 1, a);
-    const yaw = lerp(spec.entryYaw, yawEnd, turn);
-    const roll = -0.06 * turn - spec.bank * Math.sin(Math.PI * turn) + s.roll;
-    const pitch = lerp(-0.02, 0.07, turn) + s.pitch + Math.sin(t * 0.17 + phase) * 0.006 * a;
+    // Chegada em linha reta: sai do hiperespaço já no rumo final, vem pelo próprio eixo
+    // (esticada pelo salto) e freia, sem curva nem inclinação.
+    const yaw = yawEnd;
+    const roll = -0.06 + s.roll;
+    const pitch = 0.07 + s.pitch + Math.sin(t * 0.17 + phase) * 0.006 * a;
     const dist = (1 - a) * spec.entryDist;
     const stretch = 1 + 7 * Math.pow(1 - a, 2.2);
+    const hx = Math.sin(pose.yaw);
+    const hz = Math.cos(pose.yaw);
 
-    g.position.set(sx - fwd.x * dist, sy, sz - fwd.z * dist);
+    g.position.set(sx - hx * dist, sy, sz - hz * dist);
     g.rotation.set(pitch, yaw, roll);
     g.scale.set(pose.len, pose.len, pose.len * stretch);
 

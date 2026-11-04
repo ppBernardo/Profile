@@ -21,8 +21,8 @@ const COMPACT_QUERY = '(max-width: 767px)';
 
 /** Onde cada chegada rasga o céu (frações da tela), por layout. */
 const BURST_ORIGIN: Record<Exclude<ArriveKey, 'flag'>, { desktop: [number, number]; compact: [number, number] }> = {
-  two: { desktop: [0.56, 0.3], compact: [0.8, 0.2] },
-  three: { desktop: [0.41, 0.24], compact: [0.67, 0.17] },
+  two: { desktop: [0.59, 0.32], compact: [0.78, 0.36] },
+  three: { desktop: [0.42, 0.21], compact: [0.27, 0.34] },
   ties: { desktop: [0.5, 0.74], compact: [0.5, 0.47] },
 };
 
