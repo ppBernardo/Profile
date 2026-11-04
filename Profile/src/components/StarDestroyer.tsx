@@ -95,7 +95,7 @@ export function fleetShips(side: SideId): ShipSpec[] {
 
 /** Enquadramento da capitânia por sistema selecionado (deslocamentos somados à pose final). */
 const FOCUS = [
-  { dx: 0.2, dy: -0.3, dz: 0.8, yaw: -0.3, pitch: 0.06, roll: 0.02 }, // 01 ponte: quase de frente, torre ao alto
+  { dx: 0, dy: 0, dz: 0, yaw: 0, pitch: 0, roll: 0 }, // 01 ponte: a própria pose de chegada (sem curva ao sair do salto)
   { dx: -0.25, dy: -0.1, dz: 0.3, yaw: 0.12, pitch: 0.1, roll: 0.04 }, // 02 armas: mostra o flanco de bombordo e as baterias
   { dx: 0.1, dy: -0.4, dz: 0.4, yaw: 0.06, pitch: -0.18, roll: -0.08 }, // 03 hangar: nariz para cima, mostra o ventre
   { dx: -0.1, dy: 0.05, dz: -0.6, yaw: -0.08, pitch: 0, roll: 0 }, // 04 escudos: nave inteira, dentro da bolha
